@@ -9,3 +9,8 @@
 - `assets/music/` – Suno tracks (not yet wired into the game)
 - `screenshots/` – before/after shots
 - `docs/` – playtest feedback and style specs
+
+## Uppförsbacken (climb/)
+`climb/index.html` – a standalone Getting Over It–style variant: **one extremely long climb** (≈1 970 m long, 241 m up) through six zones (Ängen, Skogen, Klipporna, Snöfältet, Molnen, Toppen). Same physics engine, bike, rider and controls as `game/`, but **no death**: the helmet just bumps. You only lose progress by falling – into five ever-deeper abysses (14 → 52 m) whose floors drain left into a tunnel that climbs back up to a trapdoor earlier on the course. Height meter, best height, total time and position are saved in localStorage. An English narrator (Web Speech API + subtitles; lines in `NARRATOR_LINES` at the top of the climb code) comments on falls, records, idling and the summit.
+
+Tools: `tools/climb/build.cjs` generates the course (`course.json`, needs `npm i polygon-clipping`), `verify.cjs`/`verify_fall.cjs` drive a bot through every section with the real engine, `assemble.py` builds `climb/index.html` from `game/index.html` + `tail.js`.
