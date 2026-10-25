@@ -19,6 +19,6 @@ function solve(index,gain=3,speed=3){const l=L[index],bk=newBike(...l.start),got
 // not a claim that keyboard/touch gameplay or every expert route has been tested.
 // Check all pickups and the original finish radius on the first seven courses.
 for(const [i,gain,speed] of [[0,1.5,3],[1,3,3],[2,3,3],[3,3,3],[4,5,2.5],[5,5,2.5],[6,1.5,2.5]]){
- const result=solve(i,gain,speed);assert(result.ok,L[i].name+': '+JSON.stringify(result));
- console.log('PASS: '+L[i].name+' — all pickups and finish reached ('+result.time.toFixed(2)+' s).');
+ const name=['Startängen','Den lilla dalen','De mjuka kullarna','Första upptäcktsfärden','Bergsvalvet','Tillbaka under bron','Bergets två våningar'][i];const index=L.findIndex(l=>l.name===name);assert(index>=0,name);const result=solve(index,gain,speed);assert(result.ok,L[index].name+': '+JSON.stringify(result));
+ console.log('PASS: '+L[index].name+' — all pickups and finish reached ('+result.time.toFixed(2)+' s).');
 }
