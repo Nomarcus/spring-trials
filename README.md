@@ -10,9 +10,9 @@
 - `screenshots/` – before/after shots
 - `docs/` – playtest feedback and style specs
 
-## Uppförsbacken (climb/)
-`climb/index.html` – a standalone Getting Over It–style variant: **one extremely long climb** (≈1 970 m long, 241 m up) through six zones (Ängen, Skogen, Klipporna, Snöfältet, Molnen, Toppen). Same physics engine, bike, rider and controls as `game/`, but **no death**: the helmet just bumps. You only lose progress by falling – into five ever-deeper abysses (14 → 52 m) whose floors drain left into a tunnel that climbs back up to a trapdoor earlier on the course. Height meter, best height, total time and position are saved in localStorage. An English narrator (Web Speech API + subtitles; lines in `NARRATOR_LINES` at the top of the climb code) comments on falls, records, idling and the summit.
+## Flödet (climb/) – one long flow level for the main game
+`levels/flodet.json` is **one long level in the exact `CAMPAIGN_LEVELS` format of `game/index.html`** (rings, apples, killers, flower, start, startDir, medal, …) – paste the object into the array to add it to the campaign. `climb/index.html` is a standalone test page: the unchanged main game with only this level (normal rules: head hit = crash, Omstart; own localStorage keys so main-game records are untouched). No narrator.
 
-Tools: `tools/climb/build.cjs` generates the course (`course.json`, needs `npm i polygon-clipping`), `verify.cjs`/`verify_fall.cjs` drive a bot through every section with the real engine, `assemble.py` builds `climb/index.html` from `game/index.html` + `tail.js`.
+13 sections, ≈344 m, 15 stars: Utförsstarten, Pumpbanan, Hoppet (kicker over a deadly pit), Loopen (ceiling star, turn around, drop through the hole, chute under the loop), Skålen, Berg-och-dalbanan, Trappsteget, Tunneln, Taklisterna, Svingen (1.6 m brake-swing step), Avstampet, Schaktet (drop, turn left in the gallery, drop, turn right), Målrakan.
 
-Narrator voice: pre-recorded with the open **Kokoro-82M** TTS model (hexgrad/Kokoro-82M via `kokoro-onnx`, voice `bm_george`, British English), 216 mono MP3 clips (40 kbps, silence-trimmed, loudness-normalised) in `climb/voice/` with `manifest.json`; loaded lazily via Web Audio, browser speech only as fallback. Generator: `tools/climb/voice_gen.py`.
+Tools (`tools/flow/`): `build.cjs` → `levels/flodet.json` + `sections.json`; `beam.cjs` beam-searches real-engine inputs (gas/brake/lean/turn/volt) section by section with main-game crash rules; `verify_all.json` has the results; `assemble.py` builds `climb/index.html`; `draw.py` draws the map; `shots.py` takes screenshots. The old Uppförsbacken builder in `tools/climb/` and the voice clips in `climb/voice/` are kept but no longer used.

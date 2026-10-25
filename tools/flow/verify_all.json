@@ -1,0 +1,80 @@
+[
+ {
+  "i": 1,
+  "name": "Utförsstarten",
+  "ok": true,
+  "t": 27.15
+ },
+ {
+  "i": 2,
+  "name": "Pumpbanan",
+  "ok": true,
+  "t": 5.7
+ },
+ {
+  "i": 3,
+  "name": "Hoppet",
+  "ok": true,
+  "t": 2.55
+ },
+ {
+  "i": 4,
+  "name": "Loopen",
+  "ok": true,
+  "t": 5.25
+ },
+ {
+  "i": 5,
+  "name": "Skålen",
+  "ok": true,
+  "t": 3.75
+ },
+ {
+  "i": 6,
+  "name": "Berg-och-dalbanan",
+  "ok": true,
+  "t": 5.1
+ },
+ {
+  "i": 7,
+  "name": "Trappsteget",
+  "ok": true,
+  "t": 2.25
+ },
+ {
+  "i": 8,
+  "name": "Tunneln",
+  "ok": true,
+  "t": 2.55
+ },
+ {
+  "i": 9,
+  "name": "Taklisterna",
+  "ok": true,
+  "t": 7.5
+ },
+ {
+  "i": 10,
+  "name": "Svingen",
+  "ok": true,
+  "t": 2.55
+ },
+ {
+  "i": 11,
+  "name": "Avstampet",
+  "ok": true,
+  "t": 7.35
+ },
+ {
+  "i": 12,
+  "name": "Schaktet",
+  "ok": true,
+  "t": 9
+ },
+ {
+  "i": 13,
+  "name": "Målrakan",
+  "ok": true,
+  "t": 2.55
+ }
+]

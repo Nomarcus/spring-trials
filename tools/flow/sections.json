@@ -1,0 +1,188 @@
+[
+ {
+  "name": "Utförsstarten",
+  "move": "Släpp bromsen: lång mjuk utförsbacke ger fart",
+  "x0": 0,
+  "y0": 40,
+  "wp": [
+   [
+    32,
+    24.9,
+    0
+   ]
+  ]
+ },
+ {
+  "name": "Pumpbanan",
+  "move": "Pumpa: luta bakåt i svackan, framåt på krönet",
+  "x0": 38,
+  "y0": 24,
+  "wp": [
+   [
+    48.5,
+    26.3,
+    1
+   ]
+  ]
+ },
+ {
+  "name": "Hoppet",
+  "move": "Kicker över en dödsgrop – full gas",
+  "x0": 70,
+  "y0": 24,
+  "wp": [
+   [
+    76.2,
+    27.55,
+    2
+   ]
+  ]
+ },
+ {
+  "name": "Loopen",
+  "move": "Kör runt loopen (stjärnan sitter i taket), vänd, släpp dig ner i hålet",
+  "x0": 91.7,
+  "y0": 24.55,
+  "wp": [
+   [
+    107.7,
+    28.45,
+    3
+   ],
+   [
+    99.15,
+    25.55
+   ],
+   [
+    100.15,
+    21.55
+   ],
+   [
+    107.7,
+    17.45,
+    4
+   ]
+  ]
+ },
+ {
+  "name": "Skålen",
+  "move": "Fart ner i skålen, ta dig upp på den högre kanten",
+  "x0": 113.2,
+  "y0": 16.55,
+  "wp": [
+   [
+    133.2,
+    21.75,
+    5
+   ]
+  ]
+ },
+ {
+  "name": "Berg-och-dalbanan",
+  "move": "Stora gungor: släpp gasen på krönen så du inte flyger",
+  "x0": 138.2,
+  "y0": 20.55,
+  "wp": [
+   [
+    157.2,
+    21.45,
+    6
+   ]
+  ]
+ },
+ {
+  "name": "Trappsteget",
+  "move": "Broms-sving: lyft framhjulet och dra upp dig på kanten",
+  "x0": 180.2,
+  "y0": 20.55,
+  "wp": [
+   [
+    183.2,
+    22.7,
+    7
+   ]
+  ]
+ },
+ {
+  "name": "Tunneln",
+  "move": "Trång tunnel med vågigt golv och lågt tak – håll huvudet nere",
+  "x0": 187.2,
+  "y0": 21.8,
+  "wp": [
+   [
+    196.2,
+    22.7,
+    8
+   ]
+  ]
+ },
+ {
+  "name": "Taklisterna",
+  "move": "Trappa uppåt under överhäng – wheelie in under taket",
+  "x0": 208.2,
+  "y0": 21.8,
+  "wp": [
+   [
+    218.8,
+    24.95,
+    9
+   ]
+  ]
+ },
+ {
+  "name": "Svingen",
+  "move": "Hög kant: bromsa med framhjulet mot kanten och sving upp",
+  "x0": 224.8,
+  "y0": 24.05,
+  "wp": [
+   [
+    229.8,
+    26.55,
+    10
+   ]
+  ]
+ },
+ {
+  "name": "Avstampet",
+  "move": "Brant ramp, flyg över dödsgropen upp på platån",
+  "x0": 234.8,
+  "y0": 25.65,
+  "wp": [
+   [
+    251.3,
+    30.15,
+    11
+   ]
+  ]
+ },
+ {
+  "name": "Schaktet",
+  "move": "Släpp dig ner, vänd under hyllan, släpp igen, vänd igen",
+  "x0": 273.8,
+  "y0": 28.35,
+  "wp": [
+   [
+    278.8,
+    25.05,
+    12
+   ],
+   [
+    262.3,
+    25.05,
+    13
+   ],
+   [
+    283.8,
+    20.85,
+    14
+   ]
+  ]
+ },
+ {
+  "name": "Målrakan",
+  "move": "Flyt ut ur berget, en sista våg till blomman",
+  "x0": 303.8,
+  "y0": 19.95,
+  "wp": []
+ }
+]
