@@ -4,7 +4,7 @@
   python3 tools/fjadra/shot.py --level 0 --hold 1.5 --out shot.png
   python3 tools/fjadra/shot.py --pack 2 --level 2 --hold 2.5 --style neon --out neon.png
 
---level   index i banlistan för vald flik (0 = första)    --pack  1 eller 2 (flik)
+--level   index i banlistan för vald flik (0 = första)    --pack  1, 2 eller 3 (flik)
 --hold    sekunder som GAS (pil upp) hålls inne          --style cartoon|neon
 --menu    ta bild av menyn i stället                      --map   tryck på översiktsknappen
 Kräver:  pip install playwright && playwright install chromium
@@ -25,7 +25,7 @@ async def main():
         errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto('file://' + a.file); await pg.wait_for_timeout(900)
         if a.style == 'neon': await pg.click('#bStyle'); await pg.wait_for_timeout(300)
-        if a.pack == 2: await pg.click('#tab2'); await pg.wait_for_timeout(300)
+        if a.pack > 1: await pg.click(f'#tab{a.pack}'); await pg.wait_for_timeout(300)
         if a.menu: await pg.screenshot(path=a.out)
         else:
             await pg.click(f'.lv >> nth={a.level}'); await pg.wait_for_timeout(3400)   # banans hint-toast försvinner efter ~3,4 s

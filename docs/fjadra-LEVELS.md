@@ -63,6 +63,33 @@ Boten hittar inte vägen om målen ligger "bakåt" under starten; skriv då ett 
 | 28 | fjadra-pack2-08 | Gruvans andra våning | 2 | cave | 4 | 26/40 | ⚠️ |
 | 29 | fjadra-pack2-11 | Stenhyllan | 2 | sunset | 3 | 14/24 | ✅ |
 
+### Banpaket 3 (30 banor efter skisserna i `fjadra_30_banor.zip`, lätt → svår)
+Index fortsätter efter paket 2. Varje bana lär ut en teknik. Kolumnen *Bara gas* visar om banan går att klara utan tekniken (enkel förare som bara håller gas).
+
+| # | ID | Namn | Tema | Stjärnor | Medalj guld/silver | Bot v11 | Bara gas |
+|---|---|---|---|---|---|---|---|
+| 30 | fjadra-p3-01 | Första turen (gas) | meadow | 3 | 16/26 | ✅ 11,4 s | klarar (meningen) |
+| 31 | fjadra-p3-02 | Mjuka backen (broms + luta bak) | meadow | 1 | 14/24 | ✅ 9,4 s | klarar |
+| 32 | fjadra-p3-03 | Lutbacken (luta fram) | sunset | 2 | 24/38 | ✅ 17,5 s | kraschar |
+| 33 | fjadra-p3-04 | Bakhjulstrappan (wheelie) | meadow | 2 | 12/20 | ✅ 7,9 s | fastnar/kraschar |
+| 34 | fjadra-p3-05 | Pumpdalen (pumpa) | sunset | 2 | 13/22 | ✅ 8,3 s | kraschar |
+| 35 | fjadra-p3-06 | Lilla gapet (hopp) | meadow | 1 | 11/18 | ✅ 7,8 s | klarar |
+| 36 | fjadra-p3-07 | Halfpipe-gungan (halfpipe) | sunset | 4 | 14/24 | ✅ 7,8 s | kraschar |
+| 37 | fjadra-p3-08 | Första loopen (loop) | meadow | 1 | 16/26 | ✅ 35,4 s | klarar 10,5 s |
+| 38 | fjadra-p3-09 | Grytet (tunnel) | meadow | 1 | 11/18 | ✅ 7,2 s | missar stjärnan |
+| 39 | fjadra-p3-10 | Skorstenen (tyngdkraft, schakt) | cave | 2 + 2 blå | 14/22 | ✅ 9,1 s | – |
+| 40 | fjadra-p3-11 | Fram och tillbaka (vändning) | winter | 2 | 30/45 | ✅ 23,3 s | kraschar |
+| 41 | fjadra-p3-12 | Vågor och gap (pump + hopp) | sunset | 3 | 15/24 | ✅ 10,7 s | kraschar |
+| 42 | fjadra-p3-13 | Berg-och-dalbanan (flow) | meadow | 5 | 30/45 | ✅ 31,8 s | kraschar vid hoppet |
+| 43 | fjadra-p3-14 | Upp och ner (tyngdkraft, tak) | sunset | 1 + 2 blå | 14/24 | ✅ 9,7 s | kraschar |
+| 44 | fjadra-p3-15 | Bromssvingen (hög kant) | winter | 1 | 11/18 | ✅ 7,0 s | kraschar |
+
+**Loopar** (`loopParts` i `levels.js`): en hel loop i 2D måste korsa sin egen väg i luften. Loopen är träplankor (`woodArc`) med en öppning i botten (230°–310°). En brant rund ramp (60°) skjuter in cykeln genom öppningen; efter varvet faller den ut samma väg och landar i en 32°-backe bakom rampen. Kräver ca 16 m/s vid rampen. Rampvinkel 60° är stabil; 55° och 70° fungerar inte.
+
+**Skorstenen** byggdes först som sicksack-balkar med bunny hop, sedan som träklossar med wheelie-kanter. Båda går inte i 2D med den här fysiken: för att vända och klättra samtidigt måste cykeln korsa sin egen väg, och ett hopp eller en wheelie ger bara 0,6–1 m. Därför används blå stjärnor: man faller uppåt genom schaktet.
+
+Lärdom från bana 2: broms under `PIN_V` (3,8 m/s) låser hjulet mot marken. Tvärbroms utan att luta bakåt i en brant nedförsbacke slår runt cykeln framåt, och broms när framhjulet landar ger en Elma-studs. Håll nedförsbackar i nybörjarbanor under ~30° med breda krön.
+
 ## Idéer och referens
 - `docs/reference/atlas-20-banor.jpg` + `chatgpt-20-banor-prompt.txt`: ChatGPT:s atlas med 20 bankoncept (Dalens rytm, Åttans hemlighet, Spiralbrunnen, Nyckelhålet …). Bedömning: 01, 03, 05, 07, 09 enkla; 02, 04, 06, 08, 10, 14, 15, 16 medel (tak, flera våningar); 11, 12, 19 beror på bromshäng; 13, 17, 18, 20 för tajta som ritade och måste byggas bredare med körbara lutningar under ~35°. Tre av dem är byggda (01 Dalens rytm, 08 Gruvans andra våning, 11 Stenhyllan).
 - Marcus och Rocco planerar **helt nya banor**. De 43 banorna från Rocco i `main` (labyrinter, bromsbalans, hjulhäng) är gjorda mot den äldre fysiken och ingår inte här.

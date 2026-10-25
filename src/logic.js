@@ -4,7 +4,7 @@ const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
 const $=id=>document.getElementById(id);
 let W=0,Hh=0,DPR=1,SC=40,SC0=40,zoom=0.86;
 let li=0, lvl=null, bike=null, got=[], state='menu', T=0, acc=0, endTimer=0, flagWarn=0, parts=[], rag=null, pops=[], shake=0, bloom=0, rec=[], recT=0, ghost=null, BASE_A=1;
-const NEWLV=new Set(['fjadra-pack2-01','fjadra-pack2-08','fjadra-pack2-11']); let curPack=1;
+const NEWLV=new Set(['fjadra-pack2-01','fjadra-pack2-08','fjadra-pack2-11','fjadra-p3-01','fjadra-p3-02','fjadra-p3-03','fjadra-p3-04','fjadra-p3-05','fjadra-p3-06','fjadra-p3-07','fjadra-p3-08','fjadra-p3-09','fjadra-p3-10','fjadra-p3-11','fjadra-p3-12','fjadra-p3-13','fjadra-p3-14','fjadra-p3-15']); let curPack=1;
 let STYLE='cartoon'; try{ STYLE=localStorage.getItem('fjadra.style')==='neon'?'neon':'cartoon'; }catch(e){}
 let stuckT=0, stuckCD=0;
 // ghosts are stored per stable level id; old name-keyed ghosts are moved over the first time
@@ -37,7 +37,7 @@ function medalSVG(k){ if(!k) return '<svg viewBox="-13 -13 26 26" aria-hidden="t
 
 function loadLevel(i){ li=i; lvl=LEVELS[i]; setTheme(lvl.theme); bike=newBike(lvl.start[0],lvl.start[1]); got=lvl.apples.map(()=>false);
   T=0; acc=0; stuckT=0; stuckCD=0; parts=[]; rag=null; pops=[]; shake=0; bloom=0; rec=[]; recT=0; loadGhost(lvl); lvl.steelSegs=lvl.segs.filter(s=>s.style==='steel'); cam.x=bike.b.x+2; cam.y=bike.b.y+0.8; camBaseY=cam.y; state='play';
-  $('lvlname').textContent=(lvl.pack===2?'Paket 2 · ':'')+(LEVELS.filter(x=>x.pack===lvl.pack).indexOf(lvl)+1)+'. '+lvl.name; updApples(); updGrav(); hideOv(); toast(lvl.hint,3400); }
+  $('lvlname').textContent=(lvl.pack>1?'Paket '+lvl.pack+' · ':'')+(LEVELS.filter(x=>x.pack===lvl.pack).indexOf(lvl)+1)+'. '+lvl.name; updApples(); updGrav(); hideOv(); toast(lvl.hint,3400); }
 function updApples(){ $('applesTxt').textContent=got.filter(Boolean).length+'/'+got.length; }
 function updGrav(){ const g=bike?(bike.gy<0&&bike.gx===0?null:(bike.gy>0?'up':bike.gx<0?'left':'right')):null; $('gravTile').style.display=g?'flex':'none'; if(g) $('gravArrow').textContent=GARROW[g]; }
 function hideOv(){ $('menu').classList.remove('show'); $('endov').classList.remove('show'); }
@@ -134,16 +134,16 @@ $('bMusic').onclick=()=>setMusic(!musicOn);
 function setStyle(s){ STYLE=s; try{ localStorage.setItem('fjadra.style',s); }catch(e){} document.body.classList.toggle('neon',s==='neon'); $('bStyle').textContent='Stil: '+(s==='neon'?'Neon':'Tecknad'); curTheme=''; if(lvl) setTheme(lvl.theme); buildMenu(); }
 $('bStyle').onclick=()=>setStyle(STYLE==='neon'?'cartoon':'neon');
 $('bNextUnplayed').onclick=()=>{ audioInit(); pausedState=null; let i=LEVELS.findIndex(l=>l.pack===curPack&&best[l.id]==null); if(i<0) i=LEVELS.findIndex((l,k)=>l.pack===curPack&&medalOf(k,best[l.id])<3); if(i<0) i=LEVELS.findIndex(l=>l.pack===curPack); loadLevel(i); };
-for(const p of [1,2]) $('tab'+p).onclick=()=>{ curPack=p; buildMenu(); };
+for(const p of [1,2,3]) $('tab'+p).onclick=()=>{ curPack=p; buildMenu(); };
 $('bFull').onclick=()=>{ const d=document.documentElement; try{ if(document.fullscreenElement) document.exitFullscreen(); else { (d.requestFullscreen||d.webkitRequestFullscreen).call(d); if(screen.orientation&&screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{}); } }catch(e){} };
 function buildMenu(){ const box=$('lvls'); box.innerHTML=''; const shown=[];
-  for(const p of [1,2]){ const t=$('tab'+p); t.classList.toggle('on',p===curPack); t.setAttribute('aria-selected',p===curPack?'true':'false'); }
+  for(const p of [1,2,3]){ const t=$('tab'+p); t.classList.toggle('on',p===curPack); t.setAttribute('aria-selected',p===curPack?'true':'false'); }
   LEVELS.forEach((l,i)=>{ if(l.pack!==curPack) return; const n=shown.length+1; shown.push(l); const b=document.createElement('button'); b.className='lv'; const t=best[l.id];
     b.innerHTML='<canvas></canvas>'+(NEWLV.has(l.id)?'<span class="newb">NY</span>':'')+'<div class="meta"><div class="nm"><b>'+n+'. '+l.name+'</b><i>'+(t!=null?fmt(t):'Ej klarad')+' · guld '+l.medal[0]+' s</i></div>'+medalSVG(medalOf(i,t))+'</div>';
     b.onclick=()=>{ audioInit(); pausedState=null; loadLevel(i); }; box.appendChild(b); });
   $('resumeRow').style.display=pausedState==='play'?'flex':'none';
   const inPack=LEVELS.filter(l=>l.pack===curPack), done=inPack.filter(l=>best[l.id]!=null).length, golds=inPack.filter(l=>medalOf(LEVELS.indexOf(l),best[l.id])===3).length;
-  $('progress').textContent='Klarade '+done+' av '+inPack.length+' · '+golds+' guld'+(curPack===2?' · fler banor kommer':'');
+  $('progress').textContent='Klarade '+done+' av '+inPack.length+' · '+golds+' guld'+(curPack>1?' · fler banor kommer':'');
   $('bMusic').textContent='Musik: '+(musicOn?'på':'av');
   requestAnimationFrame(()=>{ box.querySelectorAll('canvas').forEach((c,i)=>drawPreview(c,shown[i])); }); }
 
