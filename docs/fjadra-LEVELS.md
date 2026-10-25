@@ -97,7 +97,7 @@ Index fortsätter efter paket 2. Varje bana lär ut en teknik. Kolumnen *Bara ga
 | 56 | fjadra-p3-27 | Spiralschaktet (tyngd upp/vänster/höger) | cave | 2 + 5 blå | 30/45 | ✅ 18,0 s · skript `script_spiral.js` | – |
 | 57 | fjadra-p3-28 | Stora flödet (allt i rytm) | sunset | 7 + 2 blå | 50/75 | ✅ 53,0 s | kraschar |
 | 58 | fjadra-p3-29 | Gatloppet | winter | 6 + 2 blå | 50/75 | ✅ 43,0 s | kraschar |
-| 59 | fjadra-p3-30 | Fjädertoppen (finalen) | winter | 6 + 4 blå | 80/120 | se nedan | kraschar i taket |
+| 59 | fjadra-p3-30 | Fjädertoppen (finalen) | winter | 6 + 4 blå | 80/120 | ⚠️ ej bevisad – testas manuellt av Marcus | loopar + rör ok, kraschar i taket |
 
 Bana 16–30 är längre (100–250 m). Kör testboten med längre tidsgräns: `MAXT=150 node tools/fjadra/test/run.js 59`.
 
