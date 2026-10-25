@@ -19,8 +19,8 @@ const context={};vm.createContext(context);
 vm.runInContext(scripts[0]+scripts[1]+'\nglobalThis.core={P,makeLevels,newBike,createLevelBike,step,headResolve,headPos};',context);
 const {P,makeLevels,newBike,createLevelBike,step,headResolve}=context.core;
 const levels=makeLevels(),routes=JSON.parse(fs.readFileSync(path.join(__dirname,'maze-routes.json'),'utf8'));
-assert.equal(levels.length,38);assert.equal(new Set(levels.map(l=>l.name)).size,38);
-assert.equal(new Set(levels.map(l=>l.campaignId)).size,38);
+assert.equal(levels.length,43);assert.equal(new Set(levels.map(l=>l.name)).size,43);
+assert.equal(new Set(levels.map(l=>l.campaignId)).size,43);
 function inRing(x,y,points){let inside=false;for(let i=0,j=points.length-1;i<points.length;j=i++){const a=points[i],b=points[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])inside=!inside;}return inside;}
 const air=(l,x,y)=>l.rings.reduce((inside,r)=>inside!==inRing(x,y,r.pts),false);
 function distance(l,x,y){let best=Infinity;for(const s of l.segs){const t=Math.max(0,Math.min(1,((x-s.x1)*s.dx+(y-s.y1)*s.dy)/s.l2));best=Math.min(best,Math.hypot(x-s.x1-t*s.dx,y-s.y1-t*s.dy));}return best;}
@@ -40,9 +40,9 @@ levels.forEach((l,i)=>{
 });
 assert(routes[0].routeLength<35,'First course should remain very short and gentle');
 assert(routes.filter(r=>r.floors>=3).length>=7,'Campaign should contain substantial multilayer mazes');
-assert(routes.at(-1).routeLength>1000,'Final maze must be meaningfully longer than the introduction');
+assert(routes.find(r=>r.name===levels[37].name).routeLength>1000,'Final maze must be meaningfully longer than the introduction');
 assert(routes.slice(0,4).every(r=>r.branches===0),'No underpass puzzle before the very easy introduction');
-console.log(`PASS: 38 courses, valid pickups and route headroom, 38 stable physics spawns, max ${maxSegments} collision segments.`);
+console.log(`PASS: 43 courses, valid pickups and route headroom, 43 stable physics spawns, max ${maxSegments} collision segments.`);
 if(base)console.log('PASS: data-only scope check; only authored start-facing and technical sightline initialization differ outside the level block.');
 
 assert.equal(levels.filter(l=>l.campaignId.startsWith('trials-v1-')).length,24);

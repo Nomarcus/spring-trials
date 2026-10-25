@@ -165,6 +165,9 @@ ORIGINAL_CAMPAIGN=tuple(CAMPAIGN)
 O={i:l for i,l in enumerate(ORIGINAL_CAMPAIGN,1)}
 CAMPAIGN=[O[1],TRIALS['pump'],O[2],TRIALS[2],O[3],TRIALS[5],O[4],TRIALS[4],TRIALS['peaks'],O[5],TRIALS['islands'],TRIALS[7],O[6],O[7],TRIALS[9],TRIALS[13],TRIALS['low'],O[10],TRIALS['steps'],TRIALS[11],O[13],TRIALS[15],TRIALS['hang'],TRIALS['balance'],O[16],TRIALS[18],TRIALS['centre'],TRIALS['gravity'],O[19],TRIALS[21],TRIALS[24],TRIALS['ravine'],O[22],TRIALS['rocket'],TRIALS[27],O[26],TRIALS['lastflow'],O[30]]
 
+from elma_tests import make_elma_tests
+CAMPAIGN += make_elma_tests()
+
 def build():
     target = ROOT / 'game/index.html'
     source = target.read_text()
@@ -175,7 +178,7 @@ def build():
     for level in CAMPAIGN:
         compact = {k:v for k,v in level.items() if k != 'design'}
         data.append('  ' + json.dumps(compact, ensure_ascii=False, separators=(',', ':')))
-    block = '''// ===== Levels: 38-stage mixed trials/maze campaign (generated; see tools/build_level_campaign.py) =====
+    block = '''// ===== Levels: 43-stage mixed trials/maze campaign (generated; see tools/build_level_campaign.py) =====
 const CAMPAIGN_LEVELS = [
 ''' + ',\n'.join(data) + '''
 ];
@@ -200,8 +203,9 @@ function createLevelBike(l){
     # Keep generated trees/boulders out of wheel pockets and technical sightlines.
     updated=updated.replace('const sorted=tops.filter(', 'const sorted=l.noDeco?[]:tops.filter(')
     target.write_text(updated)
-    plan = '# Bankampanj: blandade trials och labyrinter\n\n38 banor: 14 utvalda labyrinter och 24 individuellt formgivna trialsbanor. De 30 gamla bandefinitionerna finns kvar i byggverktygets ORIGINAL_CAMPAIGN; 16 återkommande labyrintvarianter ingår inte längre i huvudkampanjen. Halvcirklar, fartdalar, rena uppförsbanor, nedfarter från höger, dubbla hjulfickor och en vertikal nedfart. Startorientering är bandata; fysik, grafik, ragdoll och ljud behålls.\n\n'
+    plan = '# Bankampanj: blandade trials och labyrinter\n\n43 banor: fem nya Elasto-inspirerade testbanor (39–43), 14 utvalda labyrinter och 24 individuellt formgivna trialsbanor. De 30 gamla bandefinitionerna finns kvar i byggverktygets ORIGINAL_CAMPAIGN; 16 återkommande labyrintvarianter ingår inte längre i huvudkampanjen. Halvcirklar, fartdalar, rena uppförsbanor, nedfarter från höger, dubbla hjulfickor och en vertikal nedfart. Startorientering är bandata; fysik, grafik, ragdoll och ljud behålls.\n\n'
     plan += 'Valven har en körbar ramp upp och en 2,65 meter hög återvändsgränd under. Ta stjärnan ovanpå, kör ner från änden, vänd tillbaka under valvet och vänd sedan ut igen. Våningarnas nedfarter är avsiktliga envägspassager: ta stjärnorna före nedfarten. Alla stjärnor ligger före öppningen, med plats att bromsa. Vid en miss finns den befintliga omstartsknappen.\n\n'
+    plan += 'Testbanorna fokuserar på hjulhäng, ovanpå/under samma hylla, ett 1,30 m brett däckschakt, tre krokar och skål med retur. Befintliga regler för stålbalkar används. Ingen fysik ändras. De är experimentella: geometriska kontroller och provade hängpositioner ersätter inte full genomkörning med touch.\n\n'
     plan += '| # | Bana | Svårighet | Våningar | Valv med retur | Avsedd väg, cirka m |\n|---|---|---|---:|---:|---:|\n'
     for i,l in enumerate(CAMPAIGN,1):
         d=l['design']; plan+=f"| {i} | {l['name']} | {l['difficulty']} | {d['floors']} | {d['branches']} | {d['routeLength']} |\n"

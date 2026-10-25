@@ -1,8 +1,10 @@
 # Bankampanj: blandade trials och labyrinter
 
-38 banor: 14 utvalda labyrinter och 24 individuellt formgivna trialsbanor. De 30 gamla bandefinitionerna finns kvar i byggverktygets ORIGINAL_CAMPAIGN; 16 återkommande labyrintvarianter ingår inte längre i huvudkampanjen. Halvcirklar, fartdalar, rena uppförsbanor, nedfarter från höger, dubbla hjulfickor och en vertikal nedfart. Startorientering är bandata; fysik, grafik, ragdoll och ljud behålls.
+43 banor: fem nya Elasto-inspirerade testbanor (39–43), 14 utvalda labyrinter och 24 individuellt formgivna trialsbanor. De 30 gamla bandefinitionerna finns kvar i byggverktygets ORIGINAL_CAMPAIGN; 16 återkommande labyrintvarianter ingår inte längre i huvudkampanjen. Halvcirklar, fartdalar, rena uppförsbanor, nedfarter från höger, dubbla hjulfickor och en vertikal nedfart. Startorientering är bandata; fysik, grafik, ragdoll och ljud behålls.
 
 Valven har en körbar ramp upp och en 2,65 meter hög återvändsgränd under. Ta stjärnan ovanpå, kör ner från änden, vänd tillbaka under valvet och vänd sedan ut igen. Våningarnas nedfarter är avsiktliga envägspassager: ta stjärnorna före nedfarten. Alla stjärnor ligger före öppningen, med plats att bromsa. Vid en miss finns den befintliga omstartsknappen.
+
+Testbanorna fokuserar på hjulhäng, ovanpå/under samma hylla, ett 1,30 m brett däckschakt, tre krokar och skål med retur. Befintliga regler för stålbalkar används. Ingen fysik ändras. De är experimentella: geometriska kontroller och provade hängpositioner ersätter inte full genomkörning med touch.
 
 | # | Bana | Svårighet | Våningar | Valv med retur | Avsedd väg, cirka m |
 |---|---|---|---:|---:|---:|
@@ -44,6 +46,11 @@ Valven har en körbar ramp upp och en 2,65 meter hög återvändsgränd under. T
 | 36 | Stora bergslabyrinten | Svår | 6 | 5 | 844.2 |
 | 37 | Sista flytet | Expert | 1 | 0 | 146.5 |
 | 38 | Hjärtat av labyrinten | Expert | 8 | 7 | 1208.4 |
+| 39 | Test 1 – Hängskolan | Medel | 1 | 0 | 37.3 |
+| 40 | Test 2 – Ovanpå och under | Medel / svår | 1 | 0 | 3.0 |
+| 41 | Test 3 – Däck för däck | Svår | 1 | 0 | 38.6 |
+| 42 | Test 4 – Tre krokar | Expert | 1 | 0 | 42.0 |
+| 43 | Test 5 – Skålen och returen | Expert | 1 | 0 | 1.0 |
 
 ## Återskapa och kontrollera
 
