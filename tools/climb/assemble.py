@@ -1,9 +1,10 @@
 import os
 D=os.path.dirname(os.path.abspath(__file__)); ROOT=os.path.abspath(D+'/../..')
 import json,re
-src=open(ROOT+'/game/index.html',encoding='utf8').read().split('\n')
-L=lambda a,b:'\n'.join(src[a-1:b])
-head=L(1,188); core=L(189,416); gameinit=L(461,1164)
+full=open(ROOT+'/game/index.html',encoding='utf8').read()
+c0=full.index('<script>\n// ===== FJÄDRA core'); c1=full.index('</script>',c0)+len('</script>')
+g0=full.index('<script>\n(()=>{'); g1=full.index('// ---------- input ----------',g0)
+head=full[:c0]; core=full[c0:c1]; gameinit=full[g0:g1]
 co=json.load(open(D+'/course.json'))
 def rep(s,a,b,cnt=1):
     assert a in s, a[:80]; return s.replace(a,b,cnt)
@@ -24,7 +25,7 @@ head=rep(head,'@media (prefers-reduced-motion:reduce)','''#narr{ position:absolu
 head=re.sub(r'<div class="tile disp" id="appleTile"><svg.*?</svg><span id="applesTxt">0/3</span></div>',
  '<div class="tile disp" id="appleTile"><svg width="24" height="24" viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-11 9L-3-6l4 6 3-4 7 13z" fill="#cfd9e6" stroke="#1d2633" stroke-width="1.6" stroke-linejoin="round"/><path d="M-5.6-1L-3-6l2.4 3.6-1.6 1.2z" fill="#fff"/></svg><span id="applesTxt">0 m</span></div>',head,flags=re.S)
 head=rep(head,'<div class="tile" id="gravTile">Tyngd <span id="gravArrow">↑</span></div>','<div class="tile" id="bestTile"><span id="bestTxt">Bäst 0 m</span></div>')
-head=re.sub(r'\s*<button class="k small" id="bRestart".*?</button>','',head,flags=re.S)
+head=re.sub(r'\s*<button class="k[^"]*" id="bRestart".*?</button>','',head,flags=re.S)
 # menu + end overlay
 m0=head.index('<div class="ov show" id="menu">'); m1=head.index('<div id="toast"></div>')
 head=head[:head.index('<div id="toast"></div>')]+'''<div id="toast"></div>

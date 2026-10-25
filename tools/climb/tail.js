@@ -207,7 +207,7 @@ let armT=0; $('bNew').onclick=()=>{ const b=$('bNew'); if(SV.bike&&b.dataset.arm
 $('bMusic').onclick=()=>setMusic(!musicOn);
 $('bNarr').onclick=()=>{ narrOn=!narrOn; try{ localStorage.setItem('fjadra.narr',narrOn?'1':'0'); }catch(e){} if(!narrOn&&window.speechSynthesis) try{ speechSynthesis.cancel(); }catch(e){} buildMenu(); };
 const fsOK=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen; if(!fsOK) $('bFull').style.display='none';
-$('bFull').onclick=()=>{ const d=document.documentElement; try{ if(document.fullscreenElement) document.exitFullscreen(); else { (d.requestFullscreen||d.webkitRequestFullscreen).call(d); if(screen.orientation&&screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{}); } }catch(e){} };
+if(typeof toggleFullscreen==='function') $('bFull').onclick=toggleFullscreen; else $('bFull').onclick=()=>{ const d=document.documentElement; try{ if(document.fullscreenElement) document.exitFullscreen(); else { (d.requestFullscreen||d.webkitRequestFullscreen).call(d); if(screen.orientation&&screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{}); } }catch(e){} };
 $('bOn').onclick=()=>{ state='play'; hideOv(); };
 $('bAgain').onclick=()=>{ $('endov').classList.remove('show'); startClimb(true); };
 
