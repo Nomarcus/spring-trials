@@ -171,14 +171,51 @@ LV2.push(()=>({id:'fjadra-pack2-08', name:'Gruvans andra våning', theme:'cave',
 LV2.push(()=>({id:'fjadra-pack2-11', name:'Stenhyllan', theme:'sunset', hint:'Kör sakta mot kanten. BROMSA så fort framhjulet är ute över kanten (den gula zonen) och håll inne – bakhjulet hakar i kanten och du hänger. Ta stjärnan, släpp sen.',
   rings:[{pts:[[-14,TOP],[-14,4.5],[9.3,4.5],[9.55,4.62],[9.95,4.64],[10.05,4.55],[10.05,4.08],[8.5,3.98],[6.5,3.9],[5.2,3.6],[5,3.1],[5,2.3],[8,1.6],[11,0.75],[14,0.1],[15,0],[22,0],[29,4.5],[38,4.5],[38,TOP]]}],
   apples:[[4,5.25],[8.2,2.85],[25.5,2.95]], killers:[], flower:[34,4.5], start:[-10,4.5], marks:[[7.6,9.6]]}));
+// ================= BANPAKET 3 (30 banor, lätt → svår) =================
+const LV3=[];
+// 01 Första turen — gas: platt start, mjuka gupp, stjärnor på marken
+LV3.push(()=>{ const bump=(x,c,h,w)=>Math.abs(x-c)<w? h*0.5*(1+Math.cos(Math.PI*(x-c)/w)) : 0;
+  const f=x=>bump(x,20,0.6,3)+bump(x,26,0.6,3)+bump(x,52,0.7,4.5)+bump(x,61,0.7,4.5)+bump(x,70,0.7,4.5);
+  return {id:'fjadra-p3-01', name:'Första turen', theme:'meadow', hint:'Håll in GAS. Känn hur fjädrarna trycks ihop i guppen.',
+    rings:[{pts:[[-4,TOP],[-4,0],...sample(f,0,96,0.25),[96,TOP]]}],
+    apples:[[36,0.75],[42,0.75],[80,0.75]], killers:[], flower:[90,0], start:[2,0]}; });
+// 02 Mjuka backen — broms: uppför, brant nedför med en liten kant, stjärna i dalen, blomma på platån
+LV3.push(()=>{ const s=cr([[-4,0],[4,0],[10,0.9],[15,2.6],[19,3.7],[22,4.1],[25,4.15],[28,3.8],[31,2.7],[34,1.0],[37,-0.8],[40,-1.9],[42.5,-2.2],[45,-2.0],[47.5,-1.0],[50,0.5],[53,1.4],[56,1.6],[70,1.6]],0.25);
+  return {id:'fjadra-p3-02', name:'Mjuka backen', theme:'meadow', hint:'Uppför med gas. På toppen: BROMSA och luta BAKÅT (↺) samtidigt hela vägen ner i dalen.',
+    stuck:'Tvärbromsar du utan att luta bakåt slår cykeln runt framåt. Håll ↺ medan du bromsar.',
+    rings:[{pts:[[-4,TOP],...s,[70,TOP]]}],
+    apples:[[42.5,-1.45]], killers:[], flower:[65,1.6], start:[1,0]}; });
+// 03 Lutbacken — luta: två branta ramper med spetsiga krön, den andra brantare
+LV3.push(()=>{ const s=cr([[-4,0],[2,0],[5,0.35],[8,1.6],[10,3.0],[11.4,4.0],[12.4,4.4],[13.2,4.45],[14,4.3],[16,3.5],[20,2.2],[25,1.2],[29,0.9],
+      [32,1.4],[34,2.6],[35.4,4.0],[36.5,5.3],[37.4,6.1],[38.2,6.45],[39,6.45],[39.8,6.2],[42,5.2],[47,3.4],[53,1.8],[60,0.7],[66,0.3],[74,0.3]],0.25);
+  return {id:'fjadra-p3-03', name:'Lutbacken', theme:'sunset', hint:'Branta ramper. Luta FRAMÅT (↻) medan du gasar uppför, annars tippar du bakåt.',
+    stuck:'Tippar du bakåt? Håll ↻ hela vägen upp och gasa lugnare.',
+    rings:[{pts:[[-4,TOP],...s,[74,TOP]]}],
+    apples:[[13.2,5.2],[38.6,7.2]], killers:[], flower:[69,0.3], start:[1,0]}; });
+// 04 Bakhjulstrappan — wheelie: tre kanter, varje lite högre
+LV3.push(()=>{ const pts=[[-4,TOP],[-4,0]]; let y=0; const steps=[[10,0.6],[19,0.8],[28,1.0]];
+  for(const [x,h] of steps){ pts.push([x-0.12,y]); const y1=y+h; pts.push([x,y+0.06],[x,y1-0.1],[x+0.04,y1-0.03],[x+0.12,y1]); y=y1; }
+  pts.push([44,y],[44,TOP]);
+  return {id:'fjadra-p3-04', name:'Bakhjulstrappan', theme:'meadow', hint:'Luta BAKÅT (↺) precis före varje kant så framhjulet lyfter upp på steget. Sen fram igen.',
+    stuck:'Kör sakta mot kanten, tryck ↺ – framhjulet upp – och gasa. Bakhjulet klättrar efter.',
+    rings:[{pts}], apples:[[23.5,2.15],[34,3.15]], killers:[], flower:[40,2.4], start:[3,0]}; });
+// 05 Pumpdalen — pumpa: fyra vågor, stjärnor på topparna
+LV3.push(()=>{ const H=[1.0,1.15,1.3,1.45], W=7, X0=8;
+  const f=x=>{ const k=Math.floor((x-X0)/W); return k>=0&&k<4? H[k]*0.5*(1-Math.cos(2*Math.PI*(x-X0)/W)) : 0; };
+  return {id:'fjadra-p3-05', name:'Pumpdalen', theme:'sunset', hint:'Försök utan gas: luta BAKÅT uppför vågen och kasta dig FRAMÅT nerför. Då pumpar du fart.',
+    stuck:'Luta ↺ när du kör uppför, ↻ när det lutar nedåt. Gas får du använda om du vill.',
+    rings:[{pts:[[-4,TOP],[-4,0],...sample(f,0,58,0.25),[58,TOP]]}],
+    apples:[[X0+W*1.5,H[1]+0.75],[X0+W*3.5,H[3]+0.75]], killers:[], flower:[52,0], start:[2,0]}; });
+const MEDALS3={'fjadra-p3-01':[16,26],'fjadra-p3-02':[14,24],'fjadra-p3-03':[24,38],'fjadra-p3-04':[12,20],'fjadra-p3-05':[13,22]};
 const MEDALS={'Första stegen':[10,16],'Lådorna':[16,26],'Vändplatsen':[12,20],'Trappan':[11,17],'Hakarna':[16,26],'Svävande öar':[16,25],'Bron':[14,22],'Grottan':[10,16],'Pelarna':[14,24],'Skålen':[25,45],'Hinderbanan':[13,20],'Vinterberget':[12,19],'Klippan':[16,26],'Upp och ner':[14,24],'Hänget':[16,28],'Svävaren':[14,24],'Balkarna':[14,24],'Pumpbanan':[14,22],'Studsen':[12,20],'Schaktet':[22,34],'Klätterväggen':[18,30],'Finalen':[28,45],'Spegeln':[16,26],'Trapphoppet':[16,26],'Flowbanan':[14,22],'Stockarna':[9,15],'Volten':[9,15]};
 const MEDALS2={'fjadra-pack2-01':[12,20],'fjadra-pack2-08':[26,40],'fjadra-pack2-11':[14,24]};
 const slug=n=>n.toLowerCase().replace(/å/g,'a').replace(/ä/g,'a').replace(/ö/g,'o').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 function makeLevels(){
-  const L1=LV.map(f=>f()), L2=LV2.map(f=>f());
+  const L1=LV.map(f=>f()), L2=LV2.map(f=>f()), L3=LV3.map(f=>f());
   for(const l of L1){ l.pack=1; l.id='p1-'+slug(l.name); l.medal=MEDALS[l.name]||[15,25]; }
   for(const l of L2){ l.pack=2; l.medal=MEDALS2[l.id]||[20,35]; }
-  const L=L1.concat(L2);
+  for(const l of L3){ l.pack=3; l.medal=MEDALS3[l.id]||[20,35]; }
+  const L=L1.concat(L2,L3);
   for(const l of L){ l.segs=buildSegs(l.rings);
     let mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9; for(const r of l.rings) for(const p of r.pts){ mnx=Math.min(mnx,p[0]);mxx=Math.max(mxx,p[0]);mny=Math.min(mny,p[1]);mxy=Math.max(mxy,p[1]); }
     l.bounds=[mnx,mny,mxx,mxy];
