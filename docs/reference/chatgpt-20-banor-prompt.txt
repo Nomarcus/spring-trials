@@ -1,0 +1,222 @@
+FJÄDRA – 20 NYA BANOR OCH FÄRDIG PROMPT TILL CLAUDE
+25 oktober 2026
+
+STATUS
+Detta är ett designpaket och en implementationsprompt, inte importerbara eller speltestade banfiler. Banorna är egna förslag. Bildöversikten är konceptgrafik; specifikationerna här styr spelväg, mått och logik. Befintlig källkod har inte lästs eller ändrats.
+
+UNDERLAG OCH SLUTSATSER
+Jag öppnade ditt publicerade Claude-spel Fjädra och såg 27 banor, stjärnor som samlarobjekt, blomma som mål, medaljtider och instruktioner för pumpning, bunny hop, bromsstuds och hjulgrepp. Jag granskade menyn och det visuella spelvyn på första banan. Jag har inte verifierat hur fysiken faktiskt är implementerad eller provkört alla moment.
+
+Din befintliga grafik: ljusblå himmel, stora mjuka moln, kantiga berg i flera blågrå lager, barrskog på avstånd, rundade buskar och träd med mörka konturer. Terrängen är varm brun jord med infällda stenar, diskreta jordlager och en grön, lätt sicksackad gräskant. Cykeln och föraren är mer detaljerade än bakgrunden. Mörkblå paneler och gula stjärnor ger tydliga kontraster.
+
+Research: Elasto Manias officiella sida beskriver ett 2D-motorcykelspel byggt på balans och skicklighet. Moposites kartaarkiv visar originalbanornas verkliga silhuetter. Jag tittade särskilt på Over and Under, Tunnel Terror, Spiral och Hang Tight. Over and Under har sammanflätade övre och undre passager; Tunnel Terror har ett kompakt tunnelsystem i flera höjdlägen; Spiral använder en stor spiralform; Hang Tight använder tunna upphängda strukturer. Mina designslutsatser: använd negativt utrymme, återbesök samma område från en annan höjd, ge varje bana en igenkännbar silhuett och låt hjulens kontakt med terrängen vara själva pusslet. Detta är min analys, inte citerade regler från utvecklarna.
+
+Källor:
+https://elastomania.com/
+https://old.moposite.com/stuff_media_visual.php
+https://old.moposite.com/images/maps/elma_maps_04.gif
+https://old.moposite.com/images/maps/elma_maps_09.gif
+https://old.moposite.com/images/maps/elma_maps_18.gif
+https://old.moposite.com/images/maps/elma_maps_52.gif
+Spel som granskats: https://claude.ai/artifact/BXq7d8PwweYmL2PzYkVZ9o
+
+================ FÄRDIG PROMPT – KOPIERA HÄRIFRÅN ================
+
+Du ska vidareutveckla mitt befintliga spel FJÄDRA. Arbeta direkt i den befintliga koden och leverera en komplett fungerande uppdatering, inte bara råd eller en ny prototyp.
+
+MÅL
+Bygg ett nytt banpaket med exakt 20 handdesignade banor enligt specifikationerna nedan. Behåll spelets nuvarande visuella identitet. Utveckla den elastiska trialskänslan och banornas rumsliga variation med inspiration från Elasto Manias designprinciper. Skapa egna layouter, inte kopior av originalbanornas koordinater.
+
+BÖRJA MED KODEN
+Läs först hur rendering, kollisionsgeometri, hjul, ram, förare, fjädring, broms, vändning, kamera, banformat och sparfiler fungerar. Redovisa kort vad som redan finns och vad som faktiskt behöver ändras. Menytexten nämner redan pumpning, bunny hop, bromsstuds och hjulgrepp: kontrollera att mekanikerna fungerar innan du bygger något parallellt.
+
+Behåll de befintliga 27 banorna och deras identiteter, progression och rekord. Lägg till en separat kategori ”Banpaket 2” med stabila ID:n fjadra-pack2-01 till fjadra-pack2-20. Ändra inte befintliga sparnycklar utan migration. Låt de nya banorna vara valbara direkt under utveckling och test.
+
+GRAFIK SOM SKA BEVARAS
+Samma ljusblå himmel, mjuka moln, blågrå berg, barrskog, rundade träd och buskar, bruna jordlager med stenar, gröna gräskanter och mörka konturer. Behåll cykel, förare, stjärnor, målblomma och den mörkblå UI-stilen. Använd befintliga ritfunktioner och material. Anpassa dem till undersidor, tunnlar och överhäng. Gräs växer på uppåtvända ytor; undersidor får jord- eller bergskant. Dekor får inte dölja kollisionsytor. Skilj visuellt mellan bakgrund och körbar terräng. Gör inte om allt till retro-Elma-grafik.
+
+BANFORMAT OCH SKALA
+B = cykelns avstånd mellan hjulaxlarna i neutralläge. H = förarens totala höjd över körbanan i neutralläge. Använd dem som relativa designmått och mät deras faktiska värden i befintlig kod. Måtten nedan är startvärden som ska justeras efter speltest, inte färdiga pixelkoordinater.
+
+Alla banor får spawn, startorientering, solida polygoner eller motsvarande kollisionsgeometri, stjärnor, mål, kameragränser, utanförgräns och minimap. Hantera golv, väggar och tak; en enda höjdkurva y=f(x) räcker inte för flervåningsbanorna. Behåll befintligt format om det klarar detta. Skapa vid behov ett tydligt mellanformat och en adapter till motorn. Undvik självskärande polygoner och sömmar som fångar hjulen. Konkava former måste stödjas korrekt eller delas upp.
+
+Varje stjärna nedan är obligatorisk. Målblomman aktiveras först när alla stjärnor är tagna. Ingen dold ordningsregel: numreringen beskriver avsedd färdväg, inte ett krav på samlingsordning. Tillåt smartare rutter. Stjärnor ska ha synlig luft till både tak och golv och kunna nås av den collider som faktiskt samlar dem. Lägg aldrig föremål inne i solid mark.
+
+Träningsbanorna får breda landningar och återhämtning. Senare banor kräver precision. Nya grundmoment introduceras med låg konsekvens innan de kombineras med farliga fall. Stabila statiska ytor räcker för hela paketet; lägg inte till teleport, ny gravitation eller rörliga plattformar som genväg runt bandesignen.
+
+DE 20 BANORNA
+
+01. DALENS RYTM – lätt, cirka 22 B bred × 7 B hög, 3 stjärnor
+Silhuett: tre mjuka dalar med successivt tätare vågor och en bred avslutande uppförsbacke.
+Start: plan vänsterhylla, vänd höger. Rutt: ner i första dalen, upp över låg rygg, genom två nya dalar och upp till blomman på högerhyllan.
+Stjärnor: en över första dalbotten, en på andra krönet, en halvvägs upp i sista backen. Alla går att ta utan hopp.
+Moment: känna kompression och avlastning, dosera gas och vikt. Inga dödliga hål. Minst 3 B breda dalbottnar och mjuka övergångar.
+Expertlinje: pumpa rytmiskt över vågorna. Återhämtning: rulla tillbaka ner i dalen och försök igen.
+
+02. ETT VARV TILL – lätt, 18 B × 9 B, 3 stjärnor
+Silhuett: avlång jordö med bred övre väg och passage under ön, förbunden via öppna ramper i båda ändar.
+Start: öns vänstra ovansida, höger. Rutt: kör över ön, ner runt högeränden, vänd och kör tillbaka under ön till blomman i vänsteröppningen.
+Stjärnor: mitt på övervägen, vid nedfartens botten, i mitten av underpassagen.
+Moment: förstå att målet kan ligga bakom starten. Undergången har minst 1,5 H fri höjd. Ingen hoppplikt.
+Expertlinje: korta svängen med ett kontrollerat nedhopp. Återhämtning: bred botten utan fallgropar.
+
+03. TVÅ RYGGAR – lätt, 24 B × 10 B, 3 stjärnor
+Silhuett: låg rundad kulle följd av en högre asymmetrisk rygg med lång landningsslänt.
+Start: vänster. Stjärnor: första krönet, dalen mellan kullarna och andra backens övre del. Blomma: höger, efter landningsslänten.
+Moment: viktskifte i backe och mjuk landning. Gör den andra backen fullt körbar med båda hjulen; lär inte ut ett omöjligt hopp.
+Expertlinje: hoppa från första ryggens läpp till andra backen. Återhämtning: dalen är körbar åt båda håll.
+
+04. BRON OCH BÄCKEN – lätt/medel, 22 B × 10 B, 4 stjärnor
+Silhuett: två kullar med en jordbro och en körbar, torr ravin under bron.
+Start: vänster uppe. Rutt: över bron till höger stjärna, ner längs högerslänten, tillbaka under bron, upp längs vänster ramp till blomman på en kort sidogren.
+Stjärnor: en på bron, en efter brofästet till höger och två i ravinen. Blomman ligger utanför spawn och kan nås först efter återkomsten.
+Moment: planera insamling och vända. Bron är minst 2 B bred vid anslutningarna och ravinen har minst 1,6 H fri höjd.
+Expertlinje: kontrollerat fall från högra broänden. Återhämtning: hela ravinen är ett golv, vatten är enbart bakgrund.
+
+05. BERGETS TRAPPA – medel, 18 B × 15 B, 3 stjärnor
+Silhuett: fyra ojämna terrasser som stiger åt höger. Varje terrass har en liten infartsramp och en plan viloyta.
+Start: nederst vänster. Stjärnor på terrass två, tre och fyra; blomma på toppen.
+Moment: lyfta framhjul och sedan få upp bakhjulet. Börja med steg på ungefär 0,3 B och öka mot 0,6 B först efter verifiering av cykelns räckvidd. Viloytor minst 2 B.
+Expertlinje: länka två steg i ett svep. Återhämtning: falla till föregående terrass, inte hela banans botten.
+
+06. KRONANS UTSIDA – medel, 20 B × 12 B, 3 stjärnor
+Silhuett: stor central klippa med körväg runt foten och en krökt stig upp på höger sida till toppen.
+Start: nedre vänster. Rutt: kör höger runt foten, klättra upp, vänd vänster över klippans krön till blomman.
+Stjärnor: vid foten, på uppfarten och på övre vänstra skuldran.
+Moment: behålla grepp i konvexa övergångar, bromsa innan vändning. Undvik lodrätt väggkrav här.
+Expertlinje: kort hopp från klippans skuldra till övre stigen. Återhämtning: bred avsats under sista klättringen.
+
+07. TRE ÖAR – medel, 26 B × 12 B, 3 stjärnor
+Silhuett: tre separata jordöar ovanför en lägre räddningsväg, med stigande ovansidor.
+Start: stor vänsterplattform. Mellanrum inledningsvis 1–1,5 B och landningsytor minst 3 B; anpassa efter uppmätt hopplängd.
+Stjärna på varje ö. Blomman på sista högra plattformen. Kräver tre kontrollerade övergångar, inte ett enda långt fullgashopp.
+Moment: anpassa fart och landningsvinkel. Expertlinje: behåll flytet utan stopp.
+Återhämtning: den undre vägen leder tillbaka till en ramp vid start. En miss kostar tid men låser inte spelaren.
+
+08. GRUVANS ANDRA VÅNING – medel, 24 B × 14 B, 4 stjärnor
+Silhuett: två långa tunnelplan förbundna i högeränden och en separat utgång åt vänster på nedre planet.
+Start: övre vänster, höger. Rutt: övre tunneln ut, bred nedfart till höger, nedre tunneln tillbaka till blomman nere vänster.
+Två stjärnor per våning, tydligt placerade i färdvägen. Fri höjd minst 1,4 H på normala partier; bara ett kort lägre avsnitt med synlig varning.
+Moment: lugn gas, huvudkontroll och vändning. Ljusare golvkant och mörkare tak ger läsbarhet.
+Expertlinje: jämn fart utan takkontakt. Återhämtning: plan botten och vändficka vid högeränden.
+
+09. SKÅLEN MED EN UTGÅNG – medel, 18 B × 13 B, 3 stjärnor
+Silhuett: djup U-skål med låg ingång vänster och hög utgång höger.
+Start: vänstersidan. Stjärnor: längst ner, på vänster mellanavsats och vid högra utgångsläppen; blomman på utgångens plana hylla.
+Moment: kör fram och tillbaka för att bygga energi med gas och viktskifte. Det ska vara möjligt att återhämta sig från stillastående i botten.
+Expertlinje: en perfekt pumpsekvens. Återhämtning: inga dödliga objekt i skålen, mjuka bottenövergångar.
+
+10. SAXEN – medel, 22 B × 15 B, 4 stjärnor
+Silhuett: två överlappande diagonala jordramper med ett rejält luftgap mellan, som en öppen sax i sidovy. Ingen geometrisk korsning.
+Start: nedre vänster. Rutt: upp åt höger på nedre rampen, vänd på höger vilohylla och kör upp åt vänster på övre rampen till blomman.
+Stjärnor: två på varje ramp. Övre rampens undersida är tak över en del av nedre vägen; lämna minst 1,5 H.
+Moment: byta färdriktning på höjd. Expertlinje: gör vändningen med en liten volt på den breda hyllan.
+Återhämtning: lägre ramp fångar missade upphopp. Inga blinda huvudfällor i skarven.
+
+11. STENHYLLAN – medel/svår, 16 B × 12 B, 3 stjärnor
+Silhuett: en kort markerad utskjutande hylla över en bred landningsgrop, följd av en ramp till höger.
+Start: övre vänster. Rutt: första stjärnan på ansatsen, låt framhjulet rulla över kanten och bromsa mot hyllans hörn, nå andra stjärnan precis utanför kanten med cykelns verifierade samlarcollider, släpp till gropen och ta tredje stjärnan på utgångsrampen. Blomma uppe höger.
+Moment: första trygga introduktionen till hjulhäng. Placera andra stjärnan efter en faktisk räckviddsmätning.
+Expertlinje: kort häng och snabb kontrollerad släppning. Återhämtning: gropen är körbar och leder tillbaka till ansatsen via en sidoramp.
+
+12. HÄNGTRÄDGÅRDEN – svår, 24 B × 14 B, 4 stjärnor
+Silhuett: tre breda svävande hyllor på olika höjd ovanför ett sammanhängande golv.
+Start: vänsterhylla. Tre stjärnor vid åtkomliga ytterkanter, en på sista landningen. Blomma längst till höger på golvets uppfart.
+Moment: hjulgrepp, viktskifte och kontrollerat släpp. Hyllornas hörn ska ha avsiktlig kontaktgeometri, inte kollisionsfel.
+Expertlinje: länka hyllorna ovanför golvet. Återhämtning: golvet leder till en återföringsramp; stjärnorna kan inte tas därifrån utan att återvända upp.
+Grindvillkor: om motor och kontroller inte möjliggör repeterbara hjulhäng måste de förbättras och verifieras innan banan godkänns.
+
+13. SPIRALBRUNNEN – svår, 20 B × 20 B, 4 stjärnor
+Silhuett: stor öppen spiral runt en central målhylla, med jordfyllda band och tydlig körkorridor.
+Start: yttre övre vänster. Rutt: följ utsidan ner runt spiralens botten, klättra upp på insidan, vänd på bred avsats och nå centrum via en kort rampsekvens.
+Stjärnor: en per tydlig sektion, blomma i centrum. Korridoren ska ha minst 1,5 H fri höjd och vändplatser minst 3 B.
+Moment: orientering, kurvor och fartkontroll. Ingen lång takåkning eller gravitationsändring krävs. Geometrin ska byggas kring verkligt körbara lutningar.
+Expertlinje: kontrollerat hopp mellan två avsatser. Återhämtning: stoppfickor före branta partier; undvik en envägsficka i centrum.
+
+14. SICKSACKSSCHAKTET – svår, 15 B × 23 B, 4 stjärnor
+Silhuett: vertikalt schakt med fyra växelvis utskjutande avsatser och korta uppåtramper.
+Start: botten. Rutt: höger, vänster, höger, vänster upp genom schaktet. En stjärna på varje ny höjdnivå; blomma högst upp.
+Moment: klättra, stanna och vända. Varje vilohylla minst 2,5 B, huvudet måste ha fri båge genom hela hoppet.
+Expertlinje: behåll momentum genom två våningar. Återhämtning: föregående hylla fångar de flesta missar; botten har väg tillbaka till första rampen.
+
+15. LÅGA TAKET – svår, 24 B × 10 B, 3 stjärnor
+Silhuett: lång tunnel med tre olika takhöjder och en kort öppen ljusbrunn i mitten.
+Start: vänster. Stjärnor: före första låga taket, i ljusbrunnen och efter sista takpartiet. Blomma utanför tunneln höger.
+Moment: minska onödiga studsar, kontrollera förarens huvud och hålla rätt cykelvinkel. Dimensionera lägsta öppningen efter hela förarens kollisionssvep; den måste vara möjlig med god marginal i avsedd pose.
+Expertlinje: mjuk gas genom hela tunneln. Återhämtning: bromsfickor före trånga partier. Svårigheten ska vara synlig, inte komma från osynliga pixlar.
+
+16. DUBBELSTUDSEN – svår, 22 B × 16 B, 3 stjärnor
+Silhuett: två skålformade landningsfickor följda av var sin högre hylla.
+Start: vänster ansats. Stjärna i första fickan, på mellanplattformen och vid andra hyllans landning; blomma på högra slutplattformen.
+Moment: komprimera fjädringen vid landning och tajma avlastningen. Starta med cirka 1 B nivåskillnad och anpassa till uppmätt kontrollerad studs.
+Expertlinje: två studsar i en sammanhängande rörelse. Återhämtning: var och en av fickorna har plats att stanna och göra nytt försök. Ingen bana får kräva en numerisk fysikexplosion.
+
+17. NYCKELHÅLET – svår, 18 B × 18 B, 4 stjärnor
+Silhuett: stor rundad kammare ovanför en kort bred hals, med separata in- och utvägar.
+Start: nere vänster. Rutt: upp genom vänster ramp till kammaren, ta två stjärnor på övre sidohyllor, bromsa och fall kontrollerat genom halsen till undergången, ta sista stjärnan och kör ut åt höger till blomman. Första stjärnan på uppfarten.
+Moment: rotera och passa in cykeln i ett tydligt avläsbart genomsläpp. Halsen är ett kort passageparti, inte ett för smalt lodrätt rör.
+Expertlinje: rak kontrollerad nedfart efter sista sidostjärnan. Återhämtning: bred botten under halsen med återväg till uppfarten.
+
+18. ÅTTANS HEMLIGHET – expert, 26 B × 18 B, 5 stjärnor
+Silhuett: två sammankopplade kamrar vars färdväg tecknar en liggande åtta. Skärningspunkten har en bro på övre planet och tunnel under.
+Start: nedre vänster. Rutt: runt vänsterkammarens utsida upp till bron, över till högerkammaren, ner och tillbaka under bron, avsluta på en vänster målhylla.
+Stjärnor: vänster botten, vänster topp, broänden, höger botten och centrala underpassagen.
+Moment: läsa rutt och växla mellan nivåer. Expertlinje: korta övergången på högersidan med ett hopp, men ta fortfarande alla stjärnor.
+Återhämtning: bottnarna leder tillbaka till uppfarterna. Kamera visar nästa sväng och bro/tunnel ska inte gå att förväxla.
+
+19. KRONAN – expert, 22 B × 20 B, 5 stjärnor
+Silhuett: fem ojämna toppar kring en bred central dal, med hyllor på sidorna och en markerad krokpunkt.
+Start: vänster låg hylla. Rutt: klättra två toppar, använd krokpunkten för ett kort hjulhäng och fall till central dal, bygg fart upp till de två sista topparna och målblomman längst till höger.
+Stjärnor: en vid varje topps avsedda körlinje. Topp tre-stjärnan placeras inom verifierad räckvidd från krokpunkten.
+Moment: kombinera grepp, släpp, pumpning och precision. Expertlinje: släpp från hänget direkt in i nästa uppförsbackes rytm.
+Återhämtning: dalen är ett omtag, inte en återvändsgränd. Låt krokpunkten vara tydligt läsbar mot himlen.
+
+20. BERGETS HJÄRTA – final, 32 B × 24 B, 6 stjärnor
+Silhuett: ett enda stort berg i genomskärning med yttre klättring, övre hålrum, kort hängpassage och nedre returtunnel.
+Start: nedre vänster. Rutt: två mjuka pumpar utomhus, trappklättring på högersidan, vändning på toppen, kort trygg hängpunkt som leder ner i mittkammaren, tunnel tillbaka åt vänster och sista korta klättringen till blomman nära startens höjdläge.
+Stjärnor: första pumpdalen, trappans mitt, topphyllan, hängpunktens släppzon, mittkammarens botten och returtunnelns utgång.
+Moment: ett sammanhängande examensprov av tidigare inlärda rörelser. Ingen ny mekanik introduceras.
+Expertlinje: länka övergångarna utan stopp. Återhämtning: breda vilofickor mellan sektionerna och separata övningsstarter i träningsläge; rekordläget kör hela banan från början.
+
+GEMENSAM BALANSERING
+Tidsambition för en spelare som lärt sig banan: cirka 15–35 sekunder för de första fem, 25–55 för nästa fem, 35–80 för bana 11–15 och 45–120 för de sista. Detta är designmål, inte uppmätta medaljtider. Minska banstorlek om den faktiska hastigheten gör banorna för långa. Sätt guld/silver/brons först efter repeterbara fullföljda körningar; använd inte godtyckliga 9–16-sekunderstider från gamla banor.
+
+FYSIK OCH FJÄDRING – FÖRESLAGNA FÖRBÄTTRINGAR
+Följande är egna utvecklingsförslag. De är inte en beskrivning av Elasto Manias exakta motor och ska anpassas till nuvarande kod.
+
+1. Stabila steg: använd fast fysiksteg med ackumulator och interpolerad rendering. Börja med 1/120 s om det passar motorn, annars behåll en stabil befintlig solver. Begränsa eftersläpning efter bakgrundsflik. Verifiera samma inputsekvens vid 30, 60 och 120 renderade fps. Höj inte beräkningskostnaden blint på telefon.
+
+2. Två oberoende hjul och fjädring: varje hjul ska kunna komprimeras relativt ramen. Behåll en tydlig slaglängd med mjukt ökande stoppkraft i slutet. Landning på ett hjul ska ge begriplig rotation och avlastning, inte teleport eller stumt stopp. Fjädringens teckning ska följa den verkliga fysiken.
+
+3. Justera fjäder och dämpare separat. Om motorn använder krafter: en möjlig startmodell längs fjäderaxeln är F = -k*x - c*v_rel med entydigt definierad positiv axel. För en enskild frihetsgrad är c = 2*zeta*sqrt(k*m_eff) ett sätt att välja dämpning; zeta omkring 0,5–0,8 är bara ett startintervall, inte ett facit för en kopplad motorcykel. Om motorn är constraintsbaserad, använd dess motsvarande frekvens/dämpningsparametrar. Blanda inte ramens vikt, hjulens massa och effektiva massan okritiskt.
+
+4. Energibeteende: på plan mark ska ett stillastående fordon lugna sig. En studs ska komma från landningsenergi, motorarbete eller ett avsiktligt, begränsat viktskifte. Broms ska i grunden bromsa; om bromsstuds är en uttrycklig spelmekanik, gör dess extra impuls begränsad, synlig och bara tillgänglig i rätt kompressionsfas. Ingen obegränsad energi genom att hålla inne två knappar.
+
+5. Hjulgrepp vid kanter: använd fysisk kontakt och normalberoende friktion eller en tydligt avgränsad assistans. Ett bromsat hjul som faktiskt vilar mot ett hörn ska kunna hålla cykeln en kort stund. Ingen automatisk magnetism utan kontakt. Släpp när kontakten försvinner eller friktionsgränsen överskrids. Bromskraft ska motverka hjulens relativa rotation och inte frysa hela motorcykeln.
+
+6. Viktskifte: koppla spelarinmatning till förare/ram genom begränsad kraft eller vridmoment med mjuk upptrappning. Hjulkontakt ska påverka responsen. Luften ska tillåta kontrollerad rotation men inte fri förflyttning. Bunny hop ska vara en följd av kompression och avlastning eller en uttalad begränsad assistans, inte ett ovillkorligt hopp vid varje knapptryck.
+
+7. Kollisioner: kontrollera hjul mot linjesegment och segmentens ändpunkter med stabila normaler. Återanvänd sammanhängande kontaktnormaler där det går. Ta bort interna polygonkanter som kan fånga hjul. Använd swept collisions eller lokala substeps där hastighet och tunn terräng kräver det. Bevara befintlig avsikt att hjulen och huvudet kolliderar; gör inte ramen solid utan att först bedöma hur det påverkar genomförbarheten.
+
+8. Vändning: kontrollera hur nuvarande vändknapp ändrar cykelns riktning. Bevara fysisk position, rimliga hastigheter och giltig geometri. Undvik att spegling placerar huvud eller hjul inne i mark och att samma vändinput ger energi eller kan spammas för flygning.
+
+9. Ljud och återkoppling: låt däckljud följa faktisk kontakt och fart, kompressionsljud följa fjädringsrörelse och landningseffekt följa stötens styrka. Små partiklar får visa kontakten utan att skymma kanter. Inga kraftiga obligatoriska kameraskakningar.
+
+10. Kamera: mjuk framförhållning efter fart och riktning, med vertikal framförhållning i schakt och vid fall. Vid vändning växlar framförhållningen mjukt. Visa nästa landningsyta innan spelaren lämnar kanten. Lägg till översiktsknapp som pausar och visar hela banan, stjärnor kvar och blomma. Kamera får inte avslöja en vägg först efter hoppet.
+
+MOBIL OCH REKORD
+Behåll stora separata kontroller, tydlig feedback och multitouch. Använd pointer-ID:n så gas och lutning fungerar samtidigt och pointercancel alltid släpper rätt knapp. Kontrollerna ska inte skymma kommande landningszon. Stöd både mobil liggande och dator. Enter/omstart ska återställa fysik, input och samlarobjekt konsekvent.
+
+Behåll direkt omstart. Spara personbästa per stabilt ban-ID och per fysik-/banversion när en förändring gör tider ojämförbara. Äldre rekord får finnas kvar som historik. Förstör inte gamla tider eller medaljer genom att ersätta data på ett arrayindex. Lägg vid behov till ett valbart spöke från eget rekord efter att kärnan fungerar.
+
+GENOMFÖRANDE OCH TEST
+Bygg först banorna 01, 08 och 11 som representativa testfall för flow, flervåningskollisioner och häng. Justera tills alla går att klara med avsedda kontroller. Implementera sedan resten av paketet i samma uppdatering; stanna inte vid de tre testbanorna.
+
+För varje bana: kontrollera stabil spawn, alla stjärnors räckvidd, aktiverat mål, utanförgräns, minst en fullständig fungerande rutt och möjlighet att återhämta sig där den beskrivs. Testa hela färdvägen manuellt eller med reproducerbar input-replay. En minimap eller geometrisk granskning bevisar inte spelbarhet. Var ärlig om någon bana ännu inte är fullföljd.
+
+Kontrollera särskilt: tak och väggar har kollisionsgeometri; hjul passerar inte genom tunna hyllor vid maxfart; häng kan upprepas med kontrollerna; bromsstuds löper inte amok; cykeln fastnar inte i terrängsömmar; omstart fungerar mitt i en kollision; paus/bakgrundsflik ger ingen fysikexplosion; gamla sparfiler och ursprungliga banor fungerar; mobil multitouch fungerar.
+
+LEVERANS
+Leverera den uppdaterade spelbara artefakten med alla 20 banor, fungerande meny/minimap och bevarad grafik. Ge en kort ändringslista, vilka banor som faktiskt fullföljts under test och vilka fysikparametrar du ändrat och varför. Påstå inte att något är testat om det bara är implementerat. Prioritera färdig spelbarhet och bra körkänsla före fler nya effekter.
+
+================ SLUT PÅ PROMPT ================

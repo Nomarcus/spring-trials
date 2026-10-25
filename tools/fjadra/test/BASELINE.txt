@@ -1,0 +1,49 @@
+=== feel
+gas 1s                         x 1.38 vx 3.16 lift r/f 0.00 0.00 maxA 5 minA 0 
+gas 2s                         x 6.14 vx 6.27 lift r/f 0.00 0.00 maxA 5 minA 0 
+gas 4s                         x 23.79 vx 11.09 lift r/f 0.00 0.00 maxA 5 minA 0 
+pump x6 no gas                 x 4.80 vx 1.59 lift r/f 1.02 0.66 maxA 18 minA -27  pump pump pump pump
+drop 1.2m, brake at land       x -0.01 vx 0.02 lift r/f 0.03 0.01 maxA 1 minA -2  bounce(0.16)@0.52
+drop 1.2m, no brake            x -0.00 vx -0.00 lift r/f 0.00 0.00 maxA 1 minA -1 
+lean back+brake press (flat)   x -1.44 vx -0.72 lift r/f 0.20 1.26 maxA 43 minA -4  bounce(0.29)@0.90
+brutal volt: brake+back+volt   HEAD at 1.52 x -1.7
+drop 1.2m, brake at PEAK       x -0.17 vx -0.21 lift r/f 0.57 0.35 maxA 7 minA -10  bounce(0.34)@0.60
+drop 2.5m, brake at PEAK       x -0.14 vx -0.14 lift r/f 1.24 1.24 maxA 6 minA -10  bounce(0.36)@0.80
+drop 2.5m, no brake            x 0.00 vx -0.00 lift r/f 1.24 1.24 maxA 2 minA -3 
+=== drops
+1m  0°:ok c0.35 b0.62     20°:ok c0.35 b0.63    -20°:ok c0.34 b0.63   35°:ok c0.34 b0.66    -35°:ok c0.34 b0.74   
+2m  0°:ok c0.36 b0.60     20°:ok c0.38 b0.60    -20°:ok c0.37 b0.62   35°:ok c0.36 b0.65    -35°:ok c0.36 b0.70   
+4m  0°:ok c0.39 b0.57     20°:ok c0.42 b0.57    -20°:ok c0.41 b0.58   35°:ok c0.39 b0.60    -35°:ok c0.40 b0.63   
+6m  0°:ok c0.41 b0.54     20°:ok c0.44 b0.54    -20°:ok c0.44 b0.56   35°:ok c0.43 b0.55    -35°:ok c0.43 b0.58   
+8m  0°:ok c0.44 b0.52     20°:ok c0.46 b0.52    -20°:ok c0.47 b0.54   35°:ok c0.46 b0.52    -35°:ok c0.45 b0.53   
+10m 0°:ok c0.46 b0.50     20°:ok c0.48 b0.50    -20°:ok c0.49 b0.52   35°:ok c0.49 b0.49    -35°:ok c0.48 b0.51   
+=== ragdoll_energy
+lim    3.2/6  1.9/6  3.2/5  3.4/29  1.8/10  1.7/19  1.8/18  3.4/5  3.2/6  1.9/5
+nolim  2.9/6  2.3/6  2.9/5  1.9/6  3.1/5  3.5/5  4.1/6  4.1/6  2.1/6  1.9/5
+=== ragdoll_slide
+v4 t0.7 hip 1.7/0.1 head y0.2 | t1.3 hip 2.4/0.1 head y0.2 | t2.0 hip 2.4/0.1 head y0.3 | t2.7 hip 2.3/0.1 head y0.4 | t3.3 hip 2.1/0.1 head y0.3 | t4.0 hip 2.1/0.1 head y0.2 | thigh 0.47 shin 0.55
+v8 t0.7 hip 3.5/0.3 head y0.3 | t1.3 hip 4.9/0.2 head y0.2 | t2.0 hip 5.2/0.1 head y0.2 | t2.7 hip 5.2/0.1 head y0.2 | t3.3 hip 5.1/0.1 head y0.2 | t4.0 hip 5.0/0.1 head y0.2 | thigh 0.47 shin 0.55
+v12 t0.7 hip 5.6/0.1 head y0.3 | t1.3 hip 7.5/0.1 head y0.2 | t2.0 hip 8.0/0.1 head y0.2 | t2.7 hip 8.0/0.1 head y0.2 | t3.3 hip 7.9/0.1 head y0.2 | t4.0 hip 7.8/0.1 head y0.2 | thigh 0.47 shin 0.55
+=== gas_ramp
+run-up 3m   20°:+12°   28°:+17°   36°:+26°   44°:+56°
+run-up 6m   20°:+12°   28°:+17°   36°:+26°   44°:+56°
+run-up 12m   20°:+12°   28°:+17°   36°:+26°   44°:+56°
+=== gas_lean
+gas from rest + lean back  ->  lean 0s: 5°   lean 0.3s: 13°   lean 0.6s: 13°   lean 1s: 13°   lean 1.5s: 13°
+=== save
+rate 0  35°:saved  45°:saved  55°:saved  65°:saved  72°:saved  80°:flip
+rate 1  35°:saved  45°:saved  55°:saved  65°:flip  72°:flip  80°:flip
+rate 2  35°:saved  45°:saved  55°:flip  65°:flip  72°:flip  80°:flip
+=== hop
+rest                         rear lift 0.00 front lift 0.00 x -0.00 ang 0
+brake+back -> fwd            rear lift 0.24 front lift 0.05 x 1.58 ang 4
+back -> fwd (no brake)       rear lift 0.94 front lift 0.54 x 1.39 ang -8
+back 0.2s -> fwd             rear lift 0.13 front lift 0.31 x 0.84 ang 3
+fwd -> back (wheelie hop)    rear lift 0.58 front lift 0.13 x 0.71 ang 1
+back 0.3 -> fwd rolling 4m/s rear lift 0.92 front lift 0.55 x 8.96 ang -5
+gas 1.5s                     rear lift 0.00 front lift 0.00 x 10.88 ang -0
+=== hang
+v 1  brake@8.4: ok hang 3.7s ★          brake@9: ok hang 3.7s ★          brake@9.5: ok hang 3.7s ★          brake@9.8: ok hang 3.6s ★          brake@10.1: ok hang 3.1s          
+v 1.8  brake@8.4: ok hang 7.7s ★          brake@9: ok hang 7.7s ★          brake@9.5: ok hang 7.5s ★          brake@9.8: ok hang 7.4s            brake@10.1: CRASH@7.0 hang 0.0s   
+v 2.6  brake@8.4: ok hang 9.2s ★          brake@9: ok hang 8.9s ★          brake@9.5: ok hang 9.0s ★          brake@9.8: ok hang 8.9s ★          brake@10.1: CRASH@5.6 hang 0.0s   
+v 3.4  brake@8.4: ok hang 9.9s ★          brake@9: ok hang 9.8s ★          brake@9.5: CRASH@5.0 hang 0.0s     brake@9.8: CRASH@4.9 hang 0.0s     brake@10.1: CRASH@4.8 hang 0.0s   
