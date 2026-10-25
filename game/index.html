@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#18324f">
 <title>Fjädra – motocross på fjädrar</title>
@@ -68,7 +68,21 @@ body{ background:#18324f; color:var(--ink); font-family:'Nunito',system-ui,-appl
 .k.small svg{ width:26px; height:26px; }
 .k.small span{ font-family:'Lilita One',sans-serif; font-size:10px; letter-spacing:.06em; line-height:1; opacity:.92; }
 @media (max-height:420px){ .k{ width:64px; height:64px; border-radius:19px; } .k.lean,.k.big{ width:78px; height:78px; border-radius:24px; } .k.lean svg{ width:36px; height:36px; } .k.small{ width:56px; height:48px; border-radius:16px; } .k.small svg{ width:22px; height:22px; } .k.small span{ font-size:9px; } .rpad{ gap:7px; } }
-@media (hover:hover) and (pointer:fine){ #ctl{ opacity:.5; } }
+.tabs{ display:flex; gap:8px; margin:0 0 10px; }
+.tab{ border:2.5px solid var(--navy); background:var(--panel); color:var(--ink); border-radius:14px; padding:7px 14px; font-family:'Lilita One',sans-serif; font-size:16px; cursor:pointer; box-shadow:0 3px 0 rgba(10,22,38,.3); display:flex; align-items:center; }
+.tab.on{ background:var(--navy); color:#fff; }
+#lvlname{ background:var(--hud); border:2px solid var(--navyLine); border-radius:10px; padding:3px 10px; font-size:14px !important; font-weight:800; opacity:1 !important; text-shadow:none !important; }
+.k{ background:rgba(24,50,79,.82) !important; border-color:rgba(170,205,240,.75) !important; }
+#kGas{ background:rgba(63,174,55,.92) !important; border-color:rgba(210,255,200,.85) !important; }
+#kBrake{ background:rgba(200,72,58,.9) !important; border-color:rgba(255,205,195,.85) !important; }
+.k.on{ box-shadow:0 0 0 4px rgba(255,224,138,.55), 0 1px 0 rgba(8,18,30,.45) !important; filter:brightness(1.18); }
+body.neon{ --navy:#2a1458; --navy2:#3a1c78; --navyLine:#ff3ea5; --hud:rgba(26,12,52,.9); --green:#18c9b8; --greenDark:#0c8f84; --red:#ff3ea5; --gold:#ffe66d; --panel:#1b1034; --ink:#f4eaff; --muted:#bba6e0; --line:#4a2f7c; }
+body.neon .title{ color:#fff !important; text-shadow:0 0 14px #ff3ea5, 2px 2px 0 #7a2bd6; }
+body.neon #kGas{ background:rgba(24,201,184,.92) !important; }
+body.neon #kBrake{ background:rgba(255,62,165,.88) !important; }
+body.neon .card{ border-color:#ff3ea5; }
+body.neon .tab.on{ background:#ff3ea5; color:#1b1034; }
+@media (hover:hover) and (pointer:fine){ #ctl{ opacity:.6; } }
 
 /* Overlays */
 .ov{ position:absolute; inset:0; display:none; align-items:center; justify-content:center; padding:14px; z-index:5; }
@@ -122,16 +136,6 @@ body{ background:#18324f; color:var(--ink); font-family:'Nunito',system-ui,-appl
 .lv{ position:relative; }
 .newb{ position:absolute; top:6px; right:6px; background:var(--red); color:#fff; font-family:'Lilita One',sans-serif; font-size:12px; padding:2px 7px; border-radius:8px; border:2px solid var(--navy); }
 @media (prefers-reduced-motion:reduce){ #toast{ transition:none; } .k{ transition:none; } #appleTile.pop{ animation:none; } }
-
-/* Game gestures never pan/zoom the play surface; menu scrolling remains native. */
-html,body{overscroll-behavior:none;}
-@supports(height:100dvh){body{height:100dvh;}}
-#cv,#ctl,#hud,#bRestart,.hb{touch-action:none;-webkit-tap-highlight-color:transparent;}
-.k.restart-float{position:fixed;top:max(108px,env(safe-area-inset-top,0px));right:max(14px,env(safe-area-inset-right,0px));z-index:4;width:84px;height:78px;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:rgba(24,50,79,.90);border:2.5px solid #9cc7e1;box-shadow:0 4px 0 #08122666;pointer-events:auto;opacity:1;}
-.restart-float svg{width:32px;height:32px;}.restart-float span{font:800 11px 'Nunito',system-ui,sans-serif;letter-spacing:.05em;}
-@media(max-height:420px){.k.restart-float{top:96px;right:max(10px,env(safe-area-inset-right,0px));width:76px;height:68px;border-radius:19px;}.restart-float svg{width:28px;height:28px;}}
-@media(max-height:320px){.k.restart-float{top:80px;height:60px;width:70px;}}
-
 </style>
 </head>
 <body>
@@ -145,12 +149,11 @@ html,body{overscroll-behavior:none;}
   <div class="tile disp" id="timerTile"><svg width="22" height="22" viewBox="-12 -12 24 24" aria-hidden="true"><circle r="9" cy="1.5" fill="none" stroke="#fff" stroke-width="2.4"/><path d="M0 1.5V-3.5M0 1.5l3 2.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><path d="M-3-10h6M0-10v2.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg><span id="timer">00:00.00</span></div>
   <div class="hbtns">
     <button class="hb" id="bSound" aria-label="Ljud av eller på"><svg viewBox="-12 -12 24 24"><path id="sndPath" d="M-8-3h4l5-5v16l-5-5h-4z" fill="#fff"/><path id="sndWave" d="M4-4a6 6 0 0 1 0 8M6.5-7a10 10 0 0 1 0 14" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
-    <button class="hb" id="bFullscreen" aria-label="Helskärm" title="Helskärm"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-4-9h-5v5M4-9h5v5M9 4v5H4M-9 4v5h5" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="hb" id="bMap" aria-label="Översikt över banan"><svg viewBox="-12 -12 24 24"><path d="M-9-6l6-3 6 3 6-3v15l-6 3-6-3-6 3z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M-3-9v15M3-6v15" stroke="#fff" stroke-width="2"/></svg></button>
     <button class="hb" id="bMenu" aria-label="Paus och meny"><svg viewBox="-12 -12 24 24"><rect x="-6" y="-7" width="4" height="14" rx="1.5" fill="#fff"/><rect x="2" y="-7" width="4" height="14" rx="1.5" fill="#fff"/></svg></button>
   </div>
 </div>
 <div id="lvlname"></div>
-    <button class="k restart-float" id="bRestart" aria-label="Börja om banan"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M8.5 4.5A9.5 9.5 0 1 1 6.2-7.5" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M2.6-12.6l7.6 2.6-5.8 5.6z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg><span>OMSTART</span></button>
 
 <div id="ctl">
   <div class="pad">
@@ -159,7 +162,7 @@ html,body{overscroll-behavior:none;}
   </div>
   <div class="pad rpad">
     <div class="srow">
-
+      <button class="k small" id="bRestart" aria-label="Börja om banan"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M8.5 4.5A9.5 9.5 0 1 1 6.2-7.5" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M2.6-12.6l7.6 2.6-5.8 5.6z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg><span>OMSTART</span></button>
       <button class="k small" id="kTurn" data-k="turn" aria-label="Vänd cykeln"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M-11-3C-8-10 6-11 10-4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M12.6-9.6l-1 8.4-7.6-3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/><path d="M11 4C8 11-6 11-10 4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M-12.6 9.6l1-8.4 7.6 3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg><span>VÄND</span></button>
     </div>
     <div class="brow">
@@ -177,11 +180,12 @@ html,body{overscroll-behavior:none;}
     <p class="sub">Trialspussel på fjädrar. Samla alla stjärnor och kör till blomman. Ta det lugnt, läs banan och hitta vägen. Bara hjulen och huvudet rör marken – och huvudet tål ingenting.</p>
     <div class="row" id="resumeRow" style="margin:0 0 10px;display:none"><button class="btn" id="bResume">Fortsätt köra</button></div>
     <div class="row" style="margin:0 0 10px;align-items:center"><button class="btn" id="bNextUnplayed">Spela nästa</button><span id="progress" style="color:var(--muted);font-size:14px;font-weight:800"></span></div>
+    <div class="tabs" role="tablist"><button class="tab on" id="tab1" role="tab" aria-selected="true">Banpaket 1</button><button class="tab" id="tab2" role="tab" aria-selected="false">Banpaket 2 <span class="newb" style="position:static;margin-left:6px">NY</span></button></div>
     <div class="lvls" id="lvls"></div>
     <p class="help"><b>Mobil:</b> GAS och BROMS till höger, pilen vänder cykeln. ↺ ↻ flyttar förarens vikt och voltar cykeln – båda samtidigt ger en extra kraftig volt. <b>Pumpa:</b> luta bak och fram i takt för att ta fart med armarna. <b>Bunny hop:</b> luta bakåt en kort stund och kasta sedan vikten framåt. <b>Studs:</b> tryck ner ett hjul (landning eller volt) och tryck BROMS precis i botten. <b>Broms</b> får också hjulen att greppa – häng i kanter och balkar.<br>
     <b>Tangentbord:</b> ↑ gas, ↓ broms, ← → volta, mellanslag vänd, Enter börja om, Esc meny.</p>
     <p id="rot">Vänd mobilen till liggande läge för bäst kontroll.</p>
-    <div class="row"><button class="btn alt" id="bMusic">Musik: på</button><button class="btn alt" id="bFull">Helskärm</button></div>
+    <div class="row"><button class="btn alt" id="bMusic">Musik: på</button><button class="btn alt" id="bStyle">Stil: Tecknad</button><button class="btn alt" id="bFull">Helskärm</button></div>
   </div>
 </div>
 
@@ -199,12 +203,12 @@ html,body{overscroll-behavior:none;}
 </div>
 
 <script>
-// ===== FJÄDRA core v9: Elma-fjädring + fjädrad förare (trials) + ragdoll (no DOM) =====
+// ===== FJÄDRA core v11: Elma-fjädring + fjädrad förare (trials) + ragdoll (no DOM) =====
 const P = {G:10, WR:0.4, WM:1, WI:0.13, BM:2.3, BI:2.3, AX:0.96, AY:-0.55,
   KX:600, KY:118, CX:13, CY:4.6, MU:3.2, MUB:9, REST:0.04, T:9.0, MAXW:30, BRAKE:70,
   HOLD:6.5, LEANMAX:3.6, VOLT_A:46, VOLT_T:0.11, VOLT_LOCK:0.3, ALO:1.5,
   MR:2.0, KR:500, CR:12, RBX:-0.1, RBY:0.52, RLX:0.3, RCROUCH:0.24, REXT:0.08, RMAX:0.5,
-  THR_RATE:3.5, FLIP_T:0.38, BOUNCE:13, BOUNCE_MAX:3.8, BOUNCE_MIN:0.07, PUMP:1.1, PUMP_VMAX:8.5, PUMP_CD:0.3, VOLT_BRAKE:1.35, HOP:3.6, HOP_MIN:0.09, HOP_WIN:0.22, STRETCH:1.3, HOX:0.2, HOY:0.43, HR:0.23, TRAVEL:0.3, HEAD_SAFE:3.2, SAVE:9, ASSIST_K:30, ASSIST_D:8, ASSIST_T:1.6, KBUMP:2400, CBUMP:60, RDOWN:0.2, KRBUMP:2600, KPIN:2600, CPIN:45, PIN_MAX:105, PIN_REL:0.16, PIN_V:3.0, H:1/600};
+  THR_RATE:3.5, FLIP_T:0.38, BOUNCE:13, BOUNCE_MAX:3.8, BOUNCE_MIN:0.07, PUMP:1.1, PUMP_VMAX:8.5, PUMP_CD:0.3, VOLT_BRAKE:1.35, HOP:3.6, HOP_MIN:0.09, HOP_WIN:0.22, STRETCH:1.3, HOX:0.2, HOY:0.43, HR:0.23, TRAVEL:0.3, HEAD_SAFE:3.2, SAVE:9, ASSIST_K:30, ASSIST_D:8, ASSIST_T:1.6, KBUMP:2400, CBUMP:60, RDOWN:0.2, KRBUMP:2600, BRK_SHIFT:0.16, ANTI_LOOP:14, GAS_LOW:0.45, GAS_LOW_V:4.0, KPIN:2600, CPIN:45, PIN_MAX:170, PIN_REL:0.24, PIN_V:3.8, HANG_DAMP:1.8, HANG_LEAN:1.6, H:1/600};
 
 function buildSegs(rings){
   const segs=[];
@@ -233,7 +237,8 @@ const easeIO=u=>0.5-0.5*Math.cos(Math.PI*u);
 function facing(bk){ if(bk.flipT<0) return bk.dir; const u=easeIO(Math.min(1,bk.flipT/P.FLIP_T)); return bk.flipFrom*Math.cos(Math.PI*u); }
 // rider target in body frame (lean: +1 = ccw/left button)
 function riderTarget(bk,lean){ const f=facing(bk); const back=lean*bk.dir; // +1 = weight back, -1 = forward
-  return [P.RBX*f - P.RLX*lean, P.RBY + (back>0?-P.RCROUCH:back<0?P.REXT:0)]; }
+  const bs=(bk.brk&&!lean)?P.BRK_SHIFT*f:0;   // braking throws the rider's weight forward over the bars
+  return [P.RBX*f - P.RLX*lean + bs, P.RBY + (back>0?-P.RCROUCH:back<0?P.REXT:0) - (bs?0.04:0)]; }
 function newBike(x,y){
   const wy=y+P.WR, by=wy-P.AY;
   const bk={dir:1, gx:0, gy:-P.G, voltT:0, voltD:0, lock:0, impact:0, contact:[0,0], thr:0, flipT:-1, flipFrom:1, lean:0, rider:true, crouchT:0, relT:0, hopped:0, comp:[0,0], compMem:[0,0], noPin:0, assistT:0, prevBrake:0, prevBack:0, backT:0, pumpCD:0, bounced:0, pumped:0,
@@ -278,7 +283,7 @@ function collideWheel(w,segs,mu){
   return touched?Math.max(imp,1e-3):0;
 }
 function step(bk,inp,segs,h){
-  const lean=inp.lean||0; bk.lean=lean;
+  const lean=inp.lean||0; bk.lean=lean; bk.brk=inp.brake?1:0;
   // trials bunny hop: crouch back, then throw the weight forward
   const back=lean*bk.dir;
   // pumping: throwing the weight forward while the wheels bite pulls the bike along (arms on the bars)
@@ -329,6 +334,9 @@ function step(bk,inp,segs,h){
       if(!bk.assistTurned){ bk.assistTurned=1; const gl=Math.hypot(gx,gy)||1, tx=gy/gl, ty=-gx/gl, fT=(Math.cos(b.a)*tx+Math.sin(b.a)*ty)*bk.dir, vT=b.vx*tx+b.vy*ty; if(vT*fT<0&&Math.abs(vT)>0.8) turn(bk); } }
     const gl=Math.hypot(gx,gy)||1, ta=Math.atan2(gx/gl,-gy/gl); let e=ta-b.a; e=Math.atan2(Math.sin(e),Math.cos(e));
     b.w+=(P.ASSIST_K*e-P.ASSIST_D*b.w)*h; }
+  // low-speed anti-loop: throttle alone should not roll the bike over backwards (only active when it is already far up and slow)
+  if(bk.thr>0.2 && bk.contact[bk.dir===1?0:1]>0 && bk.assistT<=0){ const gl2=Math.hypot(gx,gy)||1, ag2=Math.atan2(gx/gl2,-gy/gl2); let pit=(b.a-ag2)*bk.dir; pit=Math.atan2(Math.sin(pit),Math.cos(pit)); const sp2=Math.hypot(b.vx,b.vy);
+    if(pit>0.75&&sp2<5.5){ const k2=Math.min(1,(pit-0.75)/0.35)*(1-sp2/5.5); b.w-=bk.dir*P.ANTI_LOOP*k2*bk.thr*h; } }
   if(bk.lock>0) bk.lock-=h;
   // trials save: braking + throwing the weight fully forward can pull a bike that is looping out back down —
   // works best around 40–65° and gets hopeless when it is too far back or tipping too fast
@@ -338,22 +346,27 @@ function step(bk,inp,segs,h){
       const f=win*Math.max(0,Math.min(1,1-Math.max(0,backRate-1.2)/2.8)); b.w-=bk.dir*P.SAVE*f*h; } }
   if(bk.voltT>0){ const vk=(inp.brake&&(bk.contact[0]>0||bk.contact[1]>0))?P.VOLT_BRAKE:1; b.w+=bk.voltD*P.VOLT_A*vk*h; bk.voltT-=h; }
   else if(lean){ if(b.w*lean<P.LEANMAX) b.w+=lean*P.HOLD*h; }
+  // hanging by a braked wheel: the swing settles calmly and leaning gives real control to parry the swing
+  { const p0=bk.wh[0].pin, p1=bk.wh[1].pin; if((p0&&bk.contact[1]<0.5)||(p1&&bk.contact[0]<0.5)){ b.w*=(1-P.HANG_DAMP*h); if(lean&&b.w*lean<P.LEANMAX+1.5) b.w+=lean*P.HOLD*P.HANG_LEAN*h; } }
   const dw=bk.wh[bk.dir===1?0:1];
   if(bk.thr>0.001){ const wr=Math.min(1,Math.max(0,-bk.dir*dw.w/P.MAXW)); if(wr<1){ const tq=P.T*bk.thr*(1.4-0.75*wr);   // trials torque: strong low-end grunt, gentle at speed
-      dw.w-=bk.dir*tq/P.WI*h; if(bk.assistT<=0) b.w+=bk.dir*tq/P.BI*h*0.22; } }
+      dw.w-=bk.dir*tq/P.WI*h; if(bk.assistT<=0){ const sp=Math.hypot(b.vx,b.vy), lowF=P.GAS_LOW+(1-P.GAS_LOW)*Math.min(1,sp/P.GAS_LOW_V); b.w+=bk.dir*tq/P.BI*h*0.22*lowF; } } }
   if(inp.brake){ const k=Math.min(1,P.BRAKE*h); for(const w of bk.wh) w.w+=(b.w-w.w)*k; }
   // Elma bounce: squeeze a wheel into the ground, then hit the brake to release the spring
   if(inp.brake && !bk.prevBrake && bk.rider){ let best=-1, cm=0; for(let i=0;i<2;i++){ if(bk.contact[i]>0 && bk.compMem[i]>cm){ cm=bk.compMem[i]; best=i; } }
     if(best>=0 && cm>P.BOUNCE_MIN){ const V=Math.min(P.BOUNCE_MAX,P.BOUNCE*(cm-P.BOUNCE_MIN*0.5)); const ux=-Math.sin(b.a), uy=Math.cos(b.a);
       const other=1-best; bk.wh[best].vx+=ux*V*1.15; bk.wh[best].vy+=uy*V*1.15; bk.wh[other].vx+=ux*V*0.6; bk.wh[other].vy+=uy*V*0.6;
       b.vx+=ux*V*0.85; b.vy+=uy*V*0.85; bk.r.vx=b.vx; bk.r.vy=b.vy; for(const w of bk.wh) w.pin=null; bk.noPin=0.3; bk.compMem=[0,0]; bk.bounced=cm; } }
-  bk.prevBrake=inp.brake?1:0;
+  bk.brakeAge=inp.brake?(bk.prevBrake?(bk.brakeAge||0)+h:0):9; bk.prevBrake=inp.brake?1:0;
   b.x+=b.vx*h; b.y+=b.vy*h; b.a+=b.w*h;
   const mu=inp.brake?P.MUB:P.MU;
   for(let i=0;i<2;i++){ const w=bk.wh[i]; w.x+=w.vx*h; w.y+=w.vy*h; w.a+=w.w*h;
     const im=collideWheel(w,segs,mu); bk.contact[i]=im>0?1:Math.max(0,bk.contact[i]-h*20); if(im>bk.impact) bk.impact=im;
     // Elma-style brake grab: a braking wheel that touches something at low speed grips that spot
-    if(inp.brake && bk.noPin<=0){ if(!w.pin && im>0 && Math.hypot(w.vx,w.vy)<P.PIN_V) w.pin={x:w.x,y:w.y};
+    if(inp.brake && bk.noPin<=0){ if(!w.pin && Math.hypot(w.vx,w.vy)<P.PIN_V){
+        // grab: touching now, or just left a surface (still within a few cm) — so a slightly late brake on a ledge still catches it
+        let ok=im>0; if(!ok && (bk.contact[i]>0.05||bk.brakeAge<0.3)){ nearest(segs,w.x,w.y,P.WR+0.16,()=>{ ok=true; return true; }); }
+        if(ok) w.pin={x:w.x,y:w.y}; }
       if(w.pin){ const ex=w.x-w.pin.x, ey=w.y-w.pin.y, d=Math.hypot(ex,ey); if(d>P.PIN_REL) w.pin=null; else {
         let fx=-P.KPIN*ex-P.CPIN*w.vx, fy=-P.KPIN*ey-P.CPIN*w.vy; const fm=Math.hypot(fx,fy); if(fm>P.PIN_MAX){ fx*=P.PIN_MAX/fm; fy*=P.PIN_MAX/fm; }
         w.vx+=fx/P.WM*h; w.vy+=fy/P.WM*h; } } }
@@ -406,20 +419,29 @@ function makeRagdoll(bk){
   const W=q=>{ const lx=q[0]*sg, ly=q[1]; return [b.x+lx*c-ly*s, b.y+lx*s+ly*c]; };
   const names=['head','sh','hip','knee','foot','elbow','hand'], src=[p.head,p.sh,p.hip,p.knee,p.foot,p.elbow,p.grip];
   const vx=bk.r.vx, vy=bk.r.vy, pts={};
-  names.forEach((n,i)=>{ const w=W(src[i]); const jit=(Math.random()-0.5)*0.6; pts[n]={x:w[0],y:w[1],px:w[0]-(vx+jit)/600*10,py:w[1]-(vy+jit)/600*10,r:n==='head'?P.HR:0.09}; });
+  const H0=1/240, wv=bk.b.w;   // verlet substep length used by stepRagdoll: start with the rider's own velocity plus the spin of the bike
+  names.forEach((n,i)=>{ const w=W(src[i]); const jit=(Math.random()-0.5)*0.5; const rx=w[0]-bk.r.x, ry=w[1]-bk.r.y;
+    const pvx=vx-wv*ry*0.6+jit, pvy=vy+wv*rx*0.6+jit; pts[n]={x:w[0],y:w[1],px:w[0]-pvx*H0,py:w[1]-pvy*H0,r:n==='head'?P.HR:0.09}; });
   const L=(a,b)=>Math.hypot(pts[a].x-pts[b].x,pts[a].y-pts[b].y);
-  const cons=[['head','sh'],['sh','hip'],['hip','knee'],['knee','foot'],['sh','elbow'],['elbow','hand'],['head','hip'],['sh','knee']].map(([a,b2])=>[a,b2,L(a,b2),(a==='head'&&b2==='hip')||(a==='sh'&&b2==='knee')?0.5:1]);
-  return {pts,cons,sg,gx:bk.gx,gy:bk.gy,t:0};
+  const cons=[['head','sh'],['sh','hip'],['hip','knee'],['knee','foot'],['sh','elbow'],['elbow','hand'],['head','hip'],['sh','knee']].map(([a,b2])=>[a,b2,L(a,b2),(a==='head'&&b2==='hip')||(a==='sh'&&b2==='knee')?0.12:1]);
+  const cr=(a,b,c)=>{ const A=pts[a],B=pts[b],Cc=pts[c]; return (B.x-A.x)*(Cc.y-B.y)-(B.y-A.y)*(Cc.x-B.x); };
+  const lim=[['hip','knee','foot',Math.sign(cr('hip','knee','foot'))||-sg],['sh','elbow','hand',Math.sign(cr('sh','elbow','hand'))||sg]];
+  return {pts,cons,sg,gx:bk.gx,gy:bk.gy,t:0,lim,bias:(Math.random()<0.5?-1:1)*(0.7+Math.random()*0.6)};
 }
 function stepRagdoll(rd,segs,dt){
   const n=Math.max(1,Math.round(dt/(1/240))), h=dt/n;
   for(let k=0;k<n;k++){ rd.t+=h;
-    for(const key in rd.pts){ const q=rd.pts[key]; const vx=(q.x-q.px)*0.999, vy=(q.y-q.py)*0.999; q.px=q.x; q.py=q.y; q.x+=vx+rd.gx*h*h; q.y+=vy+rd.gy*h*h; }
+    for(const key in rd.pts){ const q=rd.pts[key]; const vx=(q.x-q.px)*0.9965, vy=(q.y-q.py)*0.9965; q.px=q.x; q.py=q.y; q.x+=vx+rd.gx*h*h; q.y+=vy+rd.gy*h*h; if(key==='head'||key==='sh'){ q.x+=rd.bias*h*h*(rd.gy?1:0); q.y+=rd.bias*h*h*(rd.gy?0:1); } }
     for(let it=0;it<4;it++){
-      for(const [a,b,len,st] of rd.cons){ const A=rd.pts[a], B=rd.pts[b]; const dx=B.x-A.x, dy=B.y-A.y, d=Math.hypot(dx,dy)||1e-6; const diff=(d-len)/d*0.5*st; A.x+=dx*diff; A.y+=dy*diff; B.x-=dx*diff; B.y-=dy*diff; }
+      for(const [a,b,len,st] of rd.cons){ const A=rd.pts[a], B=rd.pts[b]; const dx=B.x-A.x, dy=B.y-A.y, d=Math.hypot(dx,dy)||1e-6; if(st<1&&d<len) continue; const diff=(d-len)/d*0.5*st;   // cross-braces act like ropes: they stop stretching but let the body fold up
+         A.x+=dx*diff; A.y+=dy*diff; B.x-=dx*diff; B.y-=dy*diff; }
+      // joint angle limits: knees and elbows only bend one way; if they hyper-extend they are pushed back softly
+      for(const [a,b,c,sgn] of rd.lim){ const A=rd.pts[a],B=rd.pts[b],Cc=rd.pts[c]; const cross=(B.x-A.x)*(Cc.y-B.y)-(B.y-A.y)*(Cc.x-B.x);
+        if(cross*sgn<-1e-5){ const mx=(A.x+Cc.x)/2, my=(A.y+Cc.y)/2; const dx=Cc.x-A.x, dy=Cc.y-A.y, L2=dx*dx+dy*dy||1e-6; const t=((B.x-A.x)*dx+(B.y-A.y)*dy)/L2; const fx=A.x+dx*t, fy=A.y+dy*t;
+          const rx=2*fx-B.x, ry=2*fy-B.y, ddx=Math.max(-0.05,Math.min(0.05,(rx-B.x)*0.3)), ddy=Math.max(-0.05,Math.min(0.05,(ry-B.y)*0.3)); B.x+=ddx; B.y+=ddy; B.px+=ddx; B.py+=ddy; } }   // pure position shift: no energy is added
       for(const key in rd.pts){ const q=rd.pts[key];
         nearest(segs,q.x,q.y,q.r,(qx,qy)=>{ const ex=q.x-qx, ey=q.y-qy, d=Math.hypot(ex,ey); if(d>=q.r||d<1e-6) return; const nx=ex/d, ny=ey/d, pen=q.r-d;
-          q.x+=nx*pen; q.y+=ny*pen; const vx=q.x-q.px, vy=q.y-q.py, vn=vx*nx+vy*ny, tx=vx-vn*nx, ty=vy-vn*ny; q.px=q.x-(tx*0.8-Math.min(0,vn)*0.25*nx); q.py=q.y-(ty*0.8-Math.min(0,vn)*0.25*ny); }); }
+          q.x+=nx*pen; q.y+=ny*pen; const vx=q.x-q.px, vy=q.y-q.py, vn=vx*nx+vy*ny, tx=vx-vn*nx, ty=vy-vn*ny; q.px=q.x-(tx*0.9975-Math.min(0,vn)*0.18*nx); q.py=q.y-(ty*0.9975-Math.min(0,vn)*0.18*ny); }); }
     }
   }
 }
@@ -427,65 +449,195 @@ function stepRagdoll(rd,segs,dt){
 
 </script>
 <script>
-// ===== Levels: 43-stage mixed trials/maze campaign (generated; see tools/build_level_campaign.py) =====
-const CAMPAIGN_LEVELS = [
-  {"name":"Startängen","theme":"meadow","hint":"Bara mjuk gas. Samla stjärnorna längs marken och kör till blomman.","rings":[{"pts":[[-14.0,27.0],[42.0,27.0],[42.0,0.0],[-14.0,0.0]]}],"apples":[[8,0.75],[16,0.75],[22,0.75]],"killers":[],"flower":[24,0],"start":[2,0.0],"medal":[16,26],"difficulty":"Mycket lätt","campaignId":"maze-v1-01"},
-  {"name":"Pumpstranden","theme":"meadow","hint":"Låga vågor och fri sikt. Hitta rytmen med vikten och låt hjulen följa marken.","rings":[{"pts":[[-8.0,65.0],[66.0,65.0],[66.0,0.0],[54.0,0.0],[53.5,0.0119],[53.0,0.0469],[52.5,0.1025],[52.0,0.175],[50.5,0.4406],[49.5,0.5975],[49.0,0.6531],[48.5,0.6881],[48.0,0.7],[47.5,0.6881],[47.0,0.6531],[46.5,0.5975],[45.5,0.4406],[44.0,0.175],[43.5,0.1025],[43.0,0.0469],[42.5,0.0119],[42.0,0.0],[41.5,0.0102],[41.0,0.0402],[40.5,0.0879],[39.5,0.2224],[38.0,0.45],[37.5,0.5121],[37.0,0.5598],[36.5,0.5898],[36.0,0.6],[35.5,0.5898],[35.0,0.5598],[34.5,0.5121],[33.5,0.3776],[32.0,0.15],[31.5,0.0879],[31.0,0.0402],[30.5,0.0102],[30.0,0.0],[29.5,0.0094],[29.0,0.0368],[28.5,0.0805],[27.5,0.2038],[26.0,0.4125],[25.5,0.4695],[25.0,0.5132],[24.5,0.5406],[24.0,0.55],[23.5,0.5406],[23.0,0.5132],[22.5,0.4695],[21.5,0.3462],[20.0,0.1375],[19.5,0.0805],[19.0,0.0368],[18.5,0.0094],[18.0,0.0],[17.5,0.0068],[16.5,0.0586],[13.5,0.3414],[12.5,0.3932],[12.0,0.4],[11.5,0.3932],[10.5,0.3414],[9.5,0.2518],[8.0,0.1],[7.0,0.0268],[6.5,0.0068],[6.0,0.0],[-8.0,0.0]]}],"apples":[[14,1.05],[33,1.0499999999999998],[51,1.1]],"killers":[],"flower":[62,0],"start":[2,0],"startDir":1,"noDeco":false,"medal":[29,50],"difficulty":"Mycket lätt","campaignId":"trials-v1-pumpstranden"},
-  {"name":"Den lilla dalen","theme":"meadow","hint":"Bara mjuk gas. Samla stjärnorna längs marken och kör till blomman.","rings":[{"pts":[[-14.0,27.0],[56.0,27.0],[56.0,0.0],[28.0,0.0059],[24.0,0.1066],[20.0,0.0],[16.0,0.1066],[12.0,0.0059],[-14.0,0.0]]}],"apples":[[13,0.7743],[24,0.8566],[34,0.75]],"killers":[],"flower":[38,0],"start":[2,0.0],"medal":[16,26],"difficulty":"Mycket lätt","campaignId":"maze-v1-02"},
-  {"name":"Skålens rytm","theme":"meadow","hint":"Rulla ner i den breda skålen och behåll farten upp. Luta framåt nära kanten. Hela skålen är körbar.","rings":[{"pts":[[-8.0,65.0],[34.0,65.0],[34.0,2.1055],[23.5175,2.1055],[23.2869,1.8793],[23.0138,1.6608],[22.6998,1.4513],[22.3468,1.252],[21.9568,1.064],[21.5321,0.8884],[21.0751,0.7264],[20.5886,0.5787],[20.0753,0.4463],[19.5383,0.33],[18.9807,0.2304],[18.4056,0.1481],[17.8166,0.0836],[17.217,0.0372],[16.6103,0.0093],[16.0,0.0],[15.3897,0.0093],[14.783,0.0372],[14.1834,0.0836],[13.5944,0.1481],[13.0193,0.2304],[12.4617,0.33],[11.9247,0.4463],[11.4114,0.5787],[10.9249,0.7264],[10.4679,0.8884],[10.0432,1.064],[9.6532,1.252],[9.3002,1.4513],[8.9862,1.6608],[8.7131,1.8793],[8.4825,2.1055],[-8.0,2.1055]]}],"apples":[[6,2.8555355413578605],[16,0.75],[27,2.8555355413578605]],"killers":[],"flower":[31,2.1055355413578605],"start":[2,2.1055355413578605],"startDir":1,"noDeco":true,"medal":[20,34],"difficulty":"Lätt","campaignId":"trials-v1-skålens-rytm"},
-  {"name":"De mjuka kullarna","theme":"meadow","hint":"Följ de mjuka kullarna. Släpp gasen en stund om framhjulet börjar lyfta.","rings":[{"pts":[[-14.0,27.0],[72.0,27.0],[72.0,0.0],[44.0,0.0016],[40.0,0.0844],[36.0,0.2561],[34.0,0.2531],[30.0,0.0511],[28.0,0.0],[26.0,0.0511],[22.0,0.2531],[20.0,0.2561],[16.0,0.0844],[12.0,0.0016],[-14.0,0.0]]}],"apples":[[17,0.8807],[33,0.9669],[46,0.75]],"killers":[],"flower":[54,0],"start":[2,0.0],"medal":[16,26],"difficulty":"Mycket lätt","campaignId":"maze-v1-03"},
-  {"name":"Vänstervägen","theme":"meadow","hint":"Du börjar till höger och kör åt VÄNSTER. Följ dalen hela vägen till blomman.","rings":[{"pts":[[-8.0,65.0],[88.0,65.0],[88.0,6.0],[65.0,6.0],[64.5,5.9933],[64.0,5.9731],[63.5,5.9397],[63.0,5.8934],[62.5,5.8347],[61.5,5.6822],[60.5,5.4882],[60.0,5.3778],[59.0,5.1358],[58.0,4.8731],[55.5,4.1936],[54.5,3.94],[53.5,3.7118],[53.0,3.6101],[52.0,3.4359],[51.5,3.3653],[51.0,3.3066],[50.5,3.2603],[50.0,3.2269],[49.5,3.2067],[48.0,3.1913],[47.0,3.1654],[46.0,3.1236],[45.0,3.0677],[43.0,2.9236],[39.5,2.6373],[37.5,2.5027],[36.5,2.4536],[35.5,2.4196],[33.5,2.3952],[33.0,2.3808],[32.5,2.3569],[31.5,2.2819],[31.0,2.2315],[30.0,2.1071],[28.5,1.8714],[27.5,1.6903],[24.0,1.0173],[22.5,0.7656],[21.5,0.627],[21.0,0.5685],[20.0,0.4761],[19.0,0.4192],[18.5,0.4048],[16.5,0.3848],[15.0,0.3414],[13.5,0.2765],[9.5,0.0782],[7.5,0.0152],[6.0,0.0],[-8.0,0.0]]}],"apples":[[61,6.339949493661166],[39,3.35],[17,1.1431851652578136]],"killers":[],"flower":[0,0],"start":[80,6],"startDir":-1,"noDeco":false,"medal":[35,60],"difficulty":"Lätt","campaignId":"trials-v1-vänstervägen"},
-  {"name":"Första upptäcktsfärden","theme":"meadow","hint":"Följ de mjuka kullarna. Släpp gasen en stund om framhjulet börjar lyfta.","rings":[{"pts":[[-14.0,27.0],[84.0,27.0],[84.0,0.0],[56.0,0.0016],[54.0,0.0218],[48.0,0.2056],[46.0,0.1625],[42.0,0.0],[40.0,0.0813],[36.0,0.5454],[34.0,0.65],[32.0,0.5454],[28.0,0.0812],[26.0,0.0],[22.0,0.1625],[20.0,0.2056],[14.0,0.0218],[12.0,0.0016],[-14.0,0.0]]}],"apples":[[21,0.9454],[40,0.8313],[56,0.7516]],"killers":[],"flower":[66,0],"start":[2,0.0],"medal":[18,29],"difficulty":"Lätt","campaignId":"maze-v1-04"},
-  {"name":"Medvinden","theme":"meadow","hint":"En lång fartbana nedför. Släpp gasen före krönen och låt hjulen följa de mjuka dalarna.","rings":[{"pts":[[-8.0,65.0],[114.0,65.0],[114.0,-1.0],[105.0,-1.0],[104.0,-0.9808],[103.0,-0.9239],[102.5,-0.8819],[101.5,-0.773],[101.0,-0.7071],[100.0,-0.5556],[98.5,-0.2903],[95.0,0.3827],[93.5,0.6344],[92.5,0.773],[92.0,0.8315],[91.0,0.9239],[90.5,0.9569],[89.5,0.9952],[89.0,1.0],[75.0,1.0],[74.5,1.012],[74.0,1.048],[73.5,1.1076],[73.0,1.1903],[72.5,1.2952],[72.0,1.4213],[71.5,1.5675],[71.0,1.7322],[70.5,1.914],[70.0,2.1111],[69.0,2.5433],[68.0,3.0123],[65.5,4.2257],[64.5,4.6785],[64.0,4.8889],[63.5,5.086],[63.0,5.2678],[62.5,5.4325],[62.0,5.5787],[61.5,5.7048],[61.0,5.8097],[60.5,5.8924],[60.0,5.952],[59.5,5.988],[59.0,6.0],[58.0,5.9855],[57.5,5.9675],[56.5,5.9115],[55.5,5.8316],[54.5,5.7324],[51.0,5.3227],[50.0,5.216],[48.5,5.0885],[47.5,5.0325],[46.5,5.0036],[46.0,5.0],[45.5,5.0157],[45.0,5.0627],[44.5,5.1403],[44.0,5.2476],[43.5,5.3832],[43.0,5.5454],[42.5,5.7322],[42.0,5.9413],[41.5,6.1699],[41.0,6.4153],[40.0,6.9437],[38.5,7.7799],[37.5,8.3257],[37.0,8.5847],[36.5,8.8301],[36.0,9.0587],[35.5,9.2678],[35.0,9.4546],[34.5,9.6168],[34.0,9.7524],[33.5,9.8597],[33.0,9.9373],[32.5,9.9843],[32.0,10.0],[31.0,9.983],[30.0,9.933],[29.0,9.8536],[28.0,9.75],[24.5,9.3087],[23.0,9.1464],[22.0,9.067],[21.0,9.017],[20.0,9.0],[19.5,9.0126],[19.0,9.0501],[18.5,9.1122],[18.0,9.1981],[17.5,9.3066],[17.0,9.4363],[16.5,9.5858],[16.0,9.753],[15.5,9.9359],[15.0,10.1322],[14.0,10.555],[11.5,11.6606],[10.5,12.0641],[10.0,12.247],[9.5,12.4142],[9.0,12.5637],[8.5,12.6934],[8.0,12.8019],[7.5,12.8878],[7.0,12.9499],[6.5,12.9874],[6.0,13.0],[-8.0,13.0]]}],"apples":[[20,9.75],[46,5.75],[75,1.75],[101,0.04289321881345254]],"killers":[],"flower":[110,-1],"start":[2,13],"startDir":1,"noDeco":false,"medal":[43,74],"difficulty":"Lätt","campaignId":"trials-v1-medvinden"},
-  {"name":"Tvillingtopparna","theme":"meadow","hint":"Två olika toppar. Första kan rullas över; till den andra behöver du behålla farten i dalen.","rings":[{"pts":[[-8.0,65.0],[66.0,65.0],[66.0,1.0],[55.0,1.0],[54.5,1.0229],[54.0,1.0911],[53.5,1.2033],[53.0,1.3572],[52.5,1.5496],[52.0,1.7766],[51.5,2.0336],[51.0,2.3153],[50.5,2.6161],[49.0,3.5702],[48.0,4.1847],[47.5,4.4664],[47.0,4.7234],[46.5,4.9504],[46.0,5.1428],[45.5,5.2967],[45.0,5.4089],[44.5,5.4771],[44.0,5.5],[43.5,5.4855],[43.0,5.4421],[42.5,5.3703],[42.0,5.2709],[41.5,5.145],[41.0,4.9939],[40.5,4.8193],[40.0,4.6232],[39.5,4.4076],[39.0,4.175],[38.5,3.9279],[37.5,3.401],[35.0,2.0311],[34.0,1.525],[33.5,1.2924],[33.0,1.0768],[32.5,0.8807],[32.0,0.7061],[31.5,0.555],[31.0,0.4291],[30.5,0.3297],[30.0,0.2579],[29.5,0.2145],[29.0,0.2],[28.5,0.2213],[28.0,0.2844],[27.5,0.3876],[27.0,0.5275],[26.5,0.7001],[26.0,0.9],[25.5,1.1212],[25.0,1.3569],[23.5,2.0788],[23.0,2.3],[22.5,2.4999],[22.0,2.6725],[21.5,2.8124],[21.0,2.9156],[20.5,2.9787],[20.0,3.0],[19.5,2.9891],[19.0,2.9564],[18.5,2.9025],[18.0,2.8282],[17.5,2.7345],[17.0,2.6228],[16.5,2.4947],[15.5,2.1971],[14.5,1.859],[12.0,0.9681],[11.0,0.6479],[10.5,0.5053],[10.0,0.3772],[9.5,0.2655],[9.0,0.1718],[8.5,0.0975],[8.0,0.0436],[7.5,0.0109],[7.0,0.0],[-8.0,0.0]]}],"apples":[[20,3.75],[44,6.25],[58,1.75]],"killers":[],"flower":[62,1],"start":[2,0],"startDir":1,"noDeco":false,"medal":[29,50],"difficulty":"Lätt","campaignId":"trials-v1-tvillingtopparna"},
-  {"name":"Bergsvalvet","theme":"meadow","hint":"Samla stjärnan ovanpå valvet. Släpp dig ner på andra sidan, vänd och ta stjärnan under. Kör sedan till blomman.","rings":[{"pts":[[-14.0,27.0],[90.0,27.0],[90.0,12.0],[86.0,12.0],[53.2,21.0],[36.48,13.0],[21.28,18.0],[12.0,14.7092],[12.0,4.7318],[14.0,8.6],[56.0,8.6],[58.0,4.4661],[62.0,4.6839],[70.0,5.3436],[74.0,5.6266],[78.0,5.7826],[80.0,5.7998],[80.0,0.0],[16.3519,0.0],[35.0,2.65],[53.0,2.65],[53.0,3.45],[34.0,3.45],[16.0,0.0],[-14.0,0.0]]}],"apples":[[45.4,4.2],[41,0.75],[61,0.75]],"killers":[],"flower":[64,0],"start":[2,0.0],"medal":[29,47],"difficulty":"Lätt","campaignId":"maze-v1-05"},
-  {"name":"Öarnas väg","theme":"meadow","hint":"Små mellanrum mellan fristående öar. Bromsa på varje ö, placera framhjulet och lyft över gapet. Marken under leder tillbaka.","rings":[{"pts":[[65.0,65.0],[65.0,3.0],[57.0,3.0],[56.5,2.9122],[56.0,2.6534],[55.5,2.2364],[55.0,1.6822],[54.5,1.0186],[54.0,0.2788],[53.0,-1.2788],[52.5,-2.0186],[52.0,-2.6822],[51.5,-3.2364],[51.0,-3.6534],[50.5,-3.9122],[50.0,-4.0],[8.0,-4.0],[7.5,-3.5981],[7.0,-2.5],[6.0,0.5],[5.5,1.5981],[5.0,2.0],[-8.0,2.0],[-8.0,65.0]]},{"pts":[[45.7,3.2],[35.7,3.0],[36.7,1.4],[45.1,2.0]]},{"pts":[[34.5,2.9],[25.5,2.7],[26.5,1.1],[33.9,1.7]]},{"pts":[[24.2,2.6],[16.2,2.4],[17.2,0.8],[23.6,1.4]]},{"pts":[[15.0,2.2],[7.0,2.0],[8.0,0.4],[14.4,1.0]]}],"apples":[[11,2.85],[20,3.25],[30,3.55],[41,3.85]],"killers":[],"flower":[61,3],"start":[1,2],"startDir":1,"noDeco":true,"medal":[29,50],"difficulty":"Medel","campaignId":"trials-v1-öarnas-väg"},
-  {"name":"Bergsbestigaren","theme":"meadow","hint":"Den här banan går bara UPPÅT. Ta paus på terrasserna och flytta vikten framåt i backarna.","rings":[{"pts":[[-8.0,65.0],[129.0,65.0],[129.0,18.0],[118.0,18.0],[117.5,17.9924],[117.0,17.9696],[116.5,17.9319],[116.0,17.8794],[115.5,17.8126],[115.0,17.7321],[114.5,17.6383],[114.0,17.5321],[113.5,17.4142],[112.5,17.1472],[112.0,17.0],[111.0,16.684],[110.0,16.3473],[107.5,15.4824],[106.0,15.0],[105.0,14.7144],[104.5,14.5858],[103.5,14.3617],[103.0,14.2679],[102.5,14.1874],[102.0,14.1206],[101.5,14.0681],[101.0,14.0304],[100.5,14.0076],[100.0,14.0],[92.0,14.0],[91.5,13.9924],[91.0,13.9696],[90.5,13.9319],[90.0,13.8794],[89.5,13.8126],[89.0,13.7321],[88.5,13.6383],[88.0,13.5321],[87.5,13.4142],[86.5,13.1472],[86.0,13.0],[85.0,12.684],[84.0,12.3473],[81.5,11.4824],[80.0,11.0],[79.0,10.7144],[78.5,10.5858],[77.5,10.3617],[77.0,10.2679],[76.5,10.1874],[76.0,10.1206],[75.5,10.0681],[75.0,10.0304],[74.5,10.0076],[74.0,10.0],[67.0,10.0],[66.5,9.9919],[66.0,9.9676],[65.5,9.9275],[65.0,9.8717],[64.5,9.8008],[64.0,9.7154],[63.5,9.6162],[63.0,9.5041],[62.0,9.245],[61.5,9.1002],[60.5,8.7864],[59.5,8.4491],[57.0,7.58],[56.0,7.2531],[55.0,6.955],[54.5,6.82],[53.5,6.5838],[53.0,6.4846],[52.5,6.3992],[52.0,6.3283],[51.5,6.2725],[51.0,6.2324],[50.5,6.2081],[50.0,6.2],[43.0,6.2],[42.5,6.1916],[42.0,6.1664],[41.5,6.1246],[41.0,6.0668],[40.5,5.9934],[40.0,5.9051],[39.5,5.8028],[39.0,5.6874],[38.0,5.4222],[37.5,5.2749],[36.5,4.958],[34.0,4.1086],[32.5,3.6251],[31.5,3.3398],[31.0,3.2126],[30.5,3.0972],[30.0,2.9949],[29.5,2.9066],[29.0,2.8332],[28.5,2.7754],[28.0,2.7336],[27.5,2.7084],[27.0,2.7],[21.0,2.7],[20.5,2.6915],[20.0,2.6662],[19.5,2.6242],[19.0,2.5663],[18.5,2.4931],[18.0,2.4055],[17.5,2.3046],[16.5,2.0682],[16.0,1.9357],[15.0,1.6504],[12.5,0.9041],[11.5,0.6318],[11.0,0.5083],[10.0,0.2945],[9.5,0.2069],[9.0,0.1337],[8.5,0.0758],[8.0,0.0338],[7.5,0.0085],[7.0,0.0],[-8.0,0.0]]}],"apples":[[24,3.45],[46,6.95],[71,10.75],[96,14.75],[121,18.75]],"killers":[],"flower":[125,18],"start":[2,0],"startDir":1,"noDeco":false,"medal":[48,82],"difficulty":"Medel","campaignId":"trials-v1-bergsbestigaren"},
-  {"name":"Tillbaka under bron","theme":"sunset","hint":"Samla stjärnan ovanpå valvet. Släpp dig ner på andra sidan, vänd och ta stjärnan under. Kör sedan till blomman.","rings":[{"pts":[[-14.0,27.0],[102.0,27.0],[102.0,12.0],[98.0,12.0],[61.6,21.0],[42.24,13.0],[24.64,18.0],[12.0,14.5464],[12.0,4.9453],[14.0,8.6],[56.0,8.6],[58.0,4.4],[62.0,4.4608],[66.0,4.6371],[78.0,5.4734],[82.0,5.6856],[86.0,5.792],[88.0,5.7986],[92.0,5.7172],[92.0,0.0],[16.3519,0.0],[35.0,2.65],[53.0,2.65],[53.0,3.45],[34.0,3.45],[16.0,0.0],[-14.0,0.0]]}],"apples":[[45.4,4.2],[41,0.75],[73,0.75]],"killers":[],"flower":[76,0],"start":[2,0.0],"medal":[32,52],"difficulty":"Lätt","campaignId":"maze-v1-06"},
-  {"name":"Bergets två våningar","theme":"meadow","hint":"Ta stjärnorna på varje våning före nedfarten. Valv har stjärnor BÅDE ovanpå och under: vänd och undersök. Bromsa i schakten.","rings":[{"pts":[[-14.0,39.2],[76.0,39.2],[76.0,24.2],[72.0,24.2],[43.4,33.2],[29.76,25.2],[17.36,30.2],[12.0,27.287],[12.0,17.8266],[16.0,18.0293],[18.0,18.0653],[20.0,18.0408],[22.0,17.9359],[24.0,17.7452],[30.0,16.9987],[32.0,16.8467],[34.0,16.7699],[36.0,16.7458],[40.0,16.7787],[42.0,16.8419],[44.0,16.9569],[46.0,17.1252],[52.0,17.7223],[54.0,17.87],[54.0,20.8],[66.0,20.8],[66.0,6.1],[59.2,6.1],[59.2,5.45],[66.0,5.45],[66.0,0.0],[48.0,0.0013],[42.0,0.0781],[36.0,0.0049],[32.0,0.1936],[30.0,0.25],[28.0,0.1936],[24.0,0.0049],[18.0,0.0781],[12.0,0.0013],[-4.0,0.0],[-4.0,4.8496],[0.0,4.521],[2.0,4.4298],[4.0,4.4],[6.0,4.4345],[8.0,4.53],[10.0,4.6777],[12.0,4.8655],[18.0,5.555],[20.0,5.6987],[28.0,5.9018],[30.0,5.8266],[32.0,5.5949],[36.0,4.9912],[38.0,4.8004],[44.0,4.4631],[46.0,4.42],[48.0,4.4611],[50.0,4.574],[54.0,4.9321],[54.0,12.2],[46.0,12.2082],[38.0,12.348],[30.0,12.2],[22.0,12.348],[16.0,12.2337],[12.0,12.2],[-14.0,12.2]]}],"apples":[[17.36,13.0125],[38.44,13.0962],[47,12.95],[44.64,0.7879],[23.56,0.7505],[15,0.75]],"killers":[],"flower":[12,0],"start":[2,12.2],"medal":[30,48],"difficulty":"Lätt","campaignId":"maze-v1-07"},
-  {"name":"Rutschkanan","theme":"sunset","hint":"Bara nedför, från höger till vänster. Dosera BROMS så cykeln håller sig på hjulen.","rings":[{"pts":[[-8.0,65.0],[91.0,65.0],[91.0,18.0],[77.0,18.0],[76.5,17.9754],[76.0,17.9021],[75.5,17.782],[75.0,17.618],[74.5,17.4142],[74.0,17.1756],[73.5,16.908],[73.0,16.618],[71.5,15.6871],[71.0,15.382],[70.5,15.092],[70.0,14.8244],[69.5,14.5858],[69.0,14.382],[68.5,14.218],[68.0,14.0979],[67.5,14.0246],[66.5,13.9818],[66.0,13.9274],[65.5,13.8375],[65.0,13.7136],[64.5,13.5575],[64.0,13.3713],[63.5,13.1578],[63.0,12.9202],[62.5,12.6618],[62.0,12.3865],[61.0,11.8013],[59.5,10.9017],[58.5,10.3382],[58.0,10.0798],[57.5,9.8422],[57.0,9.6287],[56.5,9.4425],[56.0,9.2864],[55.5,9.1625],[55.0,9.0726],[54.5,9.0182],[53.5,8.9811],[53.0,8.9248],[52.5,8.8316],[52.0,8.7029],[51.5,8.5402],[51.0,8.3455],[50.5,8.1213],[50.0,7.8705],[49.5,7.5961],[49.0,7.3017],[48.0,6.6676],[46.5,5.6641],[45.5,5.0092],[45.0,4.6983],[44.5,4.4039],[44.0,4.1295],[43.5,3.8787],[43.0,3.6545],[42.5,3.4598],[42.0,3.2971],[41.5,3.1684],[41.0,3.0752],[40.5,3.0189],[39.5,2.9854],[39.0,2.9419],[38.5,2.87],[38.0,2.7709],[37.5,2.646],[37.0,2.497],[36.5,2.3262],[36.0,2.1361],[35.5,1.9294],[34.5,1.4786],[33.0,0.7589],[32.0,0.2908],[31.5,0.0706],[31.0,-0.1361],[30.5,-0.3262],[30.0,-0.497],[29.5,-0.646],[29.0,-0.7709],[28.5,-0.87],[28.0,-0.9419],[27.5,-0.9854],[26.5,-1.0185],[26.0,-1.0734],[25.5,-1.1635],[25.0,-1.2865],[24.5,-1.4393],[24.0,-1.6183],[23.5,-1.819],[22.5,-2.2653],[21.0,-2.9635],[20.5,-3.181],[20.0,-3.3817],[19.5,-3.5607],[19.0,-3.7135],[18.5,-3.8365],[18.0,-3.9266],[17.5,-3.9815],[16.5,-4.0102],[16.0,-4.0405],[15.5,-4.0904],[15.0,-4.1587],[14.5,-4.2443],[14.0,-4.3451],[13.0,-4.5846],[10.5,-5.2817],[9.5,-5.5406],[9.0,-5.6549],[8.5,-5.7557],[8.0,-5.8413],[7.5,-5.9096],[7.0,-5.9595],[6.5,-5.9898],[6.0,-6.0],[-8.0,-6.0]]}],"apples":[[71,16.131966011250107],[51,9.09549444740409],[30,0.25297850365779784],[12,-4.107685161726715]],"killers":[],"flower":[0,-6],"start":[83,18],"startDir":-1,"noDeco":false,"medal":[37,63],"difficulty":"Medel","campaignId":"trials-v1-rutschkanan"},
-  {"name":"Tandemgreppet","theme":"meadow","hint":"Två urtag med samma avstånd som hjulaxlarna. Rulla sakta ner med däcken, bromsa och lyft framhjulet för att komma loss.","rings":[{"pts":[[-8.0,65.0],[40.0,65.0],[40.0,0.0],[27.56,0.0],[27.56,0.02],[27.5503,-0.0911],[27.5214,-0.1989],[27.4743,-0.3],[27.4103,-0.3914],[27.3314,-0.4703],[27.24,-0.5343],[27.1389,-0.5814],[27.0311,-0.6103],[26.92,-0.62],[26.8089,-0.6103],[26.7011,-0.5814],[26.6,-0.5343],[26.5086,-0.4703],[26.4297,-0.3914],[26.3657,-0.3],[26.3186,-0.1989],[26.2897,-0.0911],[26.28,0.02],[26.28,0.0],[25.64,0.0],[25.64,0.02],[25.6303,-0.0911],[25.6014,-0.1989],[25.5543,-0.3],[25.4903,-0.3914],[25.4114,-0.4703],[25.32,-0.5343],[25.2189,-0.5814],[25.1111,-0.6103],[25.0,-0.62],[24.8889,-0.6103],[24.7811,-0.5814],[24.68,-0.5343],[24.5886,-0.4703],[24.5097,-0.3914],[24.4457,-0.3],[24.3986,-0.1989],[24.3697,-0.0911],[24.36,0.02],[24.36,0.0],[20.0,0.0],[15.0,0.6],[8.0,0.0],[-8.0,0.0]]}],"apples":[[14,1.25],[25,0.1],[26.92,0.1]],"killers":[],"flower":[36,0],"start":[2,0],"startDir":1,"noDeco":true,"medal":[22,38],"difficulty":"Medel","campaignId":"trials-v1-tandemgreppet"},
-  {"name":"Låga porten","theme":"cave","hint":"Här är precision viktigare än fart. Kör mjukt och håll huvudet under de låga portarna.","rings":[{"pts":[[-8.0,0.0],[-8.0,3.1],[8.0,3.1],[9.0,3.089],[10.0,3.057],[11.0,3.0073],[14.5,2.7729],[15.5,2.7159],[17.0,2.661],[18.0,2.65],[19.0,2.6726],[20.0,2.7377],[21.0,2.8375],[23.5,3.1533],[24.5,3.266],[25.5,3.3498],[26.0,3.3774],[27.0,3.4],[28.0,3.3789],[28.5,3.3531],[29.5,3.275],[30.5,3.1697],[33.0,2.875],[34.0,2.7819],[35.0,2.7211],[35.5,2.7053],[36.5,2.7022],[38.0,2.7347],[39.0,2.7764],[40.0,2.8318],[41.5,2.9344],[45.0,3.2019],[47.0,3.3236],[48.5,3.3804],[50.0,3.4],[50.0,0.0],[48.5,0.0068],[47.0,0.0259],[41.5,0.1317],[39.0,0.15],[36.0,0.128],[29.5,0.0155],[26.5,0.0012],[25.5,0.0109],[24.0,0.0412],[19.5,0.1707],[18.0,0.1951],[17.0,0.2],[16.0,0.1951],[14.5,0.1707],[10.0,0.0412],[8.0,0.0049]]}],"apples":[[14,0.9087785252292473],[29,0.7600480947161671],[43,0.75]],"killers":[],"flower":[47,0],"start":[1,0],"startDir":1,"noDeco":true,"medal":[25,43],"difficulty":"Medel","campaignId":"trials-v1-låga-porten"},
-  {"name":"Lilla labyrinten","theme":"meadow","hint":"Ta stjärnorna på varje våning före nedfarten. Valv har stjärnor BÅDE ovanpå och under: vänd och undersök. Bromsa i schakten.","rings":[{"pts":[[-14.0,51.4],[86.0,51.4],[86.0,36.4],[82.0,36.4],[50.4,45.4],[34.56,37.4],[20.16,42.4],[12.0,39.1874],[12.0,30.0663],[14.0,33.0],[54.0,33.0],[56.0,30.1962],[60.0,30.0663],[64.0,29.7847],[64.0,33.0],[76.0,33.0],[76.0,18.3],[69.2,18.3],[69.2,17.65],[76.0,17.65],[76.0,12.2],[10.88,12.2],[10.88,5.764],[12.8306,5.6669],[14.8235,5.5122],[20.8024,4.8843],[24.7882,4.5339],[26.7812,4.4344],[28.7741,4.4],[30.7671,4.4342],[32.76,4.5337],[34.7529,4.6886],[40.7318,5.3167],[44.7176,5.6667],[46.7106,5.766],[48.7035,5.8],[50.6965,5.7654],[52.6894,5.6657],[54.6824,5.5105],[62.6541,4.6873],[64.6471,4.5327],[66.64,4.4337],[66.64,0.0],[-1.12,0.0],[-1.12,5.45],[5.68,5.45],[5.68,6.1],[-1.12,6.1],[-1.12,20.8],[10.88,20.8],[10.88,16.9885],[12.7221,16.8418],[16.6769,16.6351],[18.6544,16.6008],[22.6092,16.6827],[26.5641,16.9398],[32.4964,17.4856],[36.4513,17.8059],[40.4062,17.9825],[42.3836,17.9993],[44.361,17.9655],[48.3159,17.7595],[58.2031,16.8865],[62.1579,16.6551],[64.0,16.6093],[64.0,24.4],[16.3519,24.4],[35.0,27.05],[51.0,27.05],[51.0,27.85],[34.0,27.85],[16.0,24.4],[-14.0,24.4]]}],"apples":[[44.2,28.599999999999998],[41,25.15],[57,25.15],[52.65,12.95],[29.15,12.95],[17.879999999999995,12.95],[19.61,0.75],[39.93,0.75],[47.64,0.75]],"killers":[],"flower":[50.64,0],"start":[2,24.4],"medal":[65,104],"difficulty":"Lätt / medel","campaignId":"maze-v1-10"},
-  {"name":"Trappan mot himlen","theme":"winter","hint":"Uppåt på riktiga trappsteg. Lyft framhjulet vid kanten, luta sedan framåt så att bakhjulet följer med.","rings":[{"pts":[[-8.0,65.0],[49.0,65.0],[49.0,6.0],[35.0,6.0],[34.7,5.4],[32.0,5.4],[31.7,4.8],[29.0,4.8],[28.7,4.2],[26.0,4.2],[25.7,3.6],[23.0,3.6],[22.7,3.0],[20.0,3.0],[19.7,2.4],[17.0,2.4],[16.7,1.8],[14.0,1.8],[13.7,1.2],[11.0,1.2],[10.7,0.6],[8.0,0.6],[7.0,0.0],[-8.0,0.0]]}],"apples":[[12,1.95],[24,4.35],[39,6.75]],"killers":[],"flower":[46,6],"start":[1,0],"startDir":1,"noDeco":false,"medal":[25,43],"difficulty":"Medel","campaignId":"trials-v1-trappan-mot-himlen"},
-  {"name":"Halvmånen","theme":"sunset","hint":"Ner i en riktig halvcirkel och upp på kanten igen. Behåll farten, luta framåt och få upp båda hjulen.","rings":[{"pts":[[-8.0,65.0],[38.0,65.0],[38.0,8.5],[28.5,8.5],[28.4934,8.1663],[28.4738,7.8331],[28.4411,7.5009],[28.3954,7.1703],[28.3367,6.8417],[28.2651,6.5157],[28.1809,6.1928],[28.084,5.8734],[27.9746,5.558],[27.853,5.2472],[27.7192,4.9414],[27.5736,4.6411],[27.4162,4.3467],[27.2474,4.0588],[27.0675,3.7777],[26.8766,3.5038],[26.6752,3.2377],[26.4635,2.9797],[26.2417,2.7302],[26.0104,2.4896],[25.7698,2.2583],[25.5203,2.0365],[25.2623,1.8248],[24.9962,1.6234],[24.7223,1.4325],[24.4412,1.2526],[24.1533,1.0838],[23.8589,0.9264],[23.5586,0.7808],[23.2528,0.647],[22.942,0.5254],[22.6266,0.416],[22.3072,0.3191],[21.9843,0.2349],[21.6583,0.1633],[21.3297,0.1046],[20.9991,0.0589],[20.6669,0.0262],[20.3337,0.0066],[20.0,0.0],[19.6663,0.0066],[19.3331,0.0262],[19.0009,0.0589],[18.6703,0.1046],[18.3417,0.1633],[18.0157,0.2349],[17.6928,0.3191],[17.3734,0.416],[17.058,0.5254],[16.7472,0.647],[16.4414,0.7808],[16.1411,0.9264],[15.8467,1.0838],[15.5588,1.2526],[15.2777,1.4325],[15.0038,1.6234],[14.7377,1.8248],[14.4797,2.0365],[14.2302,2.2583],[13.9896,2.4896],[13.7583,2.7302],[13.5365,2.9797],[13.3248,3.2377],[13.1234,3.5038],[12.9325,3.7777],[12.7526,4.0588],[12.5838,4.3467],[12.4264,4.6411],[12.2808,4.9414],[12.147,5.2472],[12.0254,5.558],[11.916,5.8734],[11.8191,6.1928],[11.7349,6.5157],[11.6633,6.8417],[11.6046,7.1703],[11.5589,7.5009],[11.5262,7.8331],[11.5066,8.1663],[11.5,8.5],[-8.0,8.5]]}],"apples":[[8,9.25],[20,0.75],[32,9.25]],"killers":[],"flower":[35,8.5],"start":[2,8.5],"startDir":1,"noDeco":true,"medal":[23,40],"difficulty":"Medel / svår","campaignId":"trials-v1-halvmånen"},
-  {"name":"Sicksackgrottan","theme":"cave","hint":"Ta stjärnorna på varje våning före nedfarten. Valv har stjärnor BÅDE ovanpå och under: vänd och undersök. Bromsa i schakten.","rings":[{"pts":[[-14.0,63.6],[92.0,63.6],[92.0,48.6],[88.0,48.6],[54.6,57.6],[37.44,49.6],[21.84,54.6],[12.0,51.2757],[12.0,41.3411],[16.0,41.1282],[18.0,41.1018],[20.0,41.1394],[22.0,41.2326],[28.0,41.6148],[36.0,41.9344],[38.0,42.0592],[44.0,42.5751],[46.0,42.6962],[48.0,42.7383],[50.0,42.6883],[52.0,42.5531],[60.0,41.6866],[64.0,41.3411],[68.0,41.1027],[70.0,41.0327],[70.0,45.2],[82.0,45.2],[82.0,30.5],[75.2,30.5],[75.2,29.85],[82.0,29.85],[82.0,24.4],[62.45,24.4129],[56.585,24.5848],[54.63,24.5727],[50.72,24.4099],[48.765,24.425],[46.81,24.5778],[44.855,24.8056],[42.9,24.9749],[40.945,24.9771],[38.99,24.8107],[37.035,24.5826],[35.08,24.427],[33.125,24.4089],[29.215,24.5714],[27.26,24.5854],[21.395,24.4135],[15.8,24.4],[15.8,17.1342],[19.6962,16.8008],[21.6832,16.7179],[27.6443,16.6702],[29.6314,16.7715],[31.6184,17.128],[33.6054,17.5511],[35.5924,17.7198],[37.5795,17.6324],[39.5665,17.6459],[41.5535,17.9776],[43.5405,18.3796],[45.5276,18.4705],[49.5016,17.9757],[53.4757,17.811],[55.4627,17.6318],[59.4368,17.141],[63.4108,16.7954],[65.32,16.6836],[65.32,20.8],[77.32,20.8],[77.32,6.1],[70.52,6.1],[70.52,5.45],[77.32,5.45],[77.32,0.0],[57.4859,0.0066],[53.519,0.0845],[47.5688,0.3295],[45.5854,0.3554],[43.602,0.3202],[37.6517,0.0345],[35.6683,0.0],[33.6849,0.0339],[27.7346,0.3196],[25.7512,0.3554],[23.7678,0.33],[17.8176,0.085],[13.8507,0.0068],[-4.0,0.0],[-4.0,5.3706],[-2.0166,5.5247],[1.9502,5.7423],[3.9337,5.7917],[7.9005,5.7562],[11.8673,5.5541],[17.8176,5.1432],[25.7512,4.8381],[31.7015,4.5488],[33.6849,4.5295],[35.6683,4.6041],[37.6517,4.7792],[43.602,5.5815],[45.5854,5.7834],[47.5688,5.9028],[49.5522,5.9448],[53.519,5.8831],[57.4859,5.738],[61.4527,5.5035],[65.32,5.1817],[65.32,12.2],[59.4368,12.203],[55.4627,12.2996],[53.4757,12.302],[51.4886,12.2227],[49.5016,12.2244],[45.5276,12.684],[43.5405,12.6595],[41.5535,12.3741],[39.5665,12.2],[37.5795,12.3722],[35.5924,12.6582],[33.6054,12.6849],[29.6314,12.2251],[27.6443,12.2222],[25.6573,12.3017],[23.6703,12.2999],[19.6962,12.203],[3.8,12.2],[3.8,17.65],[10.6,17.65],[10.6,18.3],[3.8,18.3],[3.8,33.0],[15.8,33.0],[15.8,30.1382],[17.485,30.0612],[27.26,29.4244],[33.125,28.8645],[35.08,28.8337],[37.035,28.988],[40.945,29.5192],[42.9,29.6459],[46.81,29.5837],[48.765,29.6141],[50.72,29.7761],[54.63,30.2275],[56.585,30.3314],[58.54,30.3234],[64.405,30.055],[70.0,29.6129],[70.0,36.6],[60.0,36.6254],[58.0,36.669],[52.0,36.9],[48.0,36.9492],[46.0,36.8977],[40.0,36.6293],[38.0,36.6],[36.0,36.6293],[30.0,36.8977],[28.0,36.9492],[24.0,36.9],[18.0,36.669],[14.0,36.6056],[-14.0,36.6]]}],"apples":[[21.84,37.5649],[48.36,37.703],[63,37.349999999999994],[58.34,25.2868],[34.48,25.1567],[22.799999999999997,25.149999999999995],[26.15,13.0359],[48.42,13.0672],[58.31999999999999,12.949999999999996],[52.79,0.8616],[27.86,1.0654],[15.0,0.75]],"killers":[],"flower":[12,0],"start":[2,36.599999999999994],"medal":[76,122],"difficulty":"Medel","campaignId":"maze-v1-13"},
-  {"name":"Vändkroken","theme":"meadow","hint":"Ta sats i skålen, sätt upp däcken på hyllan och VÄND på platån. Blomman står bakom starten. Låt inte framhjulet rulla över stupet.","rings":[{"pts":[[-8.0,65.0],[40.0,65.0],[40.0,2.0],[30.0,2.0],[29.0,5.0],[20.0,5.0],[19.9906,4.7196],[19.9623,4.4402],[19.9152,4.1625],[19.8496,3.8874],[19.7655,3.6158],[19.6633,3.3486],[19.5433,3.0866],[19.4058,2.8306],[19.2513,2.5814],[19.0803,2.3398],[18.8934,2.1066],[18.691,1.8826],[18.4739,1.6683],[18.2426,1.4645],[17.9981,1.2718],[17.7409,1.0908],[17.472,0.9222],[17.1922,0.7664],[16.9023,0.6239],[16.6033,0.4952],[16.2961,0.3806],[15.9817,0.2806],[15.661,0.1954],[15.3351,0.1254],[15.005,0.0706],[14.6718,0.0314],[14.3364,0.0079],[14.0,0.0],[13.6636,0.0079],[13.3282,0.0314],[12.995,0.0706],[12.6649,0.1254],[12.339,0.1954],[12.0183,0.2806],[11.7039,0.3806],[11.3967,0.4952],[11.0977,0.6239],[10.8078,0.7664],[10.528,0.9222],[10.2591,1.0908],[10.0019,1.2718],[9.7574,1.4645],[9.5261,1.6683],[9.309,1.8826],[9.1066,2.1066],[8.9197,2.3398],[8.7487,2.5814],[8.5942,2.8306],[8.4567,3.0866],[8.3367,3.3486],[8.2345,3.6158],[8.1504,3.8874],[8.0848,4.1625],[8.0377,4.4402],[8.0094,4.7196],[8.0,5.0],[-8.0,5.0]]}],"apples":[[14,0.75],[25,5.75],[28,5.75]],"killers":[],"flower":[0,5],"start":[3,5],"startDir":1,"noDeco":false,"medal":[28,48],"difficulty":"Svår","campaignId":"trials-v1-vändkroken"},
-  {"name":"Kanten och hänget","theme":"meadow","hint":"Kör sakta ut på den tunna balken. Bromsa med bakhjulet nära kanten, häng ner och ta stjärnan. Släpp sedan ner till dalen.","rings":[{"pts":[[-8.0,65.0],[53.0,65.0],[53.0,1.0],[43.0,1.0],[32.0,-3.0],[10.0,-3.0],[10.0,4.0],[-8.0,4.0]]},{"pts":[[10,4],[17,4],[17,3.74],[10,3.74]],"style":"steel"}],"apples":[[8,4.75],[16,2.35],[26,-2.25]],"killers":[],"flower":[49,1],"start":[1,4],"startDir":1,"noDeco":true,"medal":[27,46],"difficulty":"Svår","campaignId":"trials-v1-kanten-och-hänget"},
-  {"name":"Bromsbalansen","theme":"meadow","hint":"Smala pelartoppar och korta mellanrum. Bromsa, placera däcken och gå vidare ett gap i taget. Undervägen finns om du ramlar.","rings":[{"pts":[[51.0,65.0],[51.0,2.0],[43.0,2.0],[36.0,-3.0],[8.0,-3.0],[5.0,2.0],[-8.0,2.0],[-8.0,65.0]]},{"pts":[[30.1,2.0],[30.1,-1.8],[32.6,-1.8],[32.6,2.0]]},{"pts":[[26.5,2.0],[26.5,-1.8],[29.0,-1.8],[29.0,2.0]]},{"pts":[[22.9,2.0],[22.9,-1.8],[25.4,-1.8],[25.4,2.0]]},{"pts":[[19.3,2.0],[19.3,-1.8],[21.8,-1.8],[21.8,2.0]]},{"pts":[[15.7,2.0],[15.7,-1.8],[18.2,-1.8],[18.2,2.0]]},{"pts":[[12.1,2.0],[12.1,-1.8],[14.6,-1.8],[14.6,2.0]]},{"pts":[[8.5,-1.8],[11.0,-1.8],[11.0,2.0],[8.5,2.0]]}],"apples":[[13.35,2.75],[20.55,2.75],[27.75,2.75]],"killers":[],"flower":[47,2],"start":[1,2],"startDir":1,"noDeco":true,"medal":[25,43],"difficulty":"Svår","campaignId":"trials-v1-bromsbalansen"},
-  {"name":"Gruvans återvändsgränder","theme":"cave","hint":"Ta stjärnorna på varje våning före nedfarten. Valv har stjärnor BÅDE ovanpå och under: vänd och undersök. Bromsa i schakten.","rings":[{"pts":[[-14.0,63.6],[118.0,63.6],[118.0,48.6],[114.0,48.6],[72.8,57.6],[49.92,49.6],[29.12,54.6],[12.0,51.0184],[12.0,41.0151],[14.0,45.2],[56.0,45.2],[58.0,41.9307],[70.0,41.2221],[76.0,41.0264],[80.0,41.0026],[84.0,41.0695],[88.0,41.2184],[96.0,41.6763],[96.0,45.2],[108.0,45.2],[108.0,30.5],[101.2,30.5],[101.2,29.85],[108.0,29.85],[108.0,24.4],[16.32,24.4],[16.32,16.6026],[20.32,16.7108],[22.32,20.8],[68.32,20.8],[70.32,16.6375],[74.32,16.8184],[78.32,17.1096],[78.32,20.8],[90.32,20.8],[90.32,6.1],[83.52,6.1],[83.52,5.45],[90.32,5.45],[90.32,0.0],[66.32,0.0],[48.32,3.45],[29.32,3.45],[29.32,2.65],[47.32,2.65],[65.9681,0.0],[0.16,0.0],[0.16,4.4611],[4.08,4.6489],[13.88,5.3879],[17.8,5.6366],[21.72,5.7787],[23.68,5.7998],[25.64,8.6],[68.76,8.6],[70.72,5.5297],[74.64,5.7272],[78.32,5.7976],[78.32,12.2],[24.6719,12.2],[43.32,14.85],[65.32,14.85],[65.32,15.65],[42.32,15.65],[24.32,12.2],[4.32,12.2],[4.32,17.65],[11.12,17.65],[11.12,18.3],[4.32,18.3],[4.32,33.0],[16.32,33.0],[16.32,29.5677],[24.2585,30.039],[28.2462,30.1689],[32.2338,30.1969],[36.2215,30.1188],[40.2092,29.9464],[52.1723,29.1725],[58.1538,28.8839],[62.1415,28.8036],[64.1354,28.8031],[66.1292,28.8294],[70.1169,28.9573],[74.1046,29.1679],[84.0738,29.828],[88.0615,30.0397],[92.0492,30.1692],[96.0,30.1968],[96.0,36.6],[16.3519,36.6],[35.0,39.25],[53.0,39.25],[53.0,40.05],[34.0,40.05],[16.0,36.6],[-14.0,36.6]]}],"apples":[[45.4,40.8],[41,37.349999999999994],[89,37.349999999999994],[77.21,25.15],[44.68,25.15],[23.319999999999993,25.149999999999995],[56.12,16.399999999999995],[49.32,12.949999999999996],[71.32,12.949999999999996],[36.919999999999995,4.2],[41.31999999999999,0.75],[19.159999999999997,0.75]],"killers":[],"flower":[16.16,0],"start":[2,36.599999999999994],"medal":[137,220],"difficulty":"Medel","campaignId":"maze-v1-16"},
-  {"name":"Två snabba bågar","theme":"sunset","hint":"Två stora skålar i följd. Pumpa i dalarna och hitta rytmen så att farten följer med över mittplatån.","rings":[{"pts":[[-8.0,65.0],[66.0,65.0],[66.0,3.2899],[44.5175,3.2899],[44.27,2.9133],[43.9743,2.5506],[43.6323,2.204],[43.2464,1.8761],[42.819,1.5688],[42.5907,1.4236],[42.1066,1.1511],[41.5886,0.9042],[41.0402,0.6845],[40.4651,0.4934],[39.8669,0.3321],[39.2498,0.2018],[38.6177,0.1033],[37.975,0.0373],[37.3257,0.0041],[37.0,0.0],[36.3491,0.0166],[35.7026,0.0662],[35.0646,0.1485],[34.4395,0.263],[33.8314,0.4089],[33.2442,0.5853],[32.9598,0.6845],[32.4114,0.9042],[31.8934,1.1511],[31.4093,1.4236],[30.9623,1.7197],[30.5553,2.0376],[30.1911,2.3751],[29.8719,2.73],[29.6001,3.1],[29.4825,3.2899],[20.5175,3.2899],[20.27,2.9133],[20.1281,2.73],[19.8089,2.3751],[19.4447,2.0376],[19.0377,1.7197],[18.5907,1.4236],[18.1066,1.1511],[17.5886,0.9042],[17.0402,0.6845],[16.4651,0.4934],[15.8669,0.3321],[15.2498,0.2018],[14.6177,0.1033],[13.975,0.0373],[13.3257,0.0041],[13.0,0.0],[12.3491,0.0166],[11.7026,0.0662],[11.0646,0.1485],[10.4395,0.263],[9.8314,0.4089],[9.2442,0.5853],[8.9598,0.6845],[8.4114,0.9042],[7.8934,1.1511],[7.647,1.2843],[7.181,1.5688],[6.7536,1.8761],[6.3677,2.204],[6.0257,2.5506],[5.73,2.9133],[5.4825,3.2899],[-8.0,3.2899]]}],"apples":[[13,0.75],[25,4.039899283371657],[37,0.75],[54,4.039899283371657]],"killers":[],"flower":[62,3.289899283371657],"start":[1,3.289899283371657],"startDir":1,"noDeco":true,"medal":[30,51],"difficulty":"Svår","campaignId":"trials-v1-två-snabba-bågar"},
-  {"name":"Mittpunkten","theme":"sunset","hint":"Du börjar i MITTEN och är vänd åt vänster. Ta stjärnan där först, vänd och kör tillbaka över båda dalarna.","rings":[{"pts":[[-35.0,65.0],[39.0,65.0],[39.0,5.0],[27.0,5.0],[26.5,4.9811],[26.0,4.9248],[25.5,4.8316],[25.0,4.7029],[24.5,4.5402],[24.0,4.3455],[23.5,4.1213],[23.0,3.8705],[22.5,3.5961],[22.0,3.3017],[21.5,2.9908],[20.5,2.3359],[19.0,1.3324],[18.0,0.6983],[17.5,0.4039],[17.0,0.1295],[16.5,-0.1213],[16.0,-0.3455],[15.5,-0.5402],[15.0,-0.7029],[14.5,-0.8316],[14.0,-0.9248],[13.5,-0.9811],[13.0,-1.0],[12.5,-0.9854],[12.0,-0.9419],[11.5,-0.87],[11.0,-0.7709],[10.5,-0.646],[10.0,-0.497],[9.5,-0.3262],[9.0,-0.1361],[8.5,0.0706],[8.0,0.2908],[7.0,0.7589],[5.5,1.4786],[4.5,1.9294],[4.0,2.1361],[3.5,2.3262],[3.0,2.497],[2.5,2.646],[2.0,2.7709],[1.5,2.87],[1.0,2.9419],[0.5,2.9854],[0.0,3.0],[-0.5,2.9874],[-1.0,2.9499],[-1.5,2.8878],[-2.0,2.8019],[-2.5,2.6934],[-3.0,2.5637],[-3.5,2.4142],[-4.0,2.247],[-4.5,2.0641],[-5.5,1.6606],[-8.0,0.555],[-9.0,0.1322],[-9.5,-0.0641],[-10.0,-0.247],[-10.5,-0.4142],[-11.0,-0.5637],[-11.5,-0.6934],[-12.0,-0.8019],[-12.5,-0.8878],[-13.0,-0.9499],[-13.5,-0.9874],[-14.0,-1.0],[-14.5,-0.9786],[-15.0,-0.9148],[-15.5,-0.8097],[-16.0,-0.6651],[-16.5,-0.4834],[-17.0,-0.2678],[-17.5,-0.0219],[-18.0,0.25],[-18.5,0.5433],[-19.5,1.1737],[-21.0,2.147],[-21.5,2.4567],[-22.0,2.75],[-22.5,3.0219],[-23.0,3.2678],[-23.5,3.4834],[-24.0,3.6651],[-24.5,3.8097],[-25.0,3.9148],[-25.5,3.9786],[-26.0,4.0],[-35.0,4.0]]}],"apples":[[-25,4.7],[27,5.75],[13,-0.25]],"killers":[],"flower":[34,5],"start":[0,3],"startDir":-1,"noDeco":false,"medal":[45,77],"difficulty":"Svår","campaignId":"trials-v1-mittpunkten"},
-  {"name":"Himmelsvarvet","theme":"cave","hint":"Blå stjärna vänder tyngdkraften. Kör i den rundade änden, följ taket tillbaka och ta den blå stjärnan som vänder ner dig igen.","rings":[{"pts":[[-4.0,0.0],[-4.3924,0.0128],[-4.7832,0.0513],[-5.1705,0.1153],[-5.5529,0.2044],[-5.9286,0.3184],[-6.2961,0.4567],[-6.6537,0.6188],[-7.0,0.8038],[-7.3334,1.0112],[-7.6526,1.2399],[-7.9561,1.489],[-8.2426,1.7574],[-8.511,2.0439],[-8.7601,2.3474],[-8.9888,2.6666],[-9.1962,3.0],[-9.3812,3.3463],[-9.5433,3.7039],[-9.6816,4.0714],[-9.7956,4.4471],[-9.8847,4.8295],[-9.9487,5.2168],[-9.9872,5.6076],[-10.0,6.0],[-9.9872,6.3924],[-9.9487,6.7832],[-9.8847,7.1705],[-9.7956,7.5529],[-9.6816,7.9286],[-9.5433,8.2961],[-9.3812,8.6537],[-9.1962,9.0],[-8.9888,9.3334],[-8.7601,9.6526],[-8.511,9.9561],[-8.2426,10.2426],[-7.9561,10.511],[-7.6526,10.7601],[-7.3334,10.9888],[-7.0,11.1962],[-6.6537,11.3812],[-6.2961,11.5433],[-5.9286,11.6816],[-5.5529,11.7956],[-5.1705,11.8847],[-4.7832,11.9487],[-4.3924,11.9872],[-4.0,12.0],[48.0,12.0],[48.3924,11.9872],[48.7832,11.9487],[49.1705,11.8847],[49.5529,11.7956],[49.9286,11.6816],[50.2961,11.5433],[50.6537,11.3812],[51.0,11.1962],[51.3334,10.9888],[51.6526,10.7601],[51.9561,10.511],[52.2426,10.2426],[52.511,9.9561],[52.7601,9.6526],[52.9888,9.3334],[53.1962,9.0],[53.3812,8.6537],[53.5433,8.2961],[53.6816,7.9286],[53.7956,7.5529],[53.8847,7.1705],[53.9487,6.7832],[53.9872,6.3924],[54.0,6.0],[53.9872,5.6076],[53.9487,5.2168],[53.8847,4.8295],[53.7956,4.4471],[53.6816,4.0714],[53.5433,3.7039],[53.3812,3.3463],[53.1962,3.0],[52.9888,2.6666],[52.7601,2.3474],[52.511,2.0439],[52.2426,1.7574],[51.9561,1.489],[51.6526,1.2399],[51.3334,1.0112],[51.0,0.8038],[50.6537,0.6188],[50.2961,0.4567],[49.9286,0.3184],[49.5529,0.2044],[49.1705,0.1153],[48.7832,0.0513],[48.3924,0.0128],[48.0,0.0]]}],"apples":[[45,0.75,"up"],[39,11.25],[24,11.25],[6,11.25,"down"],[0,0.75]],"killers":[],"flower":[15,0],"start":[2,0],"startDir":1,"noDeco":true,"medal":[20,34],"difficulty":"Svår","campaignId":"trials-v1-himmelsvarvet"},
-  {"name":"Ficklampans hemlighet","theme":"cave","hint":"Ta stjärnorna på varje våning före nedfarten. Valv har stjärnor BÅDE ovanpå och under: vänd och undersök. Bromsa i schakten.","rings":[{"pts":[[-14.0,75.8],[104.0,75.8],[104.0,60.8],[100.0,60.8],[63.0,69.8],[43.2,61.8],[25.2,66.8],[12.0,63.3263],[12.0,54.178],[14.0,57.4],[56.0,57.4],[58.0,53.2902],[62.0,53.4826],[72.0,54.178],[76.0,54.4153],[80.0,54.5634],[82.0,54.5954],[82.0,57.4],[94.0,57.4],[94.0,42.7],[87.2,42.7],[87.2,42.05],[94.0,42.05],[94.0,36.6],[19.7,36.6],[19.7,29.5955],[23.4209,29.8928],[25.386,33.0],[70.5837,33.0],[72.5488,29.75],[76.4791,30.0256],[80.2,30.1741],[80.2,33.0],[92.2,33.0],[92.2,18.3],[85.4,18.3],[85.4,17.65],[92.2,17.65],[92.2,12.2],[17.0,12.2],[17.0,5.2038],[20.9238,5.5171],[22.9143,8.6],[66.7048,8.6],[68.6952,5.3139],[72.6762,5.6055],[74.6667,5.7089],[78.6476,5.7999],[82.6286,5.7219],[84.619,5.624],[88.6,5.3397],[88.6,0.0],[25.3519,0.0],[44.0,2.65],[63.6,2.65],[63.6,3.45],[43.0,3.45],[25.0,0.0],[5.0,0.0],[5.0,5.45],[11.8,5.45],[11.8,6.1],[5.0,6.1],[5.0,20.8],[17.0,20.8],[17.0,16.6193],[18.8727,16.6704],[22.8364,16.8781],[34.7273,17.7864],[38.6909,17.962],[40.6727,17.9968],[42.6545,17.9931],[46.6182,17.8728],[50.5818,17.6274],[60.4909,16.8531],[64.4545,16.6571],[66.4364,16.6102],[68.4182,16.6015],[72.3818,16.6984],[76.3455,16.9267],[80.2,17.2277],[80.2,24.4],[28.0519,24.4],[46.7,27.05],[67.2,27.05],[67.2,27.85],[45.7,27.85],[27.7,24.4],[7.7,24.4],[7.7,29.85],[14.5,29.85],[14.5,30.5],[7.7,30.5],[7.7,45.2],[19.7,45.2],[19.7,41.0221],[21.4295,41.0692],[25.3523,41.2763],[37.1205,42.1855],[41.0432,42.3617],[43.0045,42.3968],[46.9273,42.3511],[50.85,42.1629],[60.6568,41.3906],[64.5795,41.1389],[66.5409,41.0565],[70.4636,41.0016],[74.3864,41.0995],[78.3091,41.3288],[82.0,41.6202],[82.0,48.8],[16.3519,48.8],[35.0,51.45],[53.0,51.45],[53.0,52.25],[34.0,52.25],[16.0,48.8],[-14.0,48.8]]}],"apples":[[45.4,53.0],[41,49.55],[75,49.55],[68.08,37.35],[41.45,37.35],[26.700000000000003,37.349999999999994],[58.6,28.599999999999998],[52.7,25.15],[73.2,25.15],[66.02,12.95],[39.1,12.95],[24.0,12.950000000000003],[55.36,4.2],[50.0,0.75],[69.6,0.75]],"killers":[],"flower":[72.6,0],"start":[2,48.8],"medal":[150,240],"difficulty":"Medel / svår","campaignId":"maze-v1-19"},
-  {"name":"Toppen från höger","theme":"winter","hint":"Börja nere till höger och klättra åt VÄNSTER hela vägen. Ingen nedfart – bara uppför och breda viloplatser.","rings":[{"pts":[[-8.0,65.0],[127.0,65.0],[127.0,0.0],[115.0,0.0],[114.5,0.0094],[114.0,0.0376],[113.5,0.0842],[113.0,0.1485],[112.5,0.2299],[112.0,0.3273],[111.5,0.4393],[111.0,0.5648],[110.5,0.702],[109.5,1.0046],[107.0,1.8338],[106.0,2.1508],[105.5,2.298],[104.5,2.5607],[104.0,2.6727],[103.5,2.7701],[103.0,2.8515],[102.5,2.9158],[102.0,2.9624],[101.5,2.9906],[101.0,3.0],[93.0,3.0],[92.5,3.0085],[92.0,3.0341],[91.5,3.0763],[91.0,3.1351],[90.5,3.2097],[90.0,3.2996],[89.5,3.404],[89.0,3.522],[88.0,3.7947],[87.5,3.9471],[86.5,4.2775],[85.5,4.6325],[83.0,5.5473],[82.0,5.8915],[81.5,6.0529],[80.5,6.3474],[80.0,6.478],[79.5,6.596],[79.0,6.7004],[78.5,6.7903],[78.0,6.8649],[77.5,6.9237],[77.0,6.9659],[76.5,6.9915],[76.0,7.0],[68.0,7.0],[67.5,7.0107],[67.0,7.0426],[66.5,7.0954],[66.0,7.1688],[65.5,7.2621],[65.0,7.3745],[64.5,7.505],[64.0,7.6525],[63.5,7.8158],[63.0,7.9934],[62.0,8.3857],[61.0,8.8158],[58.5,9.9594],[57.5,10.4031],[56.5,10.8161],[56.0,11.0066],[55.5,11.1842],[55.0,11.3475],[54.5,11.495],[54.0,11.6255],[53.5,11.7379],[53.0,11.8312],[52.5,11.9046],[52.0,11.9574],[51.5,11.9893],[51.0,12.0],[43.0,12.0],[42.5,12.012],[42.0,12.048],[41.5,12.1076],[41.0,12.1903],[40.5,12.2952],[40.0,12.4213],[39.5,12.5675],[39.0,12.7322],[38.5,12.914],[38.0,13.1111],[37.5,13.3215],[36.5,13.7743],[34.0,14.9877],[33.0,15.4567],[32.5,15.6785],[32.0,15.8889],[31.5,16.086],[31.0,16.2678],[30.5,16.4325],[30.0,16.5787],[29.5,16.7048],[29.0,16.8097],[28.5,16.8924],[28.0,16.952],[27.5,16.988],[27.0,17.0],[20.0,17.0],[19.5,17.0126],[19.0,17.0501],[18.5,17.1122],[18.0,17.1981],[17.5,17.3066],[17.0,17.4363],[16.5,17.5858],[16.0,17.753],[15.5,17.9359],[14.5,18.3394],[12.0,19.445],[11.0,19.8678],[10.5,20.0641],[10.0,20.247],[9.5,20.4142],[9.0,20.5637],[8.5,20.6934],[8.0,20.8019],[7.5,20.8878],[7.0,20.9499],[6.5,20.9874],[6.0,21.0],[-8.0,21.0]]}],"apples":[[97,3.75],[72,7.75],[47,12.75],[24,17.75]],"killers":[],"flower":[0,21],"start":[120,0],"startDir":-1,"noDeco":false,"medal":[47,80],"difficulty":"Svår","campaignId":"trials-v1-toppen-från-höger"},
-  {"name":"Hjulnyckeln","theme":"cave","hint":"Stjärnorna ligger nere i hjulfickorna. Rulla ner däcken i urtagen, ta båda och lyft dig loss. VÄND sedan tillbaka till blomman.","rings":[{"pts":[[-8.0,65.0],[40.0,65.0],[40.0,0.0],[27.47,0.0],[27.47,-0.35],[27.4616,-0.4455],[27.4368,-0.5381],[27.3963,-0.625],[27.3413,-0.7035],[27.2735,-0.7713],[27.195,-0.8263],[27.1081,-0.8668],[27.0155,-0.8916],[26.92,-0.9],[26.8245,-0.8916],[26.7319,-0.8668],[26.645,-0.8263],[26.5665,-0.7713],[26.4987,-0.7035],[26.4437,-0.625],[26.4032,-0.5381],[26.3784,-0.4455],[26.37,-0.35],[26.37,0.0],[25.55,0.0],[25.55,-0.35],[25.5416,-0.4455],[25.5168,-0.5381],[25.4763,-0.625],[25.4213,-0.7035],[25.3535,-0.7713],[25.275,-0.8263],[25.1881,-0.8668],[25.0955,-0.8916],[25.0,-0.9],[24.9045,-0.8916],[24.8119,-0.8668],[24.725,-0.8263],[24.6465,-0.7713],[24.5787,-0.7035],[24.5237,-0.625],[24.4832,-0.5381],[24.4584,-0.4455],[24.45,-0.35],[24.45,0.0],[20.0,0.0],[15.0,0.6],[8.0,0.0],[-8.0,0.0]]}],"apples":[[14,1.25],[25,-0.55],[26.92,-0.55]],"killers":[],"flower":[0,0],"start":[4,0],"startDir":1,"noDeco":true,"medal":[26,45],"difficulty":"Expert","campaignId":"trials-v1-hjulnyckeln"},
-  {"name":"Rännans mitt","theme":"meadow","hint":"Djupt ner, snabbt upp och ner igen. Pumpa i de breda dalarna och landa med hjulen längs nästa sluttning.","rings":[{"pts":[[-8.0,65.0],[81.0,65.0],[81.0,2.0],[69.0,2.0],[68.5,1.9927],[68.0,1.9709],[67.5,1.935],[67.0,1.8855],[66.5,1.823],[66.0,1.7485],[65.0,1.5681],[64.0,1.3546],[61.5,0.7607],[60.5,0.5353],[59.5,0.3369],[59.0,0.2515],[58.0,0.1145],[57.5,0.065],[57.0,0.0291],[56.5,0.0073],[56.0,0.0],[55.5,0.0254],[55.0,0.1013],[54.5,0.2259],[54.0,0.3969],[53.5,0.6106],[53.0,0.8628],[52.5,1.1484],[52.0,1.4615],[51.5,1.7957],[50.0,2.8558],[49.0,3.5385],[48.5,3.8516],[48.0,4.1372],[47.5,4.3894],[47.0,4.6031],[46.5,4.7741],[46.0,4.8987],[45.5,4.9746],[45.0,5.0],[44.5,4.9746],[44.0,4.8987],[43.5,4.7741],[43.0,4.6031],[42.5,4.3894],[42.0,4.1372],[41.5,3.8516],[41.0,3.5385],[40.5,3.2043],[39.0,2.1442],[38.0,1.4615],[37.5,1.1484],[37.0,0.8628],[36.5,0.6106],[36.0,0.3969],[35.5,0.2259],[35.0,0.1013],[34.5,0.0254],[34.0,0.0],[33.5,0.0308],[33.0,0.1224],[32.5,0.2725],[32.0,0.4775],[31.5,0.7322],[31.0,1.0305],[30.5,1.365],[30.0,1.7275],[29.5,2.1089],[28.0,3.2725],[27.5,3.635],[27.0,3.9695],[26.5,4.2678],[26.0,4.5225],[25.5,4.7275],[25.0,4.8776],[24.5,4.9692],[24.0,5.0],[23.5,4.9696],[23.0,4.8794],[22.5,4.7321],[22.0,4.5321],[21.5,4.2856],[21.0,4.0],[20.5,3.684],[19.0,2.6527],[18.5,2.316],[18.0,2.0],[17.5,1.7144],[17.0,1.4679],[16.5,1.2679],[16.0,1.1206],[15.5,1.0304],[15.0,1.0],[14.5,1.0431],[14.0,1.1713],[13.5,1.3815],[13.0,1.6684],[12.5,2.0251],[12.0,2.4428],[11.5,2.911],[11.0,3.4184],[10.5,3.9525],[9.5,5.0475],[9.0,5.5816],[8.5,6.089],[8.0,6.5572],[7.5,6.9749],[7.0,7.3316],[6.5,7.6185],[6.0,7.8287],[5.5,7.9569],[5.0,8.0],[-8.0,8.0]]}],"apples":[[15,1.75],[34,0.75],[56,0.75],[72,2.75]],"killers":[],"flower":[77,2],"start":[1,8],"startDir":1,"noDeco":false,"medal":[34,58],"difficulty":"Svår","campaignId":"trials-v1-rännans-mitt"},
-  {"name":"Djupgruvans valv","theme":"cave","hint":"Ta stjärnorna på varje våning före nedfarten. Valv har stjärnor BÅDE ovanpå och under: vänd och undersök. Bromsa i schakten.","rings":[{"pts":[[-14.0,88.0],[112.0,88.0],[112.0,73.0],[108.0,73.0],[68.6,82.0],[47.04,74.0],[27.44,79.0],[12.0,75.4587],[12.0,66.7606],[14.0,69.6],[56.0,69.6],[58.0,66.1341],[66.0,66.6109],[70.0,66.7531],[74.0,66.7999],[78.0,66.7444],[82.0,66.5947],[90.0,66.1108],[90.0,69.6],[102.0,69.6],[102.0,54.9],[95.2,54.9],[95.2,54.25],[102.0,54.25],[102.0,48.8],[13.88,48.8],[13.88,42.3986],[17.5851,42.3499],[19.5482,45.2],[66.6635,45.2],[68.6267,42.2441],[72.5529,42.373],[74.5161,42.3979],[78.4424,42.3636],[84.3318,42.1205],[90.0,41.745],[90.0,45.2],[102.0,45.2],[102.0,30.5],[95.2,30.5],[95.2,29.85],[102.0,29.85],[102.0,24.4],[78.0,24.4],[60.0,27.85],[41.0,27.85],[41.0,27.05],[59.0,27.05],[77.6481,24.4],[15.84,24.4],[15.84,17.984],[17.7546,17.9289],[21.7302,17.699],[29.6815,17.019],[33.6571,16.7419],[37.6327,16.6067],[39.6205,16.6048],[43.5961,16.733],[47.5717,17.0053],[55.5229,17.6866],[59.4985,17.9222],[61.4863,17.983],[63.4741,17.9996],[67.4498,17.8991],[69.4376,17.7884],[73.34,17.4877],[73.34,20.8],[85.34,20.8],[85.34,6.1],[78.54,6.1],[78.54,5.45],[85.34,5.45],[85.34,0.0],[61.34,0.0],[43.34,3.45],[24.92,3.45],[24.92,2.65],[42.34,2.65],[60.9881,0.0],[-0.08,0.0],[-0.08,5.7623],[3.893,5.5809],[15.8121,4.6524],[19.7851,4.4535],[21.7716,8.6],[63.4884,8.6],[65.4749,4.7916],[69.4479,4.5347],[73.34,4.4094],[73.34,12.2],[3.84,12.2],[3.84,17.65],[10.64,17.65],[10.64,18.3],[3.84,18.3],[3.84,33.0],[15.84,33.0],[15.84,29.4427],[19.5456,29.1832],[23.472,28.9604],[27.3984,28.8273],[29.3616,28.802],[31.3248,28.8059],[35.2512,28.8998],[37.2144,33.0],[80.4048,33.0],[82.368,29.021],[86.2944,28.8571],[90.0,28.8016],[90.0,36.6],[22.2319,36.6],[40.88,39.25],[62.88,39.25],[62.88,40.05],[39.88,40.05],[21.88,36.6],[1.88,36.6],[1.88,42.05],[8.68,42.05],[8.68,42.7],[1.88,42.7],[1.88,57.4],[13.88,57.4],[13.88,53.855],[21.5114,53.3763],[25.4376,53.2364],[27.4008,53.2053],[29.3639,53.2021],[33.2902,53.279],[39.1796,53.5714],[50.9584,54.3597],[54.8847,54.5295],[58.811,54.5991],[62.7373,54.5574],[66.6635,54.411],[82.3686,53.4036],[86.2949,53.2501],[90.0,53.2014],[90.0,61.0],[16.3519,61.0],[35.0,63.65],[53.0,63.65],[53.0,64.45],[34.0,64.45],[16.0,61.0],[-14.0,61.0]]}],"apples":[[45.4,65.2],[41,61.75],[83,61.75],[72.21,49.55],[40.89,49.55],[20.879999999999995,49.55],[53.68,40.800000000000004],[46.88,37.35],[83.0,37.35],[48.6,28.600000000000005],[53,25.150000000000006],[22.840000000000003,25.150000000000006],[28.42,12.95],[53.41,12.95],[66.33999999999999,12.950000000000003],[32.288,4.2],[36.33999999999999,0.75],[18.92,0.75]],"killers":[],"flower":[15.92,0],"start":[2,61.0],"medal":[197,316],"difficulty":"Svår","campaignId":"maze-v1-22"},
-  {"name":"Raketen","theme":"sunset","hint":"Kort i sidled, hög på höjden. Haka upp framhjulet stegvis och använd pauserna till att räta upp cykeln.","rings":[{"pts":[[-8.0,65.0],[47.0,65.0],[47.0,9.8],[37.2,9.8],[36.6,9.1],[34.8,9.1],[34.2,8.4],[32.4,8.4],[31.8,7.7],[30.0,7.7],[29.4,7.0],[27.6,7.0],[27.0,6.3],[25.2,6.3],[24.6,5.6],[22.8,5.6],[22.2,4.9],[20.4,4.9],[19.8,4.2],[18.0,4.2],[17.4,3.5],[15.6,3.5],[15.0,2.8],[13.2,2.8],[12.6,2.1],[10.8,2.1],[10.2,1.4],[8.4,1.4],[7.8,0.7],[6.0,0.7],[5.0,0.0],[-8.0,0.0]]}],"apples":[[10,2.15],[22,5.65],[34,9.15],[43,10.55]],"killers":[],"flower":[45,9.8],"start":[1,0],"startDir":1,"noDeco":false,"medal":[25,43],"difficulty":"Expert","campaignId":"trials-v1-raketen"},
-  {"name":"Schaktets fall","theme":"cave","hint":"Starta högst upp och kör åt vänster. Bromsa och släpp dig ner hylla för hylla. Den här banan går nästan bara NEDÅT.","rings":[{"pts":[[-7.0,40.0],[25.0,40.0],[25.0,-0.01],[-7.0,-0.01]]},{"pts":[[23.0,32.0],[3.0,32.0],[3.0,31.25],[23.0,31.25]]},{"pts":[[8.0,4.0],[8.0,3.35],[21.0,3.35],[21.0,4.0]]},{"pts":[[8.0,18.0],[8.0,17.35],[21.0,17.35],[21.0,18.0]]},{"pts":[[8.0,25.0],[8.0,24.35],[21.0,24.35],[21.0,25.0]]},{"pts":[[21.0,11.0],[8.0,11.0],[8.0,10.35],[21.0,10.35]]},{"pts":[[0.0,7.5],[0.0,6.85],[12.0,6.85],[12.0,7.5]]},{"pts":[[0.0,21.5],[0.0,20.85],[12.0,20.85],[12.0,21.5]]},{"pts":[[12.0,14.5],[0.0,14.5],[0.0,13.85],[12.0,13.85]]},{"pts":[[12.0,28.5],[0.0,28.5],[0.0,27.85],[12.0,27.85]]}],"apples":[[4,29.25],[17,25.75],[4,15.25],[17,4.75]],"killers":[],"flower":[3,0],"start":[17,32],"startDir":-1,"noDeco":true,"medal":[22,38],"difficulty":"Expert","campaignId":"trials-v1-schaktets-fall"},
-  {"name":"Stora bergslabyrinten","theme":"cave","hint":"Ta stjärnorna på varje våning före nedfarten. Valv har stjärnor BÅDE ovanpå och under: vänd och undersök. Bromsa i schakten.","rings":[{"pts":[[-14.0,88.0],[140.0,88.0],[140.0,73.0],[136.0,73.0],[88.2,82.0],[60.48,74.0],[35.28,79.0],[12.0,75.3165],[12.0,65.6785],[14.0,69.6],[56.0,69.6],[58.0,66.6675],[62.0,66.7631],[66.0,66.7997],[70.0,66.7742],[74.0,66.6888],[80.0,66.4662],[92.0,65.8619],[98.0,65.5999],[104.0,65.4369],[108.0,65.4003],[112.0,65.4258],[118.0,65.5742],[118.0,69.6],[130.0,69.6],[130.0,54.9],[123.2,54.9],[123.2,54.25],[130.0,54.25],[130.0,48.8],[106.0,48.8],[88.0,52.25],[67.0,52.25],[67.0,51.45],[87.0,51.45],[105.6481,48.8],[13.04,48.8],[13.04,41.3836],[16.8407,41.192],[18.8158,45.2],[64.2428,45.2],[66.2179,42.2969],[72.1432,42.0277],[85.9688,41.2184],[91.894,41.0269],[95.8442,41.0021],[101.62,41.1223],[101.62,45.2],[113.62,45.2],[113.62,30.5],[106.82,30.5],[106.82,29.85],[113.62,29.85],[113.62,24.4],[10.52,24.4],[10.52,17.0093],[14.3707,16.8198],[16.352,20.8],[59.9413,20.8],[61.9227,17.9974],[65.8853,17.9385],[69.848,17.8078],[73.8107,17.62],[85.6987,16.9427],[91.6427,16.696],[97.5867,16.6002],[101.5493,16.6338],[105.4,16.7388],[105.4,20.8],[117.4,20.8],[117.4,6.1],[110.6,6.1],[110.6,5.45],[117.4,5.45],[117.4,0.0],[93.4,0.0],[75.4,3.45],[52.4,3.45],[52.4,2.65],[74.4,2.65],[93.0481,0.0],[3.56,0.0],[3.56,5.0267],[11.5488,5.499],[15.5432,5.6743],[19.5375,5.7777],[23.5319,5.7963],[27.5263,5.7277],[31.5207,5.5805],[47.4982,4.6674],[49.4954,8.6],[95.4309,8.6],[97.4281,5.7448],[101.4225,5.6095],[105.4,5.4114],[105.4,12.2],[18.8719,12.2],[37.52,14.85],[57.52,14.85],[57.52,15.65],[36.52,15.65],[18.52,12.2],[-1.48,12.2],[-1.48,17.65],[5.32,17.65],[5.32,18.3],[-1.48,18.3],[-1.48,33.0],[10.52,33.0],[10.52,30.0711],[14.3959,30.1738],[18.3648,30.198],[24.3183,30.0782],[30.2717,29.8033],[42.1786,29.1049],[48.1321,28.8688],[54.0855,28.8021],[60.039,28.9225],[65.9924,29.1979],[77.8993,29.8961],[81.8683,30.0697],[85.8372,30.1745],[89.8062,30.1978],[93.7752,30.1369],[97.7441,29.9991],[101.62,29.8059],[101.62,36.6],[21.3919,36.6],[40.04,39.25],[62.04,39.25],[62.04,40.05],[39.04,40.05],[21.04,36.6],[1.04,36.6],[1.04,42.05],[7.84,42.05],[7.84,42.7],[1.04,42.7],[1.04,57.4],[13.04,57.4],[13.04,54.4368],[16.912,54.5462],[20.88,54.5975],[24.848,54.5825],[28.816,54.5029],[34.768,54.2801],[46.672,53.6576],[52.624,53.3895],[58.576,53.2292],[62.544,53.2001],[64.528,57.4],[108.176,57.4],[110.16,54.4825],[118.0,54.1543],[118.0,61.0],[16.3519,61.0],[35.0,63.65],[53.0,63.65],[53.0,64.45],[34.0,64.45],[16.0,61.0],[-14.0,61.0]]}],"apples":[[45.4,65.2],[41,61.75],[111,61.75],[75.4,53.0],[81,49.55],[20.040000000000006,49.55],[52.839999999999996,40.800000000000004],[46.04,37.35],[94.62,37.35],[79.63,25.15],[43.22,25.15],[17.519999999999996,25.150000000000006],[49.120000000000005,16.400000000000002],[43.52,12.950000000000003],[98.4,12.950000000000003],[61.60000000000001,4.2],[68.4,0.75],[22.560000000000002,0.75]],"killers":[],"flower":[19.56,0],"start":[2,61.0],"medal":[253,405],"difficulty":"Svår","campaignId":"maze-v1-26"},
-  {"name":"Sista flytet","theme":"meadow","hint":"En lång öppen fartbana med stora landningssluttningar. Behåll flytet men släpp gasen när nästa krön närmar sig.","rings":[{"pts":[[-8.0,65.0],[149.0,65.0],[149.0,0.0],[135.0,0.0],[134.5,0.0055],[133.5,0.0489],[133.0,0.0865],[132.0,0.191],[131.5,0.2569],[130.5,0.4122],[129.0,0.691],[125.5,1.4067],[124.5,1.5878],[124.0,1.6691],[123.0,1.809],[122.0,1.9135],[121.0,1.9781],[120.5,1.9945],[119.5,1.9976],[118.5,1.9785],[117.5,1.941],[116.0,1.8536],[114.0,1.6913],[109.5,1.2643],[108.0,1.1464],[107.0,1.0843],[105.5,1.0215],[104.0,1.0],[103.5,1.0241],[103.0,1.0961],[102.5,1.2153],[102.0,1.3806],[101.5,1.5904],[101.0,1.8427],[100.5,2.1349],[100.0,2.4645],[99.5,2.828],[99.0,3.2221],[98.5,3.643],[98.0,4.0866],[97.0,5.0245],[95.5,6.4901],[94.5,7.4514],[94.0,7.9134],[93.5,8.357],[93.0,8.7779],[92.5,9.172],[92.0,9.5355],[91.5,9.8651],[91.0,10.1573],[90.5,10.4096],[90.0,10.6194],[89.5,10.7847],[89.0,10.9039],[88.5,10.9759],[88.0,11.0],[87.5,10.9918],[87.0,10.9672],[86.5,10.9266],[86.0,10.8703],[85.5,10.799],[85.0,10.7135],[84.5,10.6147],[83.5,10.3817],[82.5,10.1101],[81.5,9.8119],[79.0,9.0365],[78.0,8.75],[77.5,8.6183],[76.5,8.3853],[76.0,8.2865],[75.5,8.201],[75.0,8.1297],[74.5,8.0734],[74.0,8.0328],[73.5,8.0082],[73.0,8.0],[72.5,8.0274],[72.0,8.1093],[71.5,8.2447],[71.0,8.4323],[70.5,8.6699],[70.0,8.9549],[69.5,9.2843],[69.0,9.6543],[68.5,10.0611],[68.0,10.5],[67.5,10.9663],[67.0,11.4549],[66.0,12.4774],[64.5,14.0396],[64.0,14.5451],[63.5,15.0337],[63.0,15.5],[62.5,15.9389],[62.0,16.3457],[61.5,16.7157],[61.0,17.0451],[60.5,17.3301],[60.0,17.5677],[59.5,17.7553],[59.0,17.8907],[58.5,17.9726],[58.0,18.0],[57.5,17.9874],[57.0,17.9499],[56.5,17.8878],[56.0,17.8019],[55.5,17.6934],[55.0,17.5637],[54.5,17.4142],[54.0,17.247],[53.5,17.0641],[52.5,16.6606],[50.0,15.555],[49.0,15.1322],[48.5,14.9359],[48.0,14.753],[47.5,14.5858],[47.0,14.4363],[46.5,14.3066],[46.0,14.1981],[45.5,14.1122],[45.0,14.0501],[44.5,14.0126],[44.0,14.0],[43.5,14.0283],[43.0,14.1128],[42.5,14.2525],[42.0,14.4456],[41.5,14.6897],[41.0,14.9818],[40.5,15.318],[40.0,15.6943],[39.5,16.1059],[39.0,16.5475],[38.5,17.0137],[38.0,17.4987],[36.5,19.0038],[35.5,19.9863],[35.0,20.4525],[34.5,20.8941],[34.0,21.3057],[33.5,21.682],[33.0,22.0182],[32.5,22.3103],[32.0,22.5544],[31.5,22.7475],[31.0,22.8872],[30.5,22.9717],[30.0,23.0],[29.5,22.9872],[29.0,22.9489],[28.5,22.8858],[28.0,22.799],[27.5,22.69],[27.0,22.5607],[26.5,22.4131],[26.0,22.25],[25.0,21.8882],[23.5,21.3042],[22.5,20.926],[22.0,20.75],[21.5,20.5869],[21.0,20.4393],[20.5,20.31],[20.0,20.201],[19.5,20.1142],[19.0,20.0511],[18.5,20.0128],[18.0,20.0],[17.5,20.0146],[17.0,20.0581],[16.5,20.13],[16.0,20.2291],[15.5,20.354],[15.0,20.503],[14.5,20.6738],[14.0,20.8639],[13.5,21.0706],[12.5,21.5214],[11.0,22.2411],[10.0,22.7092],[9.5,22.9294],[9.0,23.1361],[8.5,23.3262],[8.0,23.497],[7.5,23.646],[7.0,23.7709],[6.5,23.87],[6.0,23.9419],[5.5,23.9854],[5.0,24.0],[-8.0,24.0]]}],"apples":[[20,20.950961894323342],[46,14.948062264195162],[76,9.036474508437578],[106,1.7880602337443565],[137,0.75]],"killers":[],"flower":[145,0],"start":[1,24],"startDir":1,"noDeco":false,"medal":[54,92],"difficulty":"Expert","campaignId":"trials-v1-sista-flytet"},
-  {"name":"Hjärtat av labyrinten","theme":"meadow","hint":"Ta stjärnorna på varje våning före nedfarten. Valv har stjärnor BÅDE ovanpå och under: vänd och undersök. Bromsa i schakten.","rings":[{"pts":[[-14.0,112.4],[152.0,112.4],[152.0,97.4],[148.0,97.4],[96.6,106.4],[66.24,98.4],[38.64,103.4],[12.0,99.6793],[12.0,90.2037],[14.0,94.0],[56.0,94.0],[58.0,90.7963],[70.0,90.2388],[76.0,90.0017],[82.0,89.8471],[88.0,89.8006],[92.0,89.8343],[98.0,89.9756],[104.0,90.2037],[120.0,90.9268],[126.0,91.1125],[130.0,91.1812],[130.0,94.0],[142.0,94.0],[142.0,79.3],[135.2,79.3],[135.2,78.65],[142.0,78.65],[142.0,73.2],[118.0,73.2],[100.0,76.65],[79.0,76.65],[79.0,75.85],[99.0,75.85],[117.6481,73.2],[16.28,73.2],[16.28,65.6624],[20.2475,65.8357],[22.2435,69.6],[68.1501,69.6],[70.1461,66.0325],[76.1339,65.7451],[82.1217,65.5239],[86.1136,65.4342],[90.1055,65.4002],[94.0974,65.4246],[100.0852,65.5651],[106.073,65.8052],[120.0446,66.4839],[126.0325,66.6948],[130.0,66.7751],[130.0,69.6],[142.0,69.6],[142.0,54.9],[135.2,54.9],[135.2,54.25],[142.0,54.25],[142.0,48.8],[19.04,48.8],[19.04,41.3474],[22.9686,41.5813],[24.9596,45.2],[68.7632,45.2],[70.7543,41.0965],[76.7275,41.0001],[80.7096,41.0487],[84.6918,41.182],[88.6739,41.3827],[100.6204,42.1053],[106.54,42.3405],[106.54,45.2],[118.54,45.2],[118.54,30.5],[111.74,30.5],[111.74,29.85],[118.54,29.85],[118.54,24.4],[94.54,24.4],[76.54,27.85],[53.54,27.85],[53.54,27.05],[75.54,27.05],[94.1881,24.4],[13.52,24.4],[13.52,16.906],[17.3316,17.1034],[19.3081,20.8],[60.8135,20.8],[62.79,17.0837],[70.6958,16.7247],[74.6487,16.6274],[78.6016,16.6007],[82.5545,16.6473],[88.4839,16.842],[104.2955,17.6882],[108.2484,17.854],[112.06,17.9584],[112.06,20.8],[124.06,20.8],[124.06,6.1],[117.26,6.1],[117.26,5.45],[124.06,5.45],[124.06,0.0],[100.06,0.0],[82.06,3.45],[61.06,3.45],[61.06,2.65],[81.06,2.65],[99.7081,0.0],[-1.24,0.0],[-1.24,4.5367],[2.7378,4.4346],[6.7156,4.4],[12.6822,4.4801],[18.6489,4.7],[34.56,5.5347],[38.5378,5.6851],[42.5156,5.7762],[48.4822,5.7834],[52.46,5.7013],[56.4378,5.5582],[58.4267,8.6],[102.1822,8.6],[104.1711,5.086],[112.06,5.5031],[112.06,12.2],[21.8719,12.2],[40.52,14.85],[58.52,14.85],[58.52,15.65],[39.52,15.65],[21.52,12.2],[1.52,12.2],[1.52,17.65],[8.32,17.65],[8.32,18.3],[1.52,18.3],[1.52,33.0],[13.52,33.0],[13.52,28.8497],[19.3705,29.0557],[33.2542,29.8434],[37.221,30.0285],[43.1712,30.1859],[49.1214,30.1659],[51.1047,33.0],[96.7227,33.0],[98.7061,29.4216],[106.54,29.8746],[106.54,36.6],[27.3919,36.6],[46.04,39.25],[66.04,39.25],[66.04,40.05],[45.04,40.05],[27.04,36.6],[7.04,36.6],[7.04,42.05],[13.84,42.05],[13.84,42.7],[7.04,42.7],[7.04,57.4],[19.04,57.4],[19.04,53.2275],[26.8871,53.4445],[46.7341,54.3847],[50.7035,54.5105],[54.6729,54.5836],[60.6271,54.5823],[66.5812,54.4498],[72.5353,54.2117],[88.4129,53.4399],[94.3671,53.2585],[98.3365,53.2048],[104.2906,53.2367],[110.2447,53.396],[116.1988,53.6523],[130.0,54.3305],[130.0,61.0],[24.6319,61.0],[43.28,63.65],[65.28,63.65],[65.28,64.45],[42.28,64.45],[24.28,61.0],[4.28,61.0],[4.28,66.45],[11.08,66.45],[11.08,67.1],[4.28,67.1],[4.28,81.8],[16.28,81.8],[16.28,77.6249],[20.2475,77.7052],[26.2354,77.9161],[44.1988,78.764],[52.1826,78.9754],[56.1745,78.9998],[62.1623,78.9275],[68.1501,78.7384],[74.138,78.4675],[76.1339,81.8],[120.0446,81.8],[122.0406,78.3679],[130.0,78.7376],[130.0,85.4],[16.3519,85.4],[35.0,88.05],[53.0,88.05],[53.0,88.85],[34.0,88.85],[16.0,85.4],[-14.0,85.4]]}],"apples":[[45.4,89.6],[41,86.14999999999999],[123,86.14999999999999],[87.4,77.39999999999999],[93,73.94999999999999],[23.28,73.94999999999999],[56.08,65.19999999999999],[49.28,61.74999999999999],[123.0,61.74999999999999],[102.45,49.55],[59.28,49.55],[26.040000000000006,49.55],[57.64,40.8],[52.04,37.349999999999994],[99.53999999999999,37.349999999999994],[62.739999999999995,28.59999999999999],[69.53999999999999,25.14999999999999],[20.519999999999996,25.14999999999999],[50.92,16.400000000000002],[46.52,12.950000000000003],[105.06,12.950000000000003],[69.46000000000001,4.2],[75.06,0.75],[17.760000000000005,0.75]],"killers":[],"flower":[14.76,0],"start":[2,85.39999999999999],"medal":[360,576],"difficulty":"Expert","campaignId":"maze-v1-30"},
-  {"name":"Test 1 – Hängskolan","theme":"meadow","hint":"Kör ut på balken. Bromsa med ett däck kvar på kanten och luta ner huvudet till stjärnan UNDER balken. VÄND för grepp och släpp sedan ner på marken. Ingen gravitationsstjärna.","rings":[{"pts":[[-8.0,65.0],[-8.0,5.0],[10.0,5.0],[10.0,0.0],[43.0,0.0],[43.0,65.0]]},{"pts":[[10,5],[24,5],[24,4.76],[10,4.76]],"style":"steel"}],"apples":[[7,5.75],[21,3.35],[33,0.75]],"killers":[],"flower":[38,0],"start":[1,5],"startDir":1,"noDeco":true,"medal":[23,40],"difficulty":"Medel","campaignId":"elma-test-v1-1"},
-  {"name":"Test 2 – Ovanpå och under","theme":"meadow","hint":"Ta rampen upp och kör på hyllan. Vid högerkanten: bromsa, vrid ner cykeln och ta stjärnan UNDER hyllan. Ta stjärnan längst bort och VÄND tillbaka till blomman bakom starten.","rings":[{"pts":[[-8.0,65.0],[-8.0,0.0],[-7.5,0.0],[-7.0,0.0],[-6.5,0.0],[-6.0,0.0],[-5.5,0.0],[-5.0,0.0],[-4.5,0.0],[-4.0,0.0],[-3.5,0.0],[-3.0,0.0],[-2.5,0.0],[-2.0,0.0],[-1.5,0.0],[-1.0,0.0],[-0.5,0.0],[0.0,0.0],[0.5,0.0],[1.0,0.0],[1.5,0.0],[2.0,0.0],[2.5,0.0],[3.0,0.0],[3.5,0.0],[4.0,0.0],[4.5,0.0],[5.0,0.0],[5.5,0.0],[6.0,0.0],[6.5,0.0185],[7.0,0.0734],[7.5,0.1635],[8.0,0.2865],[8.5,0.4393],[9.0,0.6183],[9.5,0.819],[10.0,1.0365],[10.5,1.2653],[11.0,1.5],[11.5,1.7347],[12.0,1.9635],[12.5,2.181],[13.0,2.3817],[13.5,2.5607],[14.0,2.7135],[14.5,2.8365],[15.0,2.9266],[15.5,2.9815],[16.0,3.0],[16.5,3.0],[17.0,3.0],[17.5,3.0],[18.0,3.0],[18.5,3.0],[19.0,3.0],[19.5,3.0],[20.0,3.0],[20.5,3.0],[21.0,3.0],[21.5,3.0],[22.0,3.0],[22.5,2.5607],[23.0,1.5],[23.5,0.4393],[24.0,0.0],[24.5,0.0],[25.0,0.0],[25.5,0.0],[26.0,0.0],[26.5,0.0],[27.0,0.0],[27.5,0.0],[28.0,0.0],[28.5,0.0],[29.0,0.0],[29.5,0.0],[30.0,0.0],[30.5,0.0],[31.0,0.0],[31.5,0.0],[32.0,0.0],[32.5,0.0],[33.0,0.0],[33.5,0.0],[34.0,0.0],[34.5,0.0],[35.0,0.0],[35.5,0.0],[36.0,0.0],[36.5,0.0],[37.0,0.0],[37.5,0.0],[38.0,0.0],[38.5,0.0],[39.0,0.0],[39.5,0.0],[40.0,0.0],[40.5,0.0],[41.0,0.0],[41.5,0.0],[42.0,0.0],[42.5,0.0],[43.0,0.0],[43.5,0.0],[44.0,0.0],[44.5,0.0],[45.0,0.0],[45.5,0.0],[46.0,0.0],[46.5,0.0],[47.0,0.0],[47.5,0.0],[48.0,0.0],[48.0,65.0]]},{"pts":[[22,3],[37,3],[37,2.76],[22,2.76]],"style":"steel"}],"apples":[[20,3.75],[34,1.35],[42,0.75]],"killers":[],"flower":[0,0],"start":[3,0],"startDir":1,"noDeco":true,"medal":[20,34],"difficulty":"Medel / svår","campaignId":"elma-test-v1-2"},
-  {"name":"Test 3 – Däck för däck","theme":"meadow","hint":"Öppningen mellan de två översta hyllorna är 1,30 m. Bromsa vid kanten och vrid cykeln så däcken går igenom ETT I TAGET. Landa på mellanplanet, vänd åt höger och fortsätt ner.","rings":[{"pts":[[-8.0,65.0],[-8.0,0.0],[45.0,0.0],[45.0,65.0]]},{"pts":[[-6,7],[8,7],[8,6.76],[-6,6.76]],"style":"steel"},{"pts":[[9.3,7],[21.3,7],[21.3,6.76],[9.3,6.76]],"style":"steel"},{"pts":[[8,4],[23,4],[23,3.76],[8,3.76]],"style":"steel"}],"apples":[[5,7.75],[15,4.75],[29,0.75]],"killers":[],"flower":[38,0],"start":[0,7],"startDir":1,"noDeco":true,"medal":[23,40],"difficulty":"Svår","campaignId":"elma-test-v1-3"},
-  {"name":"Test 4 – Tre krokar","theme":"meadow","hint":"Kör höger på översta hyllan. Häng ner vid slutet och ta stjärnan under. Släpp till nästa hylla, VÄND åt vänster och häng över vänsterkanten. Vänd igen på marken och kör höger till mål.","rings":[{"pts":[[-8.0,65.0],[-8.0,0.0],[49.0,0.0],[49.0,65.0]]},{"pts":[[-5,9],[20,9],[20,8.76],[-5,8.76]],"style":"steel"},{"pts":[[20,9],[31,9],[31,8.76],[20,8.76]],"style":"steel"},{"pts":[[7,5],[33,5],[33,4.76],[7,4.76]],"style":"steel"}],"apples":[[27,9.75],[17,7.35],[11,5.75],[29,3.35],[39,0.75]],"killers":[],"flower":[44,0],"start":[3,9],"startDir":1,"noDeco":true,"medal":[24,41],"difficulty":"Expert","campaignId":"elma-test-v1-4"},
-  {"name":"Test 5 – Skålen och returen","theme":"meadow","hint":"Ta fart genom skålen och upp på den smala hyllan. Vid änden: bromsa, vrid ner och plocka stjärnan UNDER. Släpp ner till sista stjärnan. VÄND och följ den långa rampen upp, tillbaka genom skålen till starten.","rings":[{"pts":[[-8.0,65.0],[-8.0,2.8869],[5.0,2.8869],[8.7495,2.8869],[8.9174,2.6751],[9.1011,2.4686],[9.3002,2.2677],[9.5142,2.0729],[9.7428,1.8846],[9.9853,1.7033],[10.2412,1.5293],[10.5101,1.3631],[10.7912,1.2051],[11.0839,1.0555],[11.3876,0.9147],[11.7016,0.783],[12.0252,0.6608],[12.3577,0.5483],[12.6983,0.4457],[13.0464,0.3533],[13.401,0.2712],[13.7614,0.1998],[14.1268,0.139],[14.4964,0.0891],[14.8693,0.0502],[15.2448,0.0223],[15.622,0.0056],[16.0,0.0],[16.378,0.0056],[16.7552,0.0223],[17.1307,0.0502],[17.5036,0.0891],[17.8732,0.139],[18.2386,0.1998],[18.599,0.2712],[18.9536,0.3533],[19.3017,0.4457],[19.6423,0.5483],[19.9748,0.6608],[20.2984,0.783],[20.6124,0.9147],[20.9161,1.0555],[21.2088,1.2051],[21.4899,1.3631],[21.7588,1.5293],[22.0147,1.7033],[22.2572,1.8846],[22.4858,2.0729],[22.6998,2.2677],[22.8989,2.4686],[23.0826,2.6751],[23.2505,2.8869],[27.0,2.8869],[40.0,-3.0],[49.0,-3.0],[49.0,65.0]]},{"pts":[[27,2.8869086912965036],[39,2.8869086912965036],[39,2.6469086912965034],[27,2.6469086912965034]],"style":"steel"}],"apples":[[16,0.75],[31,3.6369086912965036],[36,1.2369086912965037],[44,-2.25]],"killers":[],"flower":[0,2.8869086912965036],"start":[1,2.8869086912965036],"startDir":1,"noDeco":true,"medal":[20,34],"difficulty":"Expert","campaignId":"elma-test-v1-5"}
-];
+// ===== Levels v3: pussel / trials =====
+function sample(f,x0,x1,st=0.5){ const p=[]; for(let x=x0;x<=x1+1e-9;x+=st){ p.push([+x.toFixed(3),+f(x).toFixed(3)]); } return p; }
+function arc(cx,cy,r,a0,a1,n){ const p=[]; for(let i=0;i<=n;i++){ const a=(a0+(a1-a0)*i/n)*Math.PI/180; p.push([+(cx+r*Math.cos(a)).toFixed(3),+(cy+r*Math.sin(a)).toFixed(3)]); } return p; }
+function rect(x0,y0,x1,y1,style){ return {pts:[[x0,y0],[x1,y0],[x1,y1],[x0,y1]],style}; }
+function crate(x,y,s){ s=s||0.9; return rect(x-s/2,y,x+s/2,y+s,'crate'); }
+function log(x,y,r){ const p=[]; for(let i=0;i<10;i++){ const a=i/10*Math.PI*2; p.push([+(x+Math.cos(a)*r).toFixed(3),+(y+r+Math.sin(a)*r).toFixed(3)]); } return {pts:p,style:'log'}; }
+function pillar(x0,x1,h){ return rect(x0,0,x1,h,'stone'); }
+function blob(cx,cy,w,h,seed){ const p=[]; const n=14; let s=seed||1; const rnd=()=>{ s=(s*16807)%2147483647; return s/2147483647; };
+  p.push([cx-w/2,cy]); for(let i=1;i<n;i++){ const t=i/n; const x=cx-w/2+t*w; const y=cy-h*Math.sin(Math.PI*t)*(0.75+0.3*rnd())-0.15; p.push([+x.toFixed(3),+y.toFixed(3)]); }
+  p.push([cx+w/2,cy]); p.push([cx+w/2-0.15,cy+0.25]); p.push([cx-w/2+0.15,cy+0.25]); return {pts:p}; }
+function cr(ctrl,st){ const out=[]; for(let i=0;i<ctrl.length-1;i++){ const p0=ctrl[Math.max(0,i-1)],p1=ctrl[i],p2=ctrl[i+1],p3=ctrl[Math.min(ctrl.length-1,i+2)]; const n=Math.max(1,Math.ceil(Math.hypot(p2[0]-p1[0],p2[1]-p1[1])/(st||0.5)));
+  for(let k=0;k<n;k++){ const t=k/n,t2=t*t,t3=t2*t; const f=(a,b,c,d)=>0.5*((2*b)+(-a+c)*t+(2*a-5*b+4*c-d)*t2+(-a+3*b-3*c+d)*t3); out.push([+f(p0[0],p1[0],p2[0],p3[0]).toFixed(3),+f(p0[1],p1[1],p2[1],p3[1]).toFixed(3)]); } } out.push(ctrl[ctrl.length-1]); return out; }
+const sm=(e0,e1,x)=>{ const t=Math.max(0,Math.min(1,(x-e0)/(e1-e0))); return t*t*(3-2*t); };
+const TOP=40;
+const LV=[];
+// 1 Första stegen — a low log, a gentle wide dip and a small crate
+LV.push(()=>{ const f=x=> x<12?0 : x<24? -0.45*Math.sin(Math.PI*(x-12)/12) : x<30?0 : x<38? 0.8*Math.sin(Math.PI*(x-30)/8) : 0;
+  return {name:'Första stegen', theme:'meadow', hint:'Luta bakåt (↺) för att lyfta framhjulet över stocken och lådan.',
+  stuck:'Fastnat? Håll GAS och tryck på ↺ en kort stund – då lyfter framhjulet över stocken.',
+  rings:[{pts:[[-4,TOP],[-4,0],...sample(f,0,46),[46,TOP]]}, log(7,0,0.2), crate(27,0,0.55)],
+  apples:[[18,0.3],[27,1.3],[34,1.55]], killers:[], flower:[42,0], start:[2,0]}; });
+// 2 Lådorna — lådtrappa och nedfart
+LV.push(()=>({name:'Lådorna', theme:'meadow', hint:'Klättra lådtrappan steg för steg. Bromsa ner på andra sidan.',
+  rings:[{pts:[[-4,TOP],[-4,0],[36,0],[36,TOP]]},
+    rect(8,0,10.4,0.7,'crate'), rect(10.4,0,12.8,1.3,'crate'), rect(12.8,0,15.2,1.9,'crate'), rect(15.2,0,18.4,1.9,'crate'), rect(18.4,0,20.4,1.1,'crate'), crate(25,0,0.8)],
+  apples:[[16.8,2.65],[11.6,2.05],[25,1.55]], killers:[], flower:[31,0], start:[3,0]}));
+// 3 Vändplatsen — två återvändsgränder
+LV.push(()=>({name:'Vändplatsen', theme:'sunset', hint:'Varje hylla är en återvändsgränd. Vänd med pilknappen och kör tillbaka.',
+  rings:[{pts:[[-22,TOP],[-22,3],[-13,3],[-5,0],[6,0],[12,2.6],[19,2.6],[19,TOP]]}],
+  apples:[[17.5,3.35],[3,0.75],[-15,3.75]], killers:[], flower:[-19.5,3], start:[0,0]}));
+// 4 Trappan
+LV.push(()=>{ const pts=[[-4,TOP],[-4,0],[8,0]]; let x=8,y=0; const apples=[];
+  for(let i=0;i<5;i++){ x+=0.4; y+=0.55; pts.push([x,y]); x+=3.2; pts.push([x,y]); if(i===1||i===3) apples.push([x-1.6,y+0.75]); }
+  pts.push([x+4,y]); apples.push([x+3,y+0.75]); pts.push([x+14,0]); pts.push([x+24,0]); pts.push([x+24,TOP]);
+  return {name:'Trappan', theme:'sunset', hint:'Luta bakåt vid varje kant så framhjulet hakar i, sen fram.', rings:[{pts}], apples, killers:[], flower:[x+19,0], start:[3,0]}; });
+// 5 Hakarna
+LV.push(()=>({name:'Hakarna', theme:'meadow', hint:'Kör mot kanten och lyft framhjulet. Hjulen greppar och drar upp dig.',
+  rings:[{pts:[[-4,TOP],[-4,0],[8,0],[8,0.9],[16,0.9],[16,2.0],[24,2.0],[24,3.3],[34,3.3],[34,2.0],[44,2.0],[44,3.0],[46,3.0],[46,2.0],[56,2.0],[56,TOP]]}],
+  apples:[[12,1.65],[29,4.05],[45,3.75]], killers:[], flower:[52,2.0], start:[3,0]}));
+// 6 Svävande öar
+LV.push(()=>{ const v=x=>-3*Math.sin(Math.PI*(x-46)/20);
+  return {name:'Svävande öar', theme:'meadow', hint:'Ta sats i rampen och landa på öarna. Missar du finns marken under.',
+    rings:[{pts:[[-4,TOP],[-4,0],[10,0],[18,2.6],[19,2.9],[20.5,-1.5],[24,-1.5],[25.5,2.4],...sample(x=>2.4-2.4*(x-26)/10,26,36,1),[40,0],[45,2.2],[45.3,2.2],[45.8,0],...sample(v,46,66,0.5),[80,0],[80,TOP]]},
+      blob(51.5,3.4,5,1.4,3), blob(60,2.6,4,1.2,7)],
+    apples:[[22.5,4.3],[51.5,4.15],[60,3.35],[56,-2.25]], killers:[], flower:[74,0], start:[3,0]}; });
+// Volten — air time and rotation
+LV.push(()=>({name:'Volten', theme:'sunset', hint:'Full fart upp för rampen. Volta i luften så du landar på hjulen. Hamnar du i gropen – börja om.',
+  rings:[{pts:[[-4,TOP],[-4,0],[8,0],...arc(8,6,6,-90,-50,8).slice(1),[14.6,3.7],[14.8,3.7],[14.8,0],[21,0],[21,3.5],[24,3.4],[40,0],[52,0],[52,TOP]]}],
+  apples:[[18.5,5.6],[23,4.2],[31,2.66]], killers:[], flower:[46,0], start:[1,0]}));
+// 7 Bron
+LV.push(()=>({name:'Bron', theme:'meadow', hint:'Släpp dig ner genom hålet i bron. Kroppen glider genom tunna balkar – bara hjul och huvud krockar.',
+  rings:[{pts:[[-4,TOP],[-4,0],[14,0],[14.5,-1],[16,-6],[30,-6],[40,0],[52,0],[52,TOP]]},
+    {pts:[[14,0],[21,0],[21,-0.28],[14,-0.28]],style:'steel'}, {pts:[[25,0],[34,0],[34,-0.28],[25,-0.28]],style:'steel'}, rect(19.5,-3.2,24.5,-2.95,'wood')],
+  apples:[[23,0.75],[22,-2.2],[20,-5.25]], killers:[], flower:[46,0], start:[3,0]}));
+// 8 Grottan
+LV.push(()=>{ const f=x=>sm(4,10,x)*(1-sm(52,58,x))*(1.1*Math.sin((x-4)/5)+0.7*Math.sin((x-4)/2.3));
+  const cf=x=>f(x)+3.7+0.6*Math.sin(x/3.7+1);
+  return {name:'Grottan', theme:'cave', hint:'Lågt i tak. Ta det lugnt – huvudet får inte nudda något.',
+    rings:[{pts:[...sample(f,-4,64),...sample(cf,-4,64).reverse()]}], apples:[[18,f(18)+0.75],[33,f(33)+0.75],[47,f(47)+0.75]],
+    killers:[], flower:[60,f(60)], start:[0,0]}; });
+// 9 Pelarna
+LV.push(()=>({name:'Pelarna', theme:'sunset', hint:'Små hopp från pelare till pelare. Bromsa och balansera innan varje hopp.',
+  rings:[{pts:[[-4,TOP],[-4,0],[4,0],[10,2.2],[10,0],[40,0],[40,TOP]]},
+    pillar(10,11.6,2.2), pillar(12.6,14.2,2.2), pillar(15.6,17.2,2.2), pillar(19,20.6,2.2), pillar(21.8,23.4,2.2)],
+  apples:[[16.4,2.95],[22.6,2.95],[30,0.75]], killers:[], flower:[35,0], start:[1,0]}));
+// 10 Skålen
+LV.push(()=>{ const R=6.2, cx=14, cy=6.2;
+  return {name:'Skålen', theme:'sunset', hint:'Pumpa fram och tillbaka. Vänd med pilknappen högt upp på kanten.',
+    rings:[{pts:[[-4,TOP],[-4,cy],...arc(cx,cy,R,180,360,48),[36,cy],[36,TOP]]}],
+    apples:[[cx-R*0.9*Math.cos(Math.PI/4),cy-R*0.9*Math.sin(Math.PI/4)],[cx+R*0.9*Math.cos(Math.PI/4),cy-R*0.9*Math.sin(Math.PI/4)],[2,cy+0.75]],
+    killers:[], flower:[31,cy], start:[cx,0]}; });
+// 11 Hinderbanan
+LV.push(()=>({name:'Hinderbanan', theme:'sunset', hint:'Stockar, ramper och en plankö. Hoppa eller klättra – ta det i din egen takt.',
+  rings:[{pts:[[-4,TOP],[-4,0],[9,0],[15,1.8],[15.4,1.8],[16,0],[28,0],[34,2.2],[34.4,2.2],[35,0],[41,0],[45,2.4],[45.3,2.4],[45.8,0],[62,0],[70,0],[70,TOP]]},
+         {pts:[[47.5,3.2],[54,3.2],[54,3.8],[47.5,3.8]],style:'wood'}, log(19,0,0.36), log(38.2,0,0.42), log(58.5,0,0.34)],
+  apples:[[18.5,3.4],[51,4.55],[60.5,0.75]], killers:[], flower:[65,0], start:[3,0]}));
+// 12 Vinterberget
+LV.push(()=>{ const f=x=> x<6?0 : x<70 ? 7*sm(6,40,x)-7*sm(42,70,x)+0.9*Math.sin(x/2.2)*sm(6,12,x)*(1-sm(64,70,x)) : 0;
+  return {name:'Vinterberget', theme:'winter', hint:'Uppför i snön. Lagom gas och vikten framåt, annars välter du bakåt.',
+    rings:[{pts:[[-4,TOP],[-4,0],...sample(f,0,86,0.5),[86,TOP]]}],
+    apples:[[24,f(24)+0.75],[41,f(41)+0.75],[58,f(58)+0.75]], killers:[], flower:[80,0], start:[2,0]}; });
+// 13 Klippan
+LV.push(()=>({name:'Klippan', theme:'winter', hint:'Sista stjärnan ligger i gropen. Vänd och kör tillbaka till blomman.',
+  rings:[{pts:[[-4,TOP],[-4,0],[6,0],[14,3],[18,3],[24,6.5],[27,6.5],[30,9],[40,9],[49.6,4.5],[54,4.5],[54,TOP]]}],
+  apples:[[16,3.75],[35,9.75],[52.5,5.25]], killers:[], flower:[25.5,6.5], start:[2,0]}));
+// Upp och ner — roomy gravity oval
+LV.push(()=>{ const R=7, L0=-12, L1=30;
+  return {name:'Upp och ner', theme:'cave', hint:'Blå stjärnor vänder tyngdkraften. Kör upp i kurvan, kör i taket och kom ner på andra sidan.',
+    rings:[{pts:[[L0,0],[8,0],[8,0.6],[9.5,0.6],[9.5,0],[L1,0],...arc(L1,R,R,-90,90,36).slice(1,-1),[L1,2*R],[20,2*R],[20,2*R-0.7],[18.5,2*R-0.7],[18.5,2*R],[4,2*R],[4,2*R-0.6],[2,2*R-0.6],[2,2*R],[L0,2*R],...arc(L0,R,R,90,270,36).slice(1,-1)]}],
+    apples:[[L1+R*Math.cos(-Math.PI/4)*0.88,R+R*Math.sin(-Math.PI/4)*0.88,'up'],[24,2*R-0.75],[11,2*R-0.75],[-5,2*R-0.75],[L0-R*Math.cos(Math.PI/4)*0.88,R+R*Math.sin(Math.PI/4)*0.88,'down']],
+    killers:[], flower:[-6,0], start:[0,0]}; });
+// Stockarna — bunny hop
+LV.splice(2,0,()=>({name:'Stockarna', theme:'meadow', hint:'Bunny hop: luta bakåt en kort stund och kasta sen vikten framåt. Hoppa över gropar och stockar.',
+  rings:[{pts:[[-4,TOP],[-4,0],[9,0],[9,-1.2],[10.4,-1.2],[10.4,0],[17,0],[17,-1.2],[18.5,-1.2],[18.5,0],[27,0],[27,-1.2],[28.7,-1.2],[28.7,0],[40,0],[40,TOP]]},
+    log(13.5,0,0.42), log(23,0,0.38), log(32.5,0,0.45)],
+  apples:[[13.5,1.75],[23,1.6],[32.5,1.85]], killers:[], flower:[37,0], start:[3,0]}));
+// Hänget — hang from the rear wheel
+LV.push(()=>({name:'Hänget', theme:'meadow', hint:'Kör sakta ut på balken. Bromsa när bakhjulet är vid kanten – då greppar det och du hänger. Släpp bromsen för att falla.',
+  rings:[{pts:[[-4,TOP],[-4,0],[12,0],[12,-3.6],[34,-3.6],[44,0],[56,0],[56,TOP]]},
+    {pts:[[12,0],[18,0],[18,-0.26],[12,-0.26]],style:'steel'}],
+  apples:[[17.0,-1.6],[26,-2.85],[48,0.75]], killers:[], flower:[52,0], start:[3,0]}));
+// Svävaren — fall up onto the underside of a long floating island and ride it upside down
+LV.push(()=>{ const u=x=>7.2-0.35*Math.sin((x-12)/2.6)*(x>16&&x<52?1:0);
+  const under=sample(u,10,58,0.5); const top=[[58.5,8.3],[57,9.6],[50,10.4],[30,10.6],[16,10.3],[11,9.5],[9.5,8.3]];
+  return {name:'Svävaren', theme:'sunset', hint:'Kör in i den blå stjärnan under ön – du faller uppåt och vänds automatiskt. Kör upp och ner längs öns undersida.',
+  rings:[{pts:[[-4,TOP],[-4,0],[70,0],[70,TOP]]}, {pts:[...under,...top]}],
+  apples:[[15,0.75,'up'],[24,u(24)-0.75],[33,u(33)-0.75],[42,u(42)-0.75],[53,u(53)-0.75,'down']], killers:[], flower:[64,0], start:[2,0]}; });
+// Balkarna — hop between thin beams over spikes
+LV.push(()=>({name:'Balkarna', theme:'winter', hint:'Tunna balkar över en grop. Bunny hoppa från balk till balk – bromsa och ladda innan varje hopp.',
+  rings:[{pts:[[-4,TOP],[-4,0],[8,0],[8,-3],[38,-3],[46,0],[56,0],[56,TOP]]},
+    {pts:[[8,0],[12,0],[12,-0.26],[8,-0.26]],style:'steel'},
+    {pts:[[13.3,0],[17.5,0],[17.5,-0.26],[13.3,-0.26]],style:'steel'},
+    {pts:[[19.1,0],[23,0],[23,-0.26],[19.1,-0.26]],style:'steel'},
+    {pts:[[24.9,0],[29,0],[29,-0.26],[24.9,-0.26]],style:'steel'},
+    {pts:[[30.8,0],[38,0],[38,-0.26],[30.8,-0.26]],style:'steel'}],
+  apples:[[12.65,1.0],[18.3,1.1],[24,1.1],[29.9,1.1]], killers:[], flower:[51,0], start:[2,0]}));
+// Pumpbanan — pump the rollers for speed
+LV.push(()=>{ const f=x=> x<6?0 : x<46? -0.55*Math.cos((x-6)*Math.PI*2/5)+0.55 : x<50? 0 : 0;
+  return {name:'Pumpbanan', theme:'meadow', hint:'Pumpa: luta bakåt upp för varje puckel och kasta vikten fram på väg ner. Bygg fart utan gas!',
+    rings:[{pts:[[-4,TOP],[-4,0],...sample(f,0,50,0.25),[56,0],[56,2.6],[56.4,2.6],[57,0],[64,0],[64,-2.5],[69,-2.5],[74,0],[86,0],[86,TOP]]}],
+    apples:[[18.5,2.35],[33.5,2.45],[43.5,2.5],[60.5,2.9]], killers:[], flower:[80,0], start:[2,0]}; });
+// Studsen — drop, squeeze the spring and brake to bounce
+LV.push(()=>({name:'Studsen', theme:'sunset', hint:'Hoppa ner från klippan och tryck BROMS precis när fjädrarna är i botten – studsen tar dig upp på hyllan.',
+  rings:[{pts:[[-4,TOP],[-4,4],[6,4],[6,0],[14,0],[14,2.1],[22,2.1],[22,0.8],[30,0.8],[30,TOP]]}],
+  apples:[[10,0.75],[18,2.85],[26,1.55]], killers:[], flower:[28,0.8], start:[2,4]}));
+// Schaktet — zig-zag down a deep shaft
+LV.push(()=>{ const W=13, D=3.4, N=5; const rings=[{pts:[[-6,TOP],[-6,0],[0,0],[0,-D*N-3],[W+10,-D*N-3],[W+10,-D*N],[W,-D*N],[W,TOP]]}];
+  const apples=[];
+  for(let k=1;k<N;k++){ const y=-D*k; if(k%2){ rings.push({pts:[[W-8.5,y],[W,y],[W,y-0.45],[W-8.5,y-0.45]]}); apples.push([W-0.9,y+0.75]); }
+    else { rings.push({pts:[[0,y],[8.5,y],[8.5,y-0.45],[0,y-0.45]]}); apples.push([0.9,y+0.75]); } }
+  return {name:'Schaktet', theme:'cave', hint:'Kör ner för schaktet hylla för hylla. Vänd på varje hylla – stjärnorna ligger inne vid väggen.',
+    rings, apples, killers:[], flower:[W+7,-D*N-3], start:[-3,0]}; });
+// Klätterväggen — hops and wheel hooks up a big wall
+LV.push(()=>({name:'Klätterväggen', theme:'winter', hint:'Hoppa och haka i kanterna med hjulen. Är kanten för hög: bunny hop först, sen volt bakåt.',
+  rings:[{pts:[[-4,TOP],[-4,0],[8,0],[8,1.0],[13,1.0],[13,2.2],[17,2.2],[17,0.8],[20,0.8],[20,2.4],[25,2.4],[25,3.7],[30,3.7],[30,5.0],[37,5.0],[37,3.4],[40,3.4],[40,TOP]]},
+    log(15,2.2,0.32)],
+  apples:[[10.5,1.75],[18.5,1.55],[27.5,4.45],[33,5.75]], killers:[], flower:[38.6,3.4], start:[3,0]}));
+// Finalen — everything at once, lots of room
+LV.push(()=>({name:'Finalen', theme:'sunset', hint:'Allt du lärt dig: studs, bunny hop, balk och volter. Ta det lugnt – det finns gott om plats.',
+  rings:[{pts:[[-4,TOP],[-4,0],[10,0],[16,2.4],[16.4,2.4],[17,0],[24,0],[24,-3.5],[41,-3.5],[48,0.8],[52,0.8],[52,2.0],[60,2.0],[66,0],[90,0],[90,TOP]]},
+    {pts:[[30,0.6],[38,0.6],[38,0.34],[30,0.34]],style:'steel'}, log(56,2.0,0.36)],
+  apples:[[20,0.75],[37.2,-1.0],[41,-2.75],[49,1.55],[56,3.55],[75,0.75]], killers:[], flower:[85,0], start:[2,0]}));
+// Spegeln — flip gravity mid-air, ride the ceiling, flip back
+LV.push(()=>({name:'Spegeln', theme:'cave', hint:'Blå stjärna = tyngdkraften vänder. Volta i luften så du landar på hjulen i taket – och tillbaka igen.',
+  rings:[{pts:[[-6,0],[70,0],[70,9],[-6,9]]}],
+  apples:[[12,0.75,'up'],[24,8.25],[36,8.25],[48,8.25,'down'],[58,0.75]], killers:[], flower:[66,0], start:[2,0]}));
+// Trapphoppet — bunny hop up a staircase of thin beams
+LV.push(()=>({name:'Trapphoppet', theme:'winter', hint:'Hoppa uppåt från balk till balk. Ramlar du ner kör du bara tillbaka uppför backen och försöker igen.',
+  rings:[{pts:[[-4,TOP],[-4,0],[4,0],[10,-3],[34,-3],[35.5,3.5],[50,3.5],[50,TOP]]},
+    {pts:[[8.5,0],[12,0],[12,-0.26],[8.5,-0.26]],style:'steel'}, {pts:[[13.5,0.7],[17.5,0.7],[17.5,0.44],[13.5,0.44]],style:'steel'},
+    {pts:[[19,1.4],[23,1.4],[23,1.14],[19,1.14]],style:'steel'}, {pts:[[24.5,2.1],[28.5,2.1],[28.5,1.84],[24.5,1.84]],style:'steel'},
+    {pts:[[30,2.8],[34.2,2.8],[34.2,2.54],[30,2.54]],style:'steel'}],
+  apples:[[12.75,1.6],[18.25,2.3],[23.75,3.0],[29.25,3.7],[40,4.25]], killers:[], flower:[46,3.5], start:[1,0]}));
+// Flowbanan — rollers, a double and a tabletop: pump and float
+LV.push(()=>{ const r=x=>0.7*(0.5-0.5*Math.cos((x-6)*Math.PI*2/6));
+  return {name:'Flowbanan', theme:'meadow', hint:'Pumpa över vågorna, flyg över dubbelhoppet och landa mjukt på bordet. Lugnt och flytande.',
+  rings:[{pts:[[-4,TOP],[-4,0],[6,0],...sample(r,6.25,30,0.25),[34,0],[38,1.8],[38.3,0.8],[43.7,0.8],[44,2.0],[50,0],[54,0],[60,2.4],[66,2.4],[72,0],[90,0],[90,TOP]]}],
+  apples:[[21,2.0],[41,3.6],[63,3.4],[80,0.75]], killers:[], flower:[86,0], start:[2,0]}; });
+
+// ================= BANPAKET 2 =================
+const LV2=[];
+// 01 Dalens rytm — three soft valleys, tighter and tighter, then a wide climb
+LV2.push(()=>{ const s=cr([[-4,3],[3,3],[5,2.8],[11,0],[17,2.2],[22.5,0.2],[27,2.0],[31,0.4],[35,1.2],[40,3.6],[44,5.4],[50,5.5]],0.4);
+  return {id:'fjadra-pack2-01', name:'Dalens rytm', theme:'meadow', hint:'Känn hur fjädringen trycks ihop i dalarna och lättar på krönen. Pumpa i takt om du vill ha fart.',
+    rings:[{pts:[[-4,TOP],...s,[50,TOP]]}], apples:[[11,0.85],[27,2.8],[40,4.4]], killers:[], flower:[47,5.5], start:[1,3]}; });
+// 08 Gruvans andra våning — two tunnels on top of each other, joined by a wide ramp and a turning chamber
+LV2.push(()=>({id:'fjadra-pack2-08', name:'Gruvans andra våning', theme:'cave', hint:'Övre tunneln ut åt höger, bred nedfart, vänd i kammaren och ta nedre tunneln tillbaka till blomman.',
+  rings:[{pts:[[-2,6],[33,6],[35,5.92],[37,5.5],[39,4.82],[50,0],[50,-0.6],[37,5.0],[36,5.0],[36,-0.8],[-6,-0.8],[-6,1.6],[-12,1.6],[-12,-4],[58,-4],[58,9.4],[-2,9.4]]}],
+  apples:[[12,6.8],[28,6.8],[30,-3.2],[10,-3.2]], killers:[], flower:[-9.5,-4], start:[1,6]}));
+// 11 Stenhyllan — an overhanging rock shelf: hang from the lip by the rear wheel to reach the star underneath
+LV2.push(()=>({id:'fjadra-pack2-11', name:'Stenhyllan', theme:'sunset', hint:'Kör sakta mot kanten. BROMSA så fort framhjulet är ute över kanten (den gula zonen) och håll inne – bakhjulet hakar i kanten och du hänger. Ta stjärnan, släpp sen.',
+  rings:[{pts:[[-14,TOP],[-14,4.5],[9.3,4.5],[9.55,4.62],[9.95,4.64],[10.05,4.55],[10.05,4.08],[8.5,3.98],[6.5,3.9],[5.2,3.6],[5,3.1],[5,2.3],[8,1.6],[11,0.75],[14,0.1],[15,0],[22,0],[29,4.5],[38,4.5],[38,TOP]]}],
+  apples:[[4,5.25],[8.2,2.85],[25.5,2.95]], killers:[], flower:[34,4.5], start:[-10,4.5], marks:[[7.6,9.6]]}));
+const MEDALS={'Första stegen':[10,16],'Lådorna':[16,26],'Vändplatsen':[12,20],'Trappan':[11,17],'Hakarna':[16,26],'Svävande öar':[16,25],'Bron':[14,22],'Grottan':[10,16],'Pelarna':[14,24],'Skålen':[25,45],'Hinderbanan':[13,20],'Vinterberget':[12,19],'Klippan':[16,26],'Upp och ner':[14,24],'Hänget':[16,28],'Svävaren':[14,24],'Balkarna':[14,24],'Pumpbanan':[14,22],'Studsen':[12,20],'Schaktet':[22,34],'Klätterväggen':[18,30],'Finalen':[28,45],'Spegeln':[16,26],'Trapphoppet':[16,26],'Flowbanan':[14,22],'Stockarna':[9,15],'Volten':[9,15]};
+const MEDALS2={'fjadra-pack2-01':[12,20],'fjadra-pack2-08':[26,40],'fjadra-pack2-11':[14,24]};
+const slug=n=>n.toLowerCase().replace(/å/g,'a').replace(/ä/g,'a').replace(/ö/g,'o').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 function makeLevels(){
-  return CAMPAIGN_LEVELS.map(source=>{
-    const l=JSON.parse(JSON.stringify(source)); l.segs=buildSegs(l.rings);
-    let mnx=Infinity,mny=Infinity,mxx=-Infinity,mxy=-Infinity;
-    for(const r of l.rings)for(const p of r.pts){mnx=Math.min(mnx,p[0]);mny=Math.min(mny,p[1]);mxx=Math.max(mxx,p[0]);mxy=Math.max(mxy,p[1]);}
-    l.bounds=[mnx,mny,mxx,mxy]; return l;
-  });
-}
-// Level-authored facing only; the shared physics model remains unchanged.
-function createLevelBike(l){
-  const bk=newBike(l.start[0],l.start[1]);
-  if(l.startDir===-1){bk.dir=-1;bk.flipFrom=-1;const p=riderTarget(bk,0);bk.r.x=bk.b.x+p[0];bk.r.y=bk.b.y+p[1];}
-  return bk;
+  const L1=LV.map(f=>f()), L2=LV2.map(f=>f());
+  for(const l of L1){ l.pack=1; l.id='p1-'+slug(l.name); l.medal=MEDALS[l.name]||[15,25]; }
+  for(const l of L2){ l.pack=2; l.medal=MEDALS2[l.id]||[20,35]; }
+  const L=L1.concat(L2);
+  for(const l of L){ l.segs=buildSegs(l.rings);
+    let mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9; for(const r of l.rings) for(const p of r.pts){ mnx=Math.min(mnx,p[0]);mxx=Math.max(mxx,p[0]);mny=Math.min(mny,p[1]);mxy=Math.max(mxy,p[1]); }
+    l.bounds=[mnx,mny,mxx,mxy];
+    // "view" bounds for the overview map: ignore the invisible sky lid at TOP
+    let vx0=1e9,vx1=-1e9,vy0=1e9,vy1=-1e9; const add=(x,y)=>{ vx0=Math.min(vx0,x); vx1=Math.max(vx1,x); vy0=Math.min(vy0,y); vy1=Math.max(vy1,y); };
+    for(const r of l.rings) for(const p of r.pts) if(p[1]<TOP-1) add(p[0],p[1]); for(const a of l.apples) add(a[0],a[1]+1); add(l.flower[0],l.flower[1]+2); add(l.start[0],l.start[1]+2.5);
+    l.vbounds=[vx0,vy0,vx1,vy1]; }
+  return L;
 }
 
 </script>
@@ -497,9 +649,12 @@ const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
 const $=id=>document.getElementById(id);
 let W=0,Hh=0,DPR=1,SC=40,SC0=40,zoom=0.86;
 let li=0, lvl=null, bike=null, got=[], state='menu', T=0, acc=0, endTimer=0, flagWarn=0, parts=[], rag=null, pops=[], shake=0, bloom=0, rec=[], recT=0, ghost=null, BASE_A=1;
-const NEWLV=new Set(['Spegeln','Trapphoppet','Flowbanan']);
-function loadGhost(n){ try{ const s=localStorage.getItem('fjadra.ghost.'+n); ghost=s?JSON.parse(s):null; }catch(e){ ghost=null; } }
-function saveGhost(n){ try{ localStorage.setItem('fjadra.ghost.'+n,JSON.stringify(rec)); }catch(e){} }
+const NEWLV=new Set(['fjadra-pack2-01','fjadra-pack2-08','fjadra-pack2-11']); let curPack=1;
+let STYLE='cartoon'; try{ STYLE=localStorage.getItem('fjadra.style')==='neon'?'neon':'cartoon'; }catch(e){}
+let stuckT=0, stuckCD=0;
+// ghosts are stored per stable level id; old name-keyed ghosts are moved over the first time
+function loadGhost(lv){ ghost=null; try{ let s=localStorage.getItem('fjadra.g4.'+lv.id); if(!s){ s=localStorage.getItem('fjadra.ghost.'+lv.name); if(s) localStorage.setItem('fjadra.g4.'+lv.id,s); } ghost=s?JSON.parse(s):null; }catch(e){ ghost=null; } }
+function saveGhost(lv){ try{ localStorage.setItem('fjadra.g4.'+lv.id,JSON.stringify(rec)); }catch(e){} }
 const GB={b:{x:0,y:0,a:0,vx:0,vy:0,w:0},wh:[{x:0,y:0,a:0,w:0},{x:0,y:0,a:0,w:0}],r:{x:0,y:0},dir:1,flipT:-1,flipFrom:1,rider:true,gx:0,gy:-10,contact:[1,1]};
 function ghostAt(t){ if(!ghost||!ghost.length) return null; const i=t*30, i0=Math.min(ghost.length-1,Math.floor(i)), i1=Math.min(ghost.length-1,i0+1), u=Math.min(1,i-i0); const a=ghost[i0], c=ghost[i1], L=(k)=>a[k]+(c[k]-a[k])*u;
   GB.b.x=L(0); GB.b.y=L(1); GB.b.a=L(2); GB.wh[0].x=L(3); GB.wh[0].y=L(4); GB.wh[0].a=L(5); GB.wh[1].x=L(6); GB.wh[1].y=L(7); GB.wh[1].a=L(8); GB.r.x=L(9); GB.r.y=L(10); GB.dir=a[11]; GB.flipT=a[12]; GB.flipFrom=a[13]; return GB; }
@@ -511,11 +666,13 @@ let curTheme='';
 function resize(){ DPR=Math.min(2.5,window.devicePixelRatio||1); W=cv.clientWidth; Hh=cv.clientHeight;
   cv.width=Math.round(W*DPR); cv.height=Math.round(Hh*DPR);
   SC0=Math.max(Math.min(W/18,Hh/9.5),Math.min(W,Hh)/11); SC=SC0*zoom; curTheme=''; if(lvl) setTheme(lvl.theme); }
-function setTheme(name){ if(curTheme===name+SC0+DPR) return; curTheme=name+SC0+DPR; TH=THEMES[name]; const keepSC=SC; SC=SC0; buildSprites(); SC=keepSC; buildPattern(); BG.key=''; buildBackground(name); for(const l of LEVELS) if(l.theme===name||!l.vis) { const keep=TH; TH=THEMES[l.theme]; analyze(l); TH=keep; } }
+function setTheme(name){ if(curTheme===name+STYLE+SC0+DPR) return; curTheme=name+STYLE+SC0+DPR; applyStyleColors(); TH=getTheme(name); const keepSC=SC; SC=SC0; buildSprites(); SC=keepSC; buildPattern(); BG.key=''; buildBackground(name); for(const l of LEVELS) if(l.theme===name||!l.vis) { const keep=TH; TH=getTheme(l.theme); analyze(l); TH=keep; } }
 addEventListener('resize',resize);
 
-let best={}; try{ best=JSON.parse(localStorage.getItem('fjadra3.best')||'{}')||{}; }catch(e){ best={}; }
-function saveBest(){ try{ localStorage.setItem('fjadra3.best',JSON.stringify(best)); }catch(e){} }
+// records are stored per stable level id (fjadra4.best); old name-keyed records (fjadra3.best) are migrated once and kept as history
+let best={}; try{ const s=localStorage.getItem('fjadra4.best'); if(s) best=JSON.parse(s)||{}; else { const old=JSON.parse(localStorage.getItem('fjadra3.best')||'{}')||{}; const alias={'Spikfältet':'p1-hinderbanan'};
+  for(const l of LEVELS) if(old[l.name]!=null) best[l.id]=old[l.name]; for(const n in alias) if(old[n]!=null&&best[alias[n]]==null) best[alias[n]]=old[n]; localStorage.setItem('fjadra4.best',JSON.stringify(best)); } }catch(e){ best={}; }
+function saveBest(){ try{ localStorage.setItem('fjadra4.best',JSON.stringify(best)); }catch(e){} }
 let muted=false; try{ muted=localStorage.getItem('fjadra.mute')==='1'; }catch(e){}
 function fmt(t){ const m=Math.floor(t/60), s=t-m*60; return (m<10?'0':'')+m+':'+(s<10?'0':'')+s.toFixed(2); }
 function medalOf(i,t){ if(t==null) return 0; const m=LEVELS[i].medal; return t<=m[0]?3:t<=m[1]?2:1; }
@@ -523,9 +680,9 @@ const MEDAL_COL=[null,['#c27a3d','#8a4f22'],['#c9ced6','#7d8590'],['#f6c533','#b
 function medalSVG(k){ if(!k) return '<svg viewBox="-13 -13 26 26" aria-hidden="true"><circle r="10" fill="none" stroke="currentColor" stroke-opacity=".3" stroke-width="2.5" stroke-dasharray="3 3"/></svg>';
   const [c,d]=MEDAL_COL[k]; return '<svg viewBox="-13 -13 26 26" aria-hidden="true"><circle r="11" fill="'+c+'" stroke="#1d2633" stroke-width="2"/><circle r="7.5" fill="none" stroke="'+d+'" stroke-width="1.5"/><path d="M0-5.5l1.7 3.5 3.8.5-2.8 2.6.7 3.8L0 3.1l-3.4 1.8.7-3.8-2.8-2.6 3.8-.5z" fill="#fff" stroke="'+d+'" stroke-width=".8"/></svg>'; }
 
-function loadLevel(i){ li=i; lvl=LEVELS[i]; setTheme(lvl.theme); bike=createLevelBike(lvl); got=lvl.apples.map(()=>false);
-  T=0; acc=0; parts=[]; rag=null; pops=[]; shake=0; bloom=0; rec=[]; recT=0; loadGhost(lvl.name); lvl.steelSegs=lvl.segs.filter(s=>s.style==='steel'); cam.x=bike.b.x+2*(lvl.startDir||1); cam.y=bike.b.y+0.8; camBaseY=cam.y; state='play';
-  $('lvlname').textContent=(i+1)+'. '+lvl.name; updApples(); updGrav(); hideOv(); toast(lvl.hint,3400); }
+function loadLevel(i){ li=i; lvl=LEVELS[i]; setTheme(lvl.theme); bike=newBike(lvl.start[0],lvl.start[1]); got=lvl.apples.map(()=>false);
+  T=0; acc=0; stuckT=0; stuckCD=0; parts=[]; rag=null; pops=[]; shake=0; bloom=0; rec=[]; recT=0; loadGhost(lvl); lvl.steelSegs=lvl.segs.filter(s=>s.style==='steel'); cam.x=bike.b.x+2; cam.y=bike.b.y+0.8; camBaseY=cam.y; state='play';
+  $('lvlname').textContent=(lvl.pack===2?'Paket 2 · ':'')+(LEVELS.filter(x=>x.pack===lvl.pack).indexOf(lvl)+1)+'. '+lvl.name; updApples(); updGrav(); hideOv(); toast(lvl.hint,3400); }
 function updApples(){ $('applesTxt').textContent=got.filter(Boolean).length+'/'+got.length; }
 function updGrav(){ const g=bike?(bike.gy<0&&bike.gx===0?null:(bike.gy>0?'up':bike.gx<0?'left':'right')):null; $('gravTile').style.display=g?'flex':'none'; if(g) $('gravArrow').textContent=GARROW[g]; }
 function hideOv(){ $('menu').classList.remove('show'); $('endov').classList.remove('show'); }
@@ -548,6 +705,14 @@ const THEMES={
     dirt:'#596566', dirtDark:'#424d4f', dirtLight:'#7e8985', rock:'#8293b5', rockLight:'#a5b4d1', rockDark:'#6d7ea3', top:'#8aa8cf', topLight:'#b3cdec', topDark:'#5a74a0', edge:'#2a3858', kind:'rock',
     deco:['crystal','crystal','rock','stalag']},
 };
+const NEON_BASE={clouds:0, snow:null, nearTree:null, lake:null, cave:1, kind:'neon', deco:['crystal','crystal','rock']};
+const NEON={
+  meadow:Object.assign({},NEON_BASE,{sky:['#140a2a','#2c1258','#6a2288'], sun:'#ff7ab8', mtn:'#3b1b70', mtnShade:'#2f1559', far:'#2b1663', farTree:'#7a3cff', near:'#241048', nearShade:'#1c0c3a', dirt:'#1f1338', dirtDark:'#160c2c', dirtLight:'#2c1c50', rock:'#40306f', rockLight:'#6048a8', rockDark:'#2c2056', top:'#3ef2f2', topLight:'#c4ffff', topDark:'#17a9b9', edge:'#0a0618'}),
+  sunset:Object.assign({},NEON_BASE,{sky:['#1a0a28','#541258','#ff5f6d'], sun:'#ffd27a', mtn:'#4a1a6e', mtnShade:'#3a1458', far:'#3a1263', farTree:'#ff5fa2', near:'#2b0f48', nearShade:'#210b3a', dirt:'#241034', dirtDark:'#1a0a28', dirtLight:'#34184a', rock:'#4a2f70', rockLight:'#7a4ea8', rockDark:'#33204f', top:'#ffb347', topLight:'#ffe2a8', topDark:'#d9792b', edge:'#0c0516'}),
+  winter:Object.assign({},NEON_BASE,{sky:['#08142e','#103a68','#38a0d6'], sun:null, mtn:'#1c4a80', mtnShade:'#163c6c', far:'#17407a', farTree:'#6fd0ff', near:'#10305c', nearShade:'#0c264a', dirt:'#142a4c', dirtDark:'#0e2040', dirtLight:'#1e3a64', rock:'#365c8c', rockLight:'#5d8cc2', rockDark:'#264a74', top:'#c4f6ff', topLight:'#ffffff', topDark:'#6cc4e8', edge:'#050c1c'}),
+  cave:Object.assign({},NEON_BASE,{sky:['#06101f','#0b2a3a','#0f4a52'], sun:null, mtn:'#0f3c4a', mtnShade:'#0c3340', far:'#0e3f4c', farTree:'#3cf0b0', near:'#0b2f3c', nearShade:'#08262f', dirt:'#0f2a34', dirtDark:'#0a2028', dirtLight:'#173a46', rock:'#2c5a66', rockLight:'#4a8a98', rockDark:'#1e444e', top:'#6dffa8', topLight:'#d4ffe8', topDark:'#2cbf78', edge:'#030c12'})
+};
+function getTheme(name){ return STYLE==='neon'?(NEON[name]||NEON.meadow):THEMES[name]; }
 let TH=THEMES.meadow;
 function seeded(s){ return ()=>{ s=(s*16807)%2147483647; return s/2147483647; }; }
 
@@ -720,7 +885,7 @@ function analyze(l){
   // deco placement
   const deco=[]; const rnd=seeded(97+l.name.length*31); let lastTree=-1e9, last=-1e9;
   const list=TH.deco;
-  const sorted=l.noDeco?[]:tops.filter(s=>s.ny>0.86 && s.len>0.3).sort((a,b)=>Math.min(a.x1,a.x2)-Math.min(b.x1,b.x2));
+  const sorted=tops.filter(s=>s.ny>0.86 && s.len>0.3).sort((a,b)=>Math.min(a.x1,a.x2)-Math.min(b.x1,b.x2));
   for(const s of sorted){ const x0=Math.min(s.x1,s.x2), x1=Math.max(s.x1,s.x2);
     for(let x=x0;x<x1;x+=0.5){ if(x-last<2.2||rnd()>0.22) continue; const t=(x-s.x1)/(s.x2-s.x1); const y=s.y1+t*(s.y2-s.y1);
       let kind=list[Math.floor(rnd()*list.length)];
@@ -732,7 +897,14 @@ function analyze(l){
   const hang=[]; if(TH.cave){ const r2=seeded(13); for(const s of ceils){ const x0=Math.min(s.x1,s.x2), x1=Math.max(s.x1,s.x2); for(let x=x0;x<x1;x+=0.5){ if(r2()>0.12) continue; const t=(x-s.x1)/(s.x2-s.x1); hang.push({x,y:s.y1+t*(s.y2-s.y1)+0.05,s:0.6+r2()*0.6}); } } }
   // tufts
   for(const s of tops){ s.tufts=[]; const rr=seeded(Math.floor(s.x1*100+s.y1*7)+5); for(let d=0.2; d<s.len; d+=0.42+rr()*0.5) s.tufts.push([d,0.1+rr()*0.12,rr()]); }
-  l.vis={tops,ceils,deco,hang};
+  const boulders=[], roots=[], lanterns=[]; const rb=seeded(71+l.name.length*13);
+  for(const s of tops){ const tx=(s.x2-s.x1)/s.len, ty=(s.y2-s.y1)/s.len;
+    for(let d=rb()*2; d<s.len; d+=2.4+rb()*2.2){ const px=s.x1+tx*d, py=s.y1+ty*d, dep=0.9+rb()*1.8; boulders.push({x:px-s.nx*dep,y:py-s.ny*dep,r:0.22+rb()*0.5,a:rb()*3}); }
+    if(TH.kind==='grass'&&s.ny>0.6) for(let d=rb()*1.2; d<s.len; d+=1.3+rb()*1.6){ if(rb()<0.45) continue; const px=s.x1+tx*d-s.nx*0.26, py=s.y1+ty*d-s.ny*0.26; const pts=[[px,py]]; let x=px,y=py, L=0.35+rb()*0.55, n=4;
+      for(let k=0;k<n;k++){ x+=-s.nx*L/n+(rb()-0.5)*0.14; y+=-s.ny*L/n+(rb()-0.5)*0.14; pts.push([x,y]); } roots.push(pts);
+      if(rb()<0.5){ const m=pts[2]; roots.push([m,[m[0]+(rb()-0.5)*0.3-s.nx*0.15,m[1]-s.ny*0.18]]); } } }
+  if(TH.cave){ const rl=seeded(19); for(const s of ceils){ const tx=(s.x2-s.x1)/s.len, ty=(s.y2-s.y1)/s.len; for(let d=1+rl()*3; d<s.len; d+=7+rl()*4){ lanterns.push({x:s.x1+tx*d,y:s.y1+ty*d,len:0.5+rl()*0.6,ph:rl()*6}); } } }
+  l.vis={tops,ceils,deco,hang,boulders,roots,lanterns};
 }
 
 // ---------- background layers ----------
@@ -788,8 +960,11 @@ function drawBackground(t){
   if(TH.sun){ const sx=W*0.7, sy=Hh*0.5; const gr=ctx.createRadialGradient(sx,sy,10,sx,sy,Hh*0.5); gr.addColorStop(0,'rgba(255,220,140,.65)'); gr.addColorStop(1,'rgba(255,200,120,0)'); ctx.fillStyle=gr; ctx.fillRect(0,0,W,Hh);
     ctx.fillStyle=TH.sun; ctx.beginPath(); ctx.arc(sx,sy,Math.min(W,Hh)*0.1,0,6.28); ctx.fill(); }
   const TW=1400;
-  for(const L of BG.layers){ const off=-(((cam.x*SC*L.par)+(L.drift?t*L.drift:0))%TW+TW)%TW; const vy=Math.max(-60,Math.min(60,(cam.y-camBaseY)*SC*L.par*0.6));
-    if(L.alpha) ctx.globalAlpha=L.alpha; else if(L.par<0.1) ctx.globalAlpha=0.85; for(let x=off; x<W; x+=TW) ctx.drawImage(L.c,x,vy,TW,L.c.height/DPR); ctx.globalAlpha=1; }
+  if(TH.sun){ ctx.save(); ctx.globalCompositeOperation='lighter'; const sx=W*0.7, sy=Hh*0.5; for(let i=0;i<5;i++){ const a=-2.2+i*0.32+Math.sin(t*0.05+i)*0.03, w=0.07; ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(sx+Math.cos(a-w)*W*1.4,sy+Math.sin(a-w)*W*1.4); ctx.lineTo(sx+Math.cos(a+w)*W*1.4,sy+Math.sin(a+w)*W*1.4); ctx.closePath(); ctx.fillStyle='rgba(255,210,150,.035)'; ctx.fill(); } ctx.restore(); }
+  let li_=0; for(const L of BG.layers){ li_++; const off=-(((cam.x*SC*L.par)+(L.drift?t*L.drift:0))%TW+TW)%TW; const vy=Math.max(-60,Math.min(60,(cam.y-camBaseY)*SC*L.par*0.6));
+    if(L.alpha) ctx.globalAlpha=L.alpha; else if(L.par<0.1) ctx.globalAlpha=0.85; for(let x=off; x<W; x+=TW) ctx.drawImage(L.c,x,vy,TW,L.c.height/DPR); ctx.globalAlpha=1;
+    if(Math.abs(L.par-0.16)<1e-6 && (TH.kind!=='rock')){ const fy=Hh*0.6+vy, fg=ctx.createLinearGradient(0,fy,0,fy+Hh*0.25); const fc=TH.kind==='snow'?'235,244,252':(TH.sun?'255,214,190':'240,248,250');
+      fg.addColorStop(0,'rgba('+fc+',0)'); fg.addColorStop(0.5,'rgba('+fc+','+(TH.sun?0.18:0.32)+')'); fg.addColorStop(1,'rgba('+fc+',0)'); ctx.fillStyle=fg; ctx.fillRect(0,fy,W,Hh*0.25); } }
 }
 let camBaseY=0;
 const LIFE={birds:[],flakes:[],motes:[]};
@@ -803,6 +978,19 @@ function drawLife(t){
     for(const f of LIFE.flakes){ const x=(((f.x*W+Math.sin(t*0.8+f.ph)*20-cam.x*SC*0.3)%W)+W)%W, y=(((f.y+t*f.v)*Hh-cam.y*SC*-0.3)%Hh+Hh)%Hh; ctx.beginPath(); ctx.arc(x,y,f.s,0,6.28); ctx.fill(); } }
   else if(TH.cave){ for(const m of LIFE.motes){ const x=(((m.x*W+Math.sin(t*0.3+m.ph)*30-cam.x*SC*0.2)%W)+W)%W, y=(((m.y*Hh+Math.cos(t*0.25+m.ph)*25)%Hh)+Hh)%Hh; ctx.fillStyle='rgba(120,220,255,'+(0.25+0.25*Math.sin(t*2+m.ph))+')'; ctx.beginPath(); ctx.arc(x,y,m.s,0,6.28); ctx.fill(); } }
 }
+function drawLanterns(l,t){ if(!l.vis.lanterns.length) return; const v=view();
+  for(const ln of l.vis.lanterns){ if(ln.x<v[0]-3||ln.x>v[2]+3||ln.y<v[1]-3||ln.y>v[3]+3) continue; const sw=Math.sin(t*0.8+ln.ph)*0.05, bx=ln.x+sw, by=ln.y-ln.len;
+    ctx.save(); ctx.globalCompositeOperation='lighter'; const gr=ctx.createRadialGradient(bx,by,0.05,bx,by,2.6); gr.addColorStop(0,'rgba(255,190,110,.32)'); gr.addColorStop(1,'rgba(255,170,90,0)'); ctx.fillStyle=gr; ctx.fillRect(bx-2.6,by-2.6,5.2,5.2); ctx.restore();
+    ctx.beginPath(); ctx.moveTo(ln.x,ln.y); ctx.lineTo(bx,by+0.16); ctx.strokeStyle='#2a3858'; ctx.lineWidth=0.03; ctx.stroke();
+    ctx.beginPath(); ctx.rect(bx-0.09,by-0.14,0.18,0.28); ctx.fillStyle='#ffd58a'; ctx.fill(); ctx.strokeStyle='#1d2633'; ctx.lineWidth=0.03; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(bx-0.12,by+0.14); ctx.lineTo(bx+0.12,by+0.14); ctx.lineTo(bx,by+0.24); ctx.closePath(); ctx.fillStyle='#2a3858'; ctx.fill(); } }
+// painted brake zone on a ledge (yellow/black), drawn on the actual surface
+function drawMarks(l){ if(!l.marks) return; const top=l.vbounds[3]+3;
+  for(const [x0,x1] of l.marks){ const pts=[]; for(let x=x0;x<=x1+1e-6;x+=0.2){ const h=rayHit(x,top,0,-1,top-l.vbounds[1]+5); if(h) pts.push([x,h.y]); } if(pts.length<2) continue;
+    ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]-0.06):ctx.moveTo(p[0],p[1]-0.06)); ctx.strokeStyle='#1d2633'; ctx.lineWidth=0.17; ctx.lineCap='butt'; ctx.stroke(); ctx.strokeStyle='#f2c230'; ctx.lineWidth=0.11; ctx.stroke();
+    ctx.beginPath(); for(let i=0;i<pts.length-1;i+=1){ const p=pts[i]; ctx.moveTo(p[0]+0.03,p[1]-0.11); ctx.lineTo(p[0]+0.13,p[1]-0.01); } ctx.strokeStyle='#1d2633'; ctx.lineWidth=0.045; ctx.stroke(); ctx.lineCap='round'; } }
+function drawGrade(){ ctx.setTransform(DPR,0,0,DPR,0,0); let c=null; if(TH.kind==='snow') c='rgba(165,200,245,.08)'; else if(TH.sun) c='rgba(255,165,120,.05)'; else if(TH.cave) c='rgba(20,30,70,.10)';
+  if(c){ ctx.fillStyle=c; ctx.fillRect(0,0,W,Hh); } }
 function drawVignette(){ ctx.setTransform(DPR,0,0,DPR,0,0); const r=Math.hypot(W,Hh)/2; const g=ctx.createRadialGradient(W/2,Hh/2,r*0.55,W/2,Hh/2,r*1.05); g.addColorStop(0,'rgba(10,20,35,0)'); g.addColorStop(1,TH.cave?'rgba(8,14,32,.30)':'rgba(40,50,70,.12)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,Hh); }
 // soft drop shadow under the bike (gravity down only)
 function groundBelow(x,y){ let best=-1e9; for(const s of lvl.segs){ if(x<s.minx||x>s.maxx||s.dx===0) continue; const t=(x-s.x1)/s.dx; if(t<0||t>1) continue; const gy=s.y1+t*s.dy; if(gy<=y+0.05&&gy>best) best=gy; } return best; }
@@ -840,23 +1028,39 @@ function drawGround(l,t){
   ctx.fillStyle=PAT; ctx.fill('evenodd');
   ctx.lineJoin='round'; ctx.lineCap='round';
   ctx.save(); ctx.clip('evenodd');
+  // depth: lighter close to the surface, darker deeper down
+  ctx.fillStyle=TH.cave?'rgba(8,14,34,.22)':'rgba(45,25,12,.16)'; ctx.fillRect(v[0],v[1],v[2]-v[0],v[3]-v[1]);
+  ctx.beginPath(); for(const r of l.rings) if(!r.style) ringPath(r.pts);
+  ctx.strokeStyle=TH.cave?'rgba(150,180,230,.08)':'rgba(255,232,196,.09)'; ctx.lineWidth=5.0; ctx.stroke(); ctx.lineWidth=2.6; ctx.stroke(); ctx.lineWidth=1.2; ctx.stroke();
+  // soil strata
+  ctx.beginPath(); for(let y=Math.floor(v[1]/1.9)*1.9; y<v[3]; y+=1.9){ for(let x=v[0]; x<=v[2]+0.5; x+=0.6){ const yy=y+0.22*Math.sin(x*0.42+y*1.7)+0.1*Math.sin(x*1.3+y); x===v[0]?ctx.moveTo(x,yy):ctx.lineTo(x,yy); } }
+  ctx.strokeStyle=TH.cave?'rgba(10,20,50,.16)':'rgba(70,40,20,.11)'; ctx.lineWidth=0.11; ctx.stroke();
+  // embedded boulders in different sizes
+  for(const bo of l.vis.boulders){ if(bo.x<v[0]-1||bo.x>v[2]+1||bo.y<v[1]-1||bo.y>v[3]+1) continue; ctx.save(); ctx.translate(bo.x,bo.y); ctx.rotate(bo.a);
+    ctx.globalAlpha=0.6; ctx.beginPath(); ctx.ellipse(0,0,bo.r*1.2,bo.r*0.85,0,0,6.28); ctx.fillStyle=TH.rock; ctx.fill(); ctx.strokeStyle=TH.edge; ctx.globalAlpha=0.25; ctx.lineWidth=0.04; ctx.stroke();
+    ctx.globalAlpha=0.5; ctx.beginPath(); ctx.ellipse(-bo.r*0.3,bo.r*0.25,bo.r*0.6,bo.r*0.35,0,0,6.28); ctx.fillStyle=TH.rockLight; ctx.fill(); ctx.restore(); }
+  ctx.globalAlpha=1;
+  // roots under the grass
+  if(l.vis.roots.length){ ctx.beginPath(); for(const rt of l.vis.roots){ if(rt[0][0]<v[0]-1||rt[0][0]>v[2]+1) continue; ctx.moveTo(rt[0][0],rt[0][1]); for(let k=1;k<rt.length;k++) ctx.lineTo(rt[k][0],rt[k][1]); }
+    ctx.strokeStyle='rgba(74,46,26,.55)'; ctx.lineWidth=0.035; ctx.stroke(); }
   ctx.beginPath(); for(const r of l.rings) if(!r.style) ringPath(r.pts);
   ctx.strokeStyle=TH.cave?'rgba(10,18,40,.16)':'rgba(60,30,10,.10)'; ctx.lineWidth=2.4; ctx.stroke(); ctx.lineWidth=1.1; ctx.stroke();
   ctx.strokeStyle='rgba(255,246,228,.16)'; ctx.lineWidth=0.36; ctx.stroke();
   ctx.restore();
   ctx.beginPath(); for(const r of l.rings) if(!r.style) ringPath(r.pts); ctx.strokeStyle=TH.edge; ctx.lineWidth=0.12; ctx.stroke();
+  if(TH.kind==='neon'){ ctx.beginPath(); for(const r of l.rings) if(!r.style) ringPath(r.pts); ctx.strokeStyle=TH.top; for(const [w,al] of [[0.75,0.06],[0.42,0.11],[0.2,0.25],[0.07,0.95]]){ ctx.globalAlpha=al; ctx.lineWidth=w; ctx.stroke(); } ctx.globalAlpha=1; }
   // top band (grass / snow / rock rim)
   const tops=l.vis.tops.filter(s=>segVisible(s,v));
   const band=(s,off,depth)=>{ const tx=(s.x2-s.x1)/s.len, ty=(s.y2-s.y1)/s.len; const n=Math.max(2,Math.ceil(s.len/0.22));
     ctx.moveTo(s.x1+s.nx*off-tx*0.06,s.y1+s.ny*off-ty*0.06); ctx.lineTo(s.x2+s.nx*off+tx*0.06,s.y2+s.ny*off+ty*0.06);
     for(let i=n;i>=0;i--){ const u=i/n; const d=depth+0.07*Math.sin(u*s.len*14+s.x1); ctx.lineTo(s.x1+(s.x2-s.x1)*u-s.nx*d, s.y1+(s.y2-s.y1)*u-s.ny*d); } ctx.closePath(); };
-  ctx.beginPath(); for(const s of tops) band(s,0.1,0.3); ctx.strokeStyle=TH.edge; ctx.lineWidth=0.09; ctx.stroke();
+  ctx.beginPath(); for(const s of tops) band(s,0.0,0.34); ctx.strokeStyle=TH.edge; ctx.lineWidth=0.08; ctx.stroke();
   ctx.fillStyle=TH.topDark; ctx.fill();
-  ctx.beginPath(); for(const s of tops) band(s,0.06,0.2); ctx.fillStyle=TH.top; ctx.fill();
-  ctx.beginPath(); for(const s of tops){ ctx.moveTo(s.x1+s.nx*0.04,s.y1+s.ny*0.04); ctx.lineTo(s.x2+s.nx*0.04,s.y2+s.ny*0.04); } ctx.strokeStyle=TH.topLight; ctx.lineWidth=0.07; ctx.stroke();
+  ctx.beginPath(); for(const s of tops) band(s,-0.02,0.24); ctx.fillStyle=TH.top; ctx.fill();
+  ctx.beginPath(); for(const s of tops){ ctx.moveTo(s.x1-s.nx*0.05,s.y1-s.ny*0.05); ctx.lineTo(s.x2-s.nx*0.05,s.y2-s.ny*0.05); } ctx.strokeStyle=TH.topLight; ctx.lineWidth=0.06; ctx.stroke();
   if(TH.kind==='grass'){ // blades
-    ctx.beginPath(); for(const s of tops){ const tx=(s.x2-s.x1)/s.len, ty=(s.y2-s.y1)/s.len; for(const [d,h,r] of s.tufts){ const bx=s.x1+tx*d+s.nx*0.08, by=s.y1+ty*d+s.ny*0.08; const lean=(r-0.5)*0.12;
-      ctx.moveTo(bx-tx*0.06,by-ty*0.06); ctx.lineTo(bx+s.nx*h+tx*lean,by+s.ny*h+ty*lean); ctx.lineTo(bx+tx*0.06,by+ty*0.06); } }
+    ctx.beginPath(); for(const s of tops){ const tx=(s.x2-s.x1)/s.len, ty=(s.y2-s.y1)/s.len; for(const [d,h,r] of s.tufts){ const bx=s.x1+tx*d, by=s.y1+ty*d; const lean=(r-0.5)*0.1; const hh=h*0.75;
+      ctx.moveTo(bx-tx*0.06,by-ty*0.06); ctx.lineTo(bx+s.nx*hh+tx*lean,by+s.ny*hh+ty*lean); ctx.lineTo(bx+tx*0.06,by+ty*0.06); } }
     ctx.fillStyle=TH.top; ctx.strokeStyle=TH.topDark; ctx.lineWidth=0.025; ctx.fill(); ctx.stroke(); }
   if(TH.kind==='snow'){ ctx.beginPath(); for(const s of tops){ const tx=(s.x2-s.x1)/s.len, ty=(s.y2-s.y1)/s.len; for(const [d,h,r] of s.tufts){ if(r<0.7) continue; const bx=s.x1+tx*d, by=s.y1+ty*d; ctx.moveTo(bx-s.nx*0.2+0.05,by-s.ny*0.2); ctx.arc(bx-s.nx*0.2,by-s.ny*0.2,0.05,0,6.28); } } ctx.fillStyle='#fff'; ctx.fill(); }
   // styled rings
@@ -909,6 +1113,9 @@ const BK={STEER_TOP:[0.56,0.34], STEER_BOT:[0.63,0.15], PIVOT:[-0.1,-0.3], SHOCK
 const COL={teal:'#c57342', tealD:'#8c462f', frameK:'#2a2e36', frameK2:'#3a404a', gold:'#d9a43a', goldD:'#a87a22', alu2:'#e3e7ec', green:'#bb7042', greenL:'#e4ac70', greenD:'#804a31', white:'#f4f2ea', whiteD:'#cfd3d8', black:'#1d2026', blackL:'#3a3f47',
   chrome:'#d9dee4', chromeD:'#9aa2ab', alu:'#b9c0c8', gold:'#e3b23c', red:'#d8382e',
   jersey:'#e2d8bf', jerseyD:'#a69b85', jerseyL:'#f7efdc', pants:'#22252c', pantsL:'#323741', boot:'#17191e', bootL:'#3a3f48', skin:'#f0c9a0'};
+const COL_CARTOON=Object.assign({},COL);
+const COL_NEON={green:'#ff3ea5', greenL:'#ff9ad0', greenD:'#a8176b', teal:'#3ef2f2', tealD:'#1fb8b8', gold:'#3ef2f2', goldD:'#1fb8b8', red:'#ffe66d', jersey:'#3b2a86', jerseyD:'#2a1c66', jerseyL:'#5b46c0', white:'#f4eaff'};
+function applyStyleColors(){ Object.assign(COL, COL_CARTOON); if(STYLE==='neon') Object.assign(COL, COL_NEON); }
 function P2(p,q,t){ return [p[0]+(q[0]-p[0])*t, p[1]+(q[1]-p[1])*t]; }
 function mid(p,q){ return [(p[0]+q[0])/2,(p[1]+q[1])/2]; }
 function outl(w){ ctx.strokeStyle=OUT; ctx.lineWidth=w||0.032; ctx.lineJoin='round'; ctx.lineCap='round'; ctx.stroke(); }
@@ -1150,7 +1357,7 @@ function drawParts(dt){
 }
 // ---------- level preview ----------
 function drawPreview(cnv,l){
-  const T=THEMES[l.theme]; const r=cnv.getBoundingClientRect(); const w=Math.max(120,r.width||150), h=Math.max(40,r.height||60), d=Math.min(2,window.devicePixelRatio||1);
+  const T=getTheme(l.theme); const r=cnv.getBoundingClientRect(); const w=Math.max(120,r.width||150), h=Math.max(40,r.height||60), d=Math.min(2,window.devicePixelRatio||1);
   cnv.width=w*d; cnv.height=h*d; const g=cnv.getContext('2d'); g.scale(d,d);
   const gr=g.createLinearGradient(0,0,0,h); gr.addColorStop(0,T.sky[0]); gr.addColorStop(1,T.sky[2]); g.fillStyle=gr; g.fillRect(0,0,w,h);
   g.fillStyle=T.mtn; g.beginPath(); g.moveTo(0,h); for(let x=0;x<=w;x+=12) g.lineTo(x,h*0.55-Math.abs(Math.sin(x*0.05+l.name.length))*h*0.25); g.lineTo(w,h); g.fill();
@@ -1201,43 +1408,10 @@ function sndIcon(){ $('sndWave').style.display=muted?'none':''; }
 sndIcon();
 $('bSound').onclick=()=>{ muted=!muted; sndIcon(); try{localStorage.setItem('fjadra.mute',muted?'1':'0');}catch(e){} audioInit(); };
 
-// ---------- mobile play surface: no double-tap/pinch zoom ----------
-function isPlaySurface(target){return !!(target&&target.closest&&target.closest('#cv,#ctl,#hud,#bRestart'));}
-document.addEventListener('dblclick',e=>{if(isPlaySurface(e.target))e.preventDefault();},{passive:false});
-document.addEventListener('touchmove',e=>{if(isPlaySurface(e.target)&&e.cancelable)e.preventDefault();},{passive:false});
-let lastPlayTap=null;
-document.addEventListener('touchend',e=>{
-  if(!isPlaySurface(e.target)||e.touches.length||e.changedTouches.length!==1){lastPlayTap=null;return;}
-  const t=e.changedTouches[0],now=performance.now();
-  if(lastPlayTap&&lastPlayTap.target===e.target&&now-lastPlayTap.time<330&&Math.hypot(t.clientX-lastPlayTap.x,t.clientY-lastPlayTap.y)<32){if(e.cancelable)e.preventDefault();lastPlayTap=null;}
-  else lastPlayTap={target:e.target,time:now,x:t.clientX,y:t.clientY};
-},{passive:false});
-for(const event of ['gesturestart','gesturechange','gestureend'])document.addEventListener(event,e=>{
-  if(isPlaySurface(e.target)||(e.target===document&&state==='play')){if(e.cancelable)e.preventDefault();}
-},{passive:false});
-// Standard fullscreen on desktop/Android; clear home-screen guidance on iPhone.
-let fullscreenBusy=false;
-function syncFullscreen(){const active=!!(document.fullscreenElement||document.webkitFullscreenElement);$('bFullscreen').setAttribute('aria-label',active?'Avsluta helskärm':'Helskärm');$('bFullscreen').setAttribute('title',active?'Avsluta helskärm':'Helskärm');$('bFullscreen').setAttribute('aria-pressed',active?'true':'false');}
-async function toggleFullscreen(){
-  if(fullscreenBusy)return;fullscreenBusy=true;
-  try{
-    const d=document,root=d.documentElement,active=d.fullscreenElement||d.webkitFullscreenElement;
-    if(active){const exit=d.exitFullscreen||d.webkitExitFullscreen;if(exit)await exit.call(d);}
-    else{const enter=root.requestFullscreen||root.webkitRequestFullscreen;
-      if(enter){await enter.call(root);if(screen.orientation&&screen.orientation.lock)try{await screen.orientation.lock('landscape');}catch(_){} }
-      else if(navigator.standalone||(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches))toast('Spelet körs redan från hemskärmen.',3500);
-      else toast('iPhone: tryck Dela → Lägg till på hemskärmen. Öppna spelet därifrån för helskärm.',6500);
-    }
-  }catch(_){toast('Webbläsaren kunde inte öppna helskärm. Prova helskärmsknappen igen eller öppna från hemskärmen.',4500);}
-  finally{fullscreenBusy=false;syncFullscreen();}
-}
-$('bFullscreen').onclick=toggleFullscreen;
-for(const name of ['fullscreenchange','webkitfullscreenchange'])document.addEventListener(name,syncFullscreen);
-syncFullscreen();
-
 // ---------- input ----------
 function press(k,on){
   audioInit(); if(AC&&AC.state==='suspended') AC.resume();
+  if(state==='overview'){ if(on) leaveOverview(); return; }
   if(k==='turn'){ if(on&&state==='play'){ turn(bike); beep(520,.22,'sine',.04,.45); for(let i=0;i<2;i++){ const w=bike.wh[i]; if(bike.contact[i]>0.5) for(let j=0;j<3;j++) puff(w.x+(Math.random()-0.5)*0.4,w.y-0.32,(Math.random()-0.5)*2.2,0.3+Math.random()*0.6,0.09,TH.kind==='snow'?'#ffffff':TH.dirtLight,0.45); } } return; }
   const was=inp[k]; inp[k]=on?1:0;
   if(on&&!was&&state==='play'&&(k==='left'||k==='right')){
@@ -1260,25 +1434,46 @@ addEventListener('blur',()=>{ for(const k in inp) inp[k]=0; document.querySelect
 document.addEventListener('contextmenu',e=>e.preventDefault());
 
 function restart(){ loadLevel(li); }
+function enterOverview(){ if(state!=='play') return; state='overview'; for(const k in inp) inp[k]=0; document.querySelectorAll('.k.on').forEach(b=>b.classList.remove('on')); toast('Översikt – tryck på valfri knapp för att fortsätta',2200); }
+function leaveOverview(){ if(state!=='overview') return; state='play'; acc=0; }
+// soft edge pointers toward stars and the flower when they are off-screen
+function drawPointers(){ const tg=[]; lvl.apples.forEach((a,i)=>{ if(!got[i]) tg.push({x:a[0],y:a[1],k:a[2]?'g':'s'}); }); const ready=got.every(Boolean); tg.push({x:lvl.flower[0],y:lvl.flower[1]+1,k:'f'});
+  const top=70, bot=Hh-165, L=18, R=W-18; const off=[];
+  for(const t of tg){ const sx=W/2+(t.x-cam.x)*SC, sy=Hh/2-(t.y-cam.y)*SC; if(sx>10&&sx<W-10&&sy>10&&sy<Hh-10) continue; t.d=Math.hypot(t.x-bike.b.x,t.y-bike.b.y); t.sx=sx; t.sy=sy; off.push(t); }
+  const stars=off.filter(t=>t.k!=='f').sort((a,b)=>a.d-b.d).slice(0,3), fl=off.filter(t=>t.k==='f');
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  for(const t of stars.concat(fl)){ const cx=W/2, cy=Hh/2, dx=t.sx-cx, dy=t.sy-cy; const s=Math.min(Math.abs((dx>0?R-cx:L-cx)/(dx||1e-6)),Math.abs((dy>0?bot-cy:top-cy)/(dy||1e-6))); const px=cx+dx*s, py=cy+dy*s, an=Math.atan2(dy,dx);
+    const isF=t.k==='f'; ctx.globalAlpha=isF&&!ready?0.55:0.9;
+    ctx.save(); ctx.translate(px,py); ctx.rotate(an); ctx.beginPath(); ctx.moveTo(19,0); ctx.lineTo(11,-6); ctx.lineTo(11,6); ctx.closePath(); ctx.fillStyle=isF?'#ffffff':(t.k==='g'?'#8fd0ff':'#ffd23f'); ctx.fill(); ctx.restore();
+    ctx.beginPath(); ctx.arc(px,py,11,0,6.28); ctx.fillStyle='rgba(20,42,68,.88)'; ctx.fill(); ctx.strokeStyle='rgba(160,195,230,.7)'; ctx.lineWidth=1.5; ctx.stroke();
+    if(isF){ for(let i=0;i<6;i++){ const a=i*Math.PI/3; ctx.beginPath(); ctx.ellipse(px+Math.cos(a)*4,py+Math.sin(a)*4,3,1.8,a,0,6.28); ctx.fillStyle='#fff'; ctx.fill(); } ctx.beginPath(); ctx.arc(px,py,2.4,0,6.28); ctx.fillStyle='#f7c51e'; ctx.fill(); }
+    else { ctx.beginPath(); for(let i=0;i<10;i++){ const a=-Math.PI/2+i*Math.PI/5, r=i%2?3:7; ctx.lineTo(px+Math.cos(a)*r,py+Math.sin(a)*r); } ctx.closePath(); ctx.fillStyle=t.k==='g'?'#8fd0ff':'#ffd23f'; ctx.fill(); } }
+  ctx.globalAlpha=1; }
 function next(){ loadLevel((li+1)%LEVELS.length); }
 let pausedState=null;
 function showMenu(){ state='menu'; buildMenu(); $('endov').classList.remove('show'); $('menu').classList.add('show'); }
 function toggleMenu(){ if($('menu').classList.contains('show')){ if(pausedState){ state=pausedState; pausedState=null; hideOv(); if(state==='win'||state==='crash') $('endov').classList.add('show'); } return; }
   pausedState=(state==='play'||state==='crash'||state==='win')?state:null; showMenu(); }
-$('bMenu').onclick=toggleMenu; $('bRestart').onclick=()=>{ if(lvl) restart(); };
+$('bMenu').onclick=toggleMenu; $('bMap').onclick=()=>{ audioInit(); if(state==='overview') leaveOverview(); else enterOverview(); }; $('bRestart').onclick=()=>{ if(lvl) restart(); };
 $('bResume').onclick=()=>{ if(pausedState){ state=pausedState; pausedState=null; hideOv(); if(state==='win'||state==='crash') $('endov').classList.add('show'); } };
 $('bNext').onclick=next; $('bAgain').onclick=restart; $('bLevels').onclick=()=>{ pausedState=null; showMenu(); };
+const fsOK=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen; if(!fsOK) $('bFull').style.display='none';
 $('bMusic').onclick=()=>setMusic(!musicOn);
-$('bNextUnplayed').onclick=()=>{ audioInit(); pausedState=null; let i=LEVELS.findIndex(l=>best[l.name]==null); if(i<0) i=LEVELS.findIndex((l,k)=>medalOf(k,best[l.name])<3); if(i<0) i=0; loadLevel(i); };
-$('bFull').onclick=toggleFullscreen;
-function buildMenu(){ const box=$('lvls'); box.innerHTML='';
-  LEVELS.forEach((l,i)=>{ const b=document.createElement('button'); b.className='lv'; const t=best[l.name];
-    b.innerHTML='<canvas></canvas>'+(NEWLV.has(l.name)?'<span class="newb">NY</span>':'')+'<div class="meta"><div class="nm"><b>'+(i+1)+'. '+l.name+'</b><i>'+(t!=null?fmt(t):'Ej klarad')+' · guld '+l.medal[0]+' s</i></div>'+medalSVG(medalOf(i,t))+'</div>';
+function setStyle(s){ STYLE=s; try{ localStorage.setItem('fjadra.style',s); }catch(e){} document.body.classList.toggle('neon',s==='neon'); $('bStyle').textContent='Stil: '+(s==='neon'?'Neon':'Tecknad'); curTheme=''; if(lvl) setTheme(lvl.theme); buildMenu(); }
+$('bStyle').onclick=()=>setStyle(STYLE==='neon'?'cartoon':'neon');
+$('bNextUnplayed').onclick=()=>{ audioInit(); pausedState=null; let i=LEVELS.findIndex(l=>l.pack===curPack&&best[l.id]==null); if(i<0) i=LEVELS.findIndex((l,k)=>l.pack===curPack&&medalOf(k,best[l.id])<3); if(i<0) i=LEVELS.findIndex(l=>l.pack===curPack); loadLevel(i); };
+for(const p of [1,2]) $('tab'+p).onclick=()=>{ curPack=p; buildMenu(); };
+$('bFull').onclick=()=>{ const d=document.documentElement; try{ if(document.fullscreenElement) document.exitFullscreen(); else { (d.requestFullscreen||d.webkitRequestFullscreen).call(d); if(screen.orientation&&screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{}); } }catch(e){} };
+function buildMenu(){ const box=$('lvls'); box.innerHTML=''; const shown=[];
+  for(const p of [1,2]){ const t=$('tab'+p); t.classList.toggle('on',p===curPack); t.setAttribute('aria-selected',p===curPack?'true':'false'); }
+  LEVELS.forEach((l,i)=>{ if(l.pack!==curPack) return; const n=shown.length+1; shown.push(l); const b=document.createElement('button'); b.className='lv'; const t=best[l.id];
+    b.innerHTML='<canvas></canvas>'+(NEWLV.has(l.id)?'<span class="newb">NY</span>':'')+'<div class="meta"><div class="nm"><b>'+n+'. '+l.name+'</b><i>'+(t!=null?fmt(t):'Ej klarad')+' · guld '+l.medal[0]+' s</i></div>'+medalSVG(medalOf(i,t))+'</div>';
     b.onclick=()=>{ audioInit(); pausedState=null; loadLevel(i); }; box.appendChild(b); });
   $('resumeRow').style.display=pausedState==='play'?'flex':'none';
-  const done=LEVELS.filter(l=>best[l.name]!=null).length, golds=LEVELS.filter((l,i)=>medalOf(i,best[l.name])===3).length; $('progress').textContent='Klarade '+done+' av '+LEVELS.length+' · '+golds+' guld';
+  const inPack=LEVELS.filter(l=>l.pack===curPack), done=inPack.filter(l=>best[l.id]!=null).length, golds=inPack.filter(l=>medalOf(LEVELS.indexOf(l),best[l.id])===3).length;
+  $('progress').textContent='Klarade '+done+' av '+inPack.length+' · '+golds+' guld'+(curPack===2?' · fler banor kommer':'');
   $('bMusic').textContent='Musik: '+(musicOn?'på':'av');
-  requestAnimationFrame(()=>{ box.querySelectorAll('canvas').forEach((c,i)=>drawPreview(c,LEVELS[i])); }); }
+  requestAnimationFrame(()=>{ box.querySelectorAll('canvas').forEach((c,i)=>drawPreview(c,shown[i])); }); }
 
 // ---------- rules ----------
 function crash(){ if(state!=='play') return; state='crash'; endTimer=0; const [hx,hy]=headPos(bike);
@@ -1287,7 +1482,7 @@ function crash(){ if(state!=='play') return; state='crash'; endTimer=0; const [h
   beep(130,.35,'sawtooth',.13,.3); try{ navigator.vibrate&&navigator.vibrate(60); }catch(e){}
   $('endTitle').textContent='Krasch!'; $('endTime').innerHTML=''; $('endNote').textContent='Tryck GAS eller Enter för att köra igen'; $('bNext').style.display='none';
   setTimeout(()=>{ if(state==='crash') $('endov').classList.add('show'); },1100); }
-function win(){ state='win'; endTimer=0; const prev=best[lvl.name]; const isRec=prev==null||T<prev; if(isRec){ best[lvl.name]=T; saveBest(); saveGhost(lvl.name); } const rec_=isRec;
+function win(){ state='win'; endTimer=0; const prev=best[lvl.id]; const isRec=prev==null||T<prev; if(isRec){ best[lvl.id]=T; saveBest(); saveGhost(lvl); } const rec_=isRec;
   const cols=['#ffe08a','#9bd37f','#8fb7ee','#f2a7a0','#ffffff','#b9e3ff']; for(let i=0;i<50;i++){ const an=Math.PI/2+(Math.random()-0.5)*2.0, v=3.5+Math.random()*4.5; parts.push({k:'conf',x:lvl.flower[0],y:lvl.flower[1]+1.1,vx:Math.cos(an)*v,vy:Math.sin(an)*v,rot:Math.random()*6,vr:(Math.random()-0.5)*14,l:2.2+Math.random(),L:3,c:cols[i%cols.length]}); }
   spark(lvl.flower[0],lvl.flower[1]+1); spark(lvl.flower[0],lvl.flower[1]+1);
   beep(660,.12,'triangle',.11); setTimeout(()=>beep(880,.12,'triangle',.11),110); setTimeout(()=>beep(1320,.28,'triangle',.11),220);
@@ -1313,6 +1508,8 @@ function physics(dt){ acc+=dt; const h=P.H; let n=0; const lean=(inp.left?1:0)-(
     if(bike.b.y<lvl.bounds[1]-25||bike.b.y>lvl.bounds[3]+25||bike.b.x<lvl.bounds[0]-25||bike.b.x>lvl.bounds[2]+25) crash();
     if(!isFinite(bike.b.x)){ restart(); return; } }
   if(n>=40) acc=0;
+  if(state==='play'){ const spd=Math.hypot(bike.b.vx,bike.b.vy); stuckT=spd<0.35?stuckT+dt:0; stuckCD-=dt;
+    if(stuckT>4.5&&stuckCD<=0&&T>3){ stuckT=0; stuckCD=25; toast(lvl.stuck||'Fastnat? Pumpa (luta bakåt och kasta vikten framåt), prova en bunny hop – eller tryck OMSTART.',4600); } }
   // landing dust
   if(state==='play'&&bike.impact>4.5){ const s=Math.min(1,(bike.impact-4)/8); for(const w of bike.wh){ for(let i=0;i<2+s*3;i++) puff(w.x+(Math.random()-0.5)*0.4,w.y-0.32,(Math.random()-0.5)*4*(0.5+s),Math.random()*1.2,0.13+s*0.12,TH.kind==='snow'?'#ffffff':TH.dirtLight,0.5+s*0.4); } beep(90,.12,'sine',.08*s+.02); }
   if(state==='play') bike.impact=0;
@@ -1335,13 +1532,15 @@ function frame(now){
   if(state==='play') physics(dt); else if(state==='crash'){ endTimer+=dt; physics(dt); if(rag&&endTimer<6) stepRagdoll(rag,lvl.segs,dt); } else if(state==='win'){ endTimer+=dt; physics(dt*(endTimer<1.0?0.3:1)); }
   engineUpdate();
   if(lvl){
-    const fx0=rag?rag.pts.hip.x:bike.b.x, fy0=rag?rag.pts.hip.y:bike.b.y; const lx=fx0+(rag?0:Math.max(-3,Math.min(3,bike.b.vx*.28))), ly=fy0+.7+(rag?0:Math.max(-2,Math.min(2,bike.b.vy*.15)));
+    if(state==='overview'){ const vb=lvl.vbounds, bw=vb[2]-vb[0]+3, bh=vb[3]-vb[1]+3; const sco=Math.min(W/bw,(Hh-130)/bh); const k=Math.min(1,dt*4);
+      cam.x+=((vb[0]+vb[2])/2-cam.x)*k; cam.y+=((vb[1]+vb[3])/2-6/sco-cam.y)*k; SC+=(sco-SC)*k; }
+    else { const fx0=rag?rag.pts.hip.x:bike.b.x, fy0=rag?rag.pts.hip.y:bike.b.y; const lx=fx0+(rag?0:Math.max(-3,Math.min(3,bike.b.vx*.28))), ly=fy0+.7+(rag?0:Math.max(-2.2,Math.min(2,bike.b.vy*0.3)));
     const k=Math.min(1,dt*2.8); cam.x+=(lx-cam.x)*k; cam.y+=(ly-cam.y)*k*0.85;
-    const spd=Math.hypot(bike.b.vx,bike.b.vy), air=(bike.contact[0]<0.5&&bike.contact[1]<0.5)?1:0; const zt=0.86-Math.min(0.12,spd*0.008)-air*0.05; zoom+=(zt-zoom)*Math.min(1,dt*1.2); SC=SC0*zoom;
+    const spd=Math.hypot(bike.b.vx,bike.b.vy), air=(bike.contact[0]<0.5&&bike.contact[1]<0.5)?1:0; const zt=0.86-Math.min(0.12,spd*0.008)-air*0.05; zoom+=(zt-zoom)*Math.min(1,dt*1.2); const tsc=SC0*zoom; SC+=(tsc-SC)*Math.min(1,dt*5); }
     shake*=Math.exp(-dt*7); const shx=(Math.random()-0.5)*shake, shy=(Math.random()-0.5)*shake; cam.x+=shx; cam.y+=shy;
     drawBackground(tt); drawLife(tt);
     for(const d of lvl.vis.deco) blit(SPR[d.kind],d.x,d.y,0,d.s);
-    drawGround(lvl,tt);
+    drawGround(lvl,tt); drawMarks(lvl); drawLanterns(lvl,tt);
     for(const hng of lvl.vis.hang) blit(SPR.stalac,hng.x,hng.y,0,hng.s);
     // flower: bud until all stars are collected, then it blooms with a light beam
     const ready=got.every(Boolean); const fx=lvl.flower[0], fy=lvl.flower[1]; bloom+=((ready?1:0)-bloom)*Math.min(1,dt*3);
@@ -1370,7 +1569,7 @@ function frame(now){
     for(const p of pops){ p.t+=dt; } pops=pops.filter(p=>p.t<0.9);
     for(const p of pops){ ctx.save(); ctx.translate(p.x,p.y+p.t*1.2); ctx.scale(1,-1); ctx.globalAlpha=Math.max(0,1-p.t/0.9); ctx.font='bold 0.55px "Lilita One",Arial,sans-serif'; ctx.textAlign='center'; ctx.lineWidth=0.12; ctx.strokeStyle='#1d2633'; ctx.strokeText(p.txt,0,0); ctx.fillStyle=p.txt==='+1'?'#ffd23f':'#8fd0ff'; ctx.fillText(p.txt,0,0); ctx.restore(); }
     ctx.globalAlpha=1;
-    drawVignette();
+    drawGrade(); if(state!=='overview') drawPointers(); drawVignette();
     cam.x-=shx; cam.y-=shy;
     ctx.setTransform(1,0,0,1,0,0);
     $('timer').textContent=fmt(T);
@@ -1378,7 +1577,8 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 resize();
-(function(){ lvl=LEVELS[0]; setTheme(lvl.theme); bike=createLevelBike(lvl); got=lvl.apples.map(()=>false); cam.x=bike.b.x+5*(lvl.startDir||1); cam.y=bike.b.y+1.2; camBaseY=cam.y; state='menu'; $('lvlname').textContent=''; updApples(); buildMenu(); })();
+document.body.classList.toggle('neon',STYLE==='neon'); $('bStyle').textContent='Stil: '+(STYLE==='neon'?'Neon':'Tecknad');
+(function(){ lvl=LEVELS[0]; setTheme(lvl.theme); bike=newBike(lvl.start[0],lvl.start[1]); got=lvl.apples.map(()=>false); cam.x=bike.b.x+5; cam.y=bike.b.y+1.2; camBaseY=cam.y; state='menu'; $('lvlname').textContent=''; updApples(); buildMenu(); })();
 requestAnimationFrame(frame);
 
 })();

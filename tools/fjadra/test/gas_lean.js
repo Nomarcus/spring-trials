@@ -1,0 +1,3 @@
+const C=require(process.argv[2]||'../../../src/core.js'); const flat=C.buildSegs([[[-40,80],[-40,0],[200,0],[200,80]]]);
+function run(leanT,gas0){ const bk=C.newBike(0,0); let maxA=0, res='ok'; for(let i=0;i<600*4;i++){ const t=i/600; const lean=(t>=gas0&&t<gas0+leanT)?1:0; C.step(bk,{gas:1,lean},flat,C.P.H); maxA=Math.max(maxA,bk.b.a); if(C.headHit(bk,flat)||bk.b.a>2.4){ res='LOOP'; break; } } return res==='LOOP'?'LOOP':(maxA*57.3).toFixed(0)+'°'; }
+const row=[]; for(const lt of [0,0.3,0.6,1.0,1.5]) row.push('lean '+lt+'s: '+run(lt,0.3)); console.log('gas from rest + lean back  ->  '+row.join('   '));
