@@ -232,7 +232,7 @@ LV3.push(()=>{ const lp=loopParts(54,6.5,4,51.5,3.5,60,0);
   return {id:'fjadra-p3-08', name:'Första loopen', theme:'meadow', hint:'Full gas nerför backen, ta hoppet och låt farten bära dig runt loopen.',
     stuck:'För lite fart? Gasa hela vägen från toppen.',
     rings:[{pts:[[-4,TOP],...s,...lp.ground,[90,0],[90,TOP]]}, ...lp.rings],
-    apples:[[54,9.6]], killers:[], flower:[84,0], start:[1,12]}; });
+    apples:[lp.top], killers:[], flower:[84,0], start:[1,12]}; });
 // 09 Grytet — ner i ett hål, kort tunnel med lågt tak, stjärna i en nisch, upp igen
 LV3.push(()=>{ const F=-4.5, C=F+2.8;
   const ground=[[-4,TOP],[-4,0],[10,0],...cr([[10,0],[11.5,-0.3],[13.5,-1.3],[16,-3.0],[18,-4.1],[20,F],[21.5,F]],0.25).slice(1),[41,F],...cr([[41,F],[44,-3.7],[48,-1.7],[51,-0.2],[53,0.4],[55,0.5]],0.3).slice(1),[65,0.5],[65,TOP]];
@@ -273,7 +273,7 @@ LV3.push(()=>{ const lp=loopParts(P13.cx,P13.cy,P13.R,P13.kx,P13.kr,P13.ka,0); c
   return {id:'fjadra-p3-13', name:'Berg-och-dalbanan', theme:'meadow', hint:'Flow! Låt cykeln rulla genom vågorna, gasa in i loopen, hoppa gapet och susa genom röret.',
     stuck:'Mer fart in i loopen: håll gasen nere genom vågorna.',
     rings:[{pts:[[-4,TOP],...top,...lp.ground,...after.slice(1),[E+66,TOP]]}, ...lp.rings],
-    apples:[[14.5,14.5],[30.5,8.9],[P13.cx,P13.cy+P13.R-0.9],[E+21.8,3.7],[E+47,-2.25]], killers:[], flower:[E+61,0], start:[1,19.5]}; });
+    apples:[[14.5,14.5],[30.5,8.9],lp.top,[E+21.8,3.7],[E+47,-2.25]], killers:[], flower:[E+61,0], start:[1,19.5]}; });
 // 14 Upp och ner — kvartsrör upp mot ett klippvalv, blå stjärna vänder tyngden, kör i taket, blå stjärna tillbaka
 LV3.push(()=>{ const qp=[[-4,TOP],[-4,0],[8,0],...arc(8,5,5,270,360,20).slice(1),[13,5.15],[13.25,5.3],[13.5,5.15],[13.5,0],[54,0],[54,TOP]];
   const und=cr([[9,7.6],[14,7.5],[18,7.2],[23,6.6],[27,5.6],[30,5.3],[33,5.6],[37,6.6],[41,7.2],[45,7.5],[48,7.6]],0.3);
@@ -287,10 +287,10 @@ LV3.push(()=>{ const H=5.0, s=cr([[-4,0],[14,0],[17,0.25],[19.5,1.0],[21.3,2.2],
     stuck:'Når du inte upp? Längre ansats och full gas hela vägen upp för väggen.',
     rings:[{pts:[[-4,TOP],...s,[23.32,H-0.08],[23.42,H],[23.6,H+0.05],[30,H+0.05],[30.15,H-0.05],[30.2,3.2],[48,3.2],[48,TOP]]}],
     apples:[[27,H+0.8]], killers:[], flower:[44,3.2], start:[1,0]}; });
-// loop med öppning i botten: en brant ramp skjuter in cykeln genom öppningen, efter varvet faller den ut samma väg och landar i backen bakom rampen
-function loopParts(cx,cy,R,kx,kr,ka,fy){ const r=ka*Math.PI/180, k0=kx-kr*Math.sin(r), kh=kr*(1-Math.cos(r)), L=kh/Math.tan(32*Math.PI/180);
-  const ground=[...arc(k0,fy+kr,kr,-90,-90+ka,14),...cr([[kx+0.2,fy+kh-0.02],[kx+0.5,fy+kh-0.12],[kx+0.5+L,fy+0.05],[kx+1.5+L,fy]],0.25)];
-  return {k0,end:kx+1.5+L,ground,rings:woodArc(cx,cy,R,-50,230,0.35,40)}; }
+// loop: man kör rakt in i loopens botten (den ligger strax under vägen, som en bro över ett dike), varvet runt,
+// och efter varvet faller man ut genom öppningen nere till vänster, ner i diket som leder ut under loopen.
+// Signaturen är kvar från den gamla hopp-loopen; bara cx och fy används. k0-2 = där vägen före loopen ska sluta.
+function loopParts(cx,cy,R,kx,kr,ka,fy){ const lr=loopRide(cx,4.6,fy); return {k0:lr.lip+1.7,end:lr.end,ground:lr.ground,rings:lr.rings,top:lr.top}; }
 // 16 Vändgrottan — grotta i fyra våningar: ner genom breda hål, vänd i återvändsgränderna och hämta stjärnorna bakom dig
 LV3.push(()=>{ const D=4.2, Y=[3*D,2*D,D,0], sl=(x0,x1,y)=>({pts:[[x0,y],[x1,y],[x1,y-0.5],[x0,y-0.5]]});
   const air=[[-16,TOP],[-16,Y[0]],[0,Y[0]],[0,0],[41,0],...cr([[41,0],[43,-0.2],[45,-0.75],[47,-0.9],[50,-0.9]],0.25).slice(1),[50,Y[0]+3.3],[0.4,Y[0]+3.3],[0,Y[0]+3.7],[0,TOP]];
@@ -323,7 +323,7 @@ LV3.push(()=>{ const A=loopParts(P19.c1,8+6.5,4.6,P19.c1-2.5,3.5,60,8), F=P19.f2
   return {id:'fjadra-p3-19', name:'Dubbelloopen', theme:'meadow', hint:'Två loopar! Gasa hela vägen ner, genom första loopen, nerför igen och in i den andra. Sist ett gap.',
     stuck:'Ramlar du ur en loop? Mer fart – håll gasen nere i backarna.',
     rings:[{pts:[[-4,TOP],...s,...A.ground,...m.slice(1),...B.ground,...e.slice(1),[B.end+46,TOP]]}, ...A.rings, ...B.rings],
-    apples:[[P19.c1,8+6.5+4.6-0.9],[A.end+18,F+(8-F)*0.45+0.75],[P19.c2,F+6.5+4.6-0.9],[B.end+20.5,F+4.6]], killers:[], flower:[B.end+41,F], start:[1,22]}; });
+    apples:[A.top,[A.end+18,F+(8-F)*0.45+0.75],B.top,[B.end+20.5,F+4.6]], killers:[], flower:[B.end+41,F], start:[1,22]}; });
 // 20 Labyrinten — tre våningar gångar: ner genom schakt, stjärnor i hörnen, och ut genom en skorsten i slutet (blå stjärnor)
 LV3.push(()=>{ const sl=(x0,x1,y0,y1)=>({pts:[[x0,y1],[x1,y1],[x1,y0],[x0,y0]]});
   const air=[[-8,TOP],[-8,18],[0,18],[0,0],[24,0],...cr([[24,0],[25.5,-0.5],[27,-1.2],[28.5,-0.5],[30,0]],0.25).slice(1),[54,0],[54,14.5],[66,14.5],[66,TOP]];
@@ -361,7 +361,7 @@ LV3.push(()=>{ const S=P23.s, lp=loopParts(P23.cx,P23.cy,4.6,P23.cx-2.5,3.5,60,0
   return {id:'fjadra-p3-23', name:'Rördrömmen', theme:'meadow', hint:'Genom röret, in i loopen, igenom tunneln i kullen – och gunga dig upp ur den sista djupa halfpipen.',
     stuck:'Sista röret: gasa nerför, släpp upp mot kanten och vänd i luften för att bygga fart.',
     rings:[{pts:[[-4,TOP],...s,...lp.ground,...t.slice(1),[E+80,TOP]]}, ...lp.rings, hill],
-    apples:[[16,S-0.65],[P23.cx,P23.cy+4.6-0.9],[E+25,2.35],[E+62,-4.75],[E+73.8,4.0]], killers:[], flower:[E+77,2.2], start:[1,P23.h]}; });
+    apples:[[16,S-0.65],lp.top,[E+25,2.35],[E+62,-4.75],[E+73.8,4.0]], killers:[], flower:[E+77,2.2], start:[1,P23.h]}; });
 // 24 Trånga passet — slingrig smal tunnel, stjärnor uppe i krönen, en återvändsgränd och ett hål ner till en undre tunnel ut
 LV3.push(()=>{ const env=x=>sm(6,14,x)*(1-sm(70,78,x)); const f=x=>env(x)*(1.5*Math.sin((x-6)/4.2)+0.5*Math.sin((x-6)/1.9));
   const c=x=>f(x)+3.0-0.35*Math.exp(-((x-30)**2)/3)-0.35*Math.exp(-((x-52)**2)/3);
@@ -409,7 +409,7 @@ LV3.push(()=>{ const lp=loopParts(P28.cx,6.5,4.6,P28.cx-2.5,3.5,60,0), E=lp.end,
   return {id:'fjadra-p3-28', name:'Stora flödet', theme:'sunset', hint:'Allt i en rytm: flyt över vågorna, gasa in i loopen, kör i taket, flyg över gapet och svinga upp på väggen.',
     stuck:'Loopen behöver fart – håll gasen nere genom vågorna. Väggen: full fart och luta fram uppe vid krönet.',
     rings:[{pts:[[-4,TOP],...s,...lp.ground,[E+8,0],...after]}, ...lp.rings, cr2.roof],
-    apples:[[13,P28.h-2.45],[19,P28.h-2.85],[26,P28.h-5.05],[P28.cx,6.5+4.6-0.9],...cr2.apples,[J+18.5,4.2],[J+60,5.3]], killers:[], flower:[J+63,4.54], start:[1,P28.h]}; });
+    apples:[[13,P28.h-2.45],[19,P28.h-2.85],[26,P28.h-5.05],lp.top,...cr2.apples,[J+18.5,4.2],[J+60,5.3]], killers:[], flower:[J+63,4.54], start:[1,P28.h]}; });
 // 29 Gatloppet — tunnel, en brant topp, ett schakt du faller uppåt ur, ett brett gap och gömda fickor
 LV3.push(()=>{ const pts=[[-4,TOP],[-4,0],[30,0],...cr([[30,0],[34,1.2],[38,3.4],[41,5.2],[43,6.1],[44.5,6.3],[46,6.2],[46.4,5.9]],0.25).slice(1),[46.5,-6],[53,-6],[53,9.0],
     ...cr([[53,9.0],[60,9.0],[66,9.4],[69,10.4],[70.6,11.1],[71,11.15],[71.3,10.8],[71.4,2]],0.25).slice(1),[81,2],[81.1,7.8],[81.6,8.2],...cr([[81.6,8.2],[84,8.0],[88,6.0],[92,4.0],[96,3.4],[100,3.4]],0.3).slice(1),
@@ -434,7 +434,14 @@ LV3.push(()=>{ const F=-7, A=loopParts(48,8+6.5,4.6,45.5,3.5,60,8), B=loopParts(
   return {id:'fjadra-p3-30', name:'Fjädertoppen', theme:'winter', hint:'Finalen! Två loopar, ett rör, tak-körning, svingväggen – och skorstenen upp till blomman på toppen.',
     stuck:'Ta det i etapper: loopen behöver full fart, väggen behöver ansats, skorstenen: blå stjärnan nere i botten.',
     rings:[{pts}, ...A.rings, ...B.rings, R.roof, ...ch],
-    apples:[[48,8+6.5+4.6-0.9],[94,F+6.5+4.6-0.9],[B.end+17,F-2.85],...R.apples,[T+3,H+0.8],[T+6+W/2,H+0.75,'up'],[T+6+W-0.8,H+3.4*2-0.5-0.75],[T+6+W+3,top-1.6,'down']], killers:[], flower:[T+6+W+14,top+0.4], start:[1,22]}; });
+    apples:[A.top,B.top,[B.end+17,F-2.85],...R.apples,[T+3,H+0.8],[T+6+W/2,H+0.75,'up'],[T+6+W-0.8,H+3.4*2-0.5-0.75],[T+6+W+3,top-1.6,'down']], killers:[], flower:[T+6+W+14,top+0.4], start:[1,22]}; });
+// loop man kör rakt in i: loopens botten ligger i marknivå (som en bro över ett dike). Man kör in, runt, och efter varvet
+// faller man ut genom öppningen nere till vänster ner i diket, som leder ut under loopen. Ger: markpunkter från kanten t.o.m. diket, plankorna.
+function loopRide(cx,R,fy,o){ o=Object.assign({dy:-0.5,gap:2.3,o0:255,o1:215},LOOPRIDE,o||{}); const cy=fy+R+o.dy, Ro=R+o.gap;
+  const a0=180+Math.asin((cy-fy)/Ro)*180/Math.PI, lip=cx+Ro*Math.cos(a0*Math.PI/180), D=cy-Ro;   // diket: en större cirkel runt samma mittpunkt
+  const ground=[[lip-0.3,fy],[lip,fy],...arc(cx,cy,Ro,a0,270,18).slice(1),...cr([[cx,D],[cx+5,D],[cx+9,D+0.3],[cx+14,fy-0.6],[cx+18,fy-0.05],[cx+20,fy]],0.3).slice(1)];
+  return {lip, end:cx+20, ground, rings:woodArc(cx,cy,R,o.o0,o.o1+360,0.35,44), top:[cx,cy+R-0.9]}; }
+var LOOPRIDE={};
 const MEDALS3={'fjadra-p3-01':[16,26],'fjadra-p3-02':[14,24],'fjadra-p3-03':[24,38],'fjadra-p3-04':[12,20],'fjadra-p3-05':[13,22],
   'fjadra-p3-06':[11,18],'fjadra-p3-07':[14,24],'fjadra-p3-08':[16,26],'fjadra-p3-09':[11,18],'fjadra-p3-10':[14,22],'fjadra-p3-11':[30,45],'fjadra-p3-12':[15,24],'fjadra-p3-13':[30,45],'fjadra-p3-14':[14,24],'fjadra-p3-15':[11,18],
   'fjadra-p3-16':[30,45],'fjadra-p3-17':[16,26],'fjadra-p3-18':[26,40],'fjadra-p3-19':[30,45],'fjadra-p3-20':[34,50],'fjadra-p3-21':[24,36],'fjadra-p3-22':[24,36],'fjadra-p3-23':[26,40],'fjadra-p3-24':[34,50],'fjadra-p3-25':[40,60],

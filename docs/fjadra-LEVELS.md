@@ -105,10 +105,10 @@ Bana 16–30 är längre (100–250 m). Kör testboten med längre tidsgräns: `
 - *Hål i golvet* (Vändgrottan): rullar man långsamt över kanten tippar cykeln framåt och landar på huvudet. Med 4–8 m/s och ↺ intryckt över kanten landar den rätt. Hålen är 6 m breda och våningarna 4,2 m isär (3,7 m takhöjd) – lägre tak ger huvudkrasch när cykeln studsar.
 - *Bromsa en gång och håll*: broms som slås av och på när fjädern är ihoptryckt ger Elma-studs (upp till 3,8 m/s uppåt) – i låga tunnlar slår huvudet i taket.
 - *Testbotens svaghet*: den jagar närmaste stjärna fågelvägen. Ligger en stjärna rakt under en återvändsgränd fastnar den. Lägg stjärnorna så att "närmast" också är vägen dit.
-- *Loopar* har ett fartfönster på ca 15,5–17,5 m/s vid rampen och behöver ~8 m plan mark före rampen. Fjädertoppen återanvänder Dubbelloopens bevisade loop-par.
+- *Loopar*: efter landningen i diket vill cykeln steglas – luta framåt. Fjädertoppen använder samma loop-par som Dubbelloopen.
 - *Falla uppåt* från en kant är lika våldsamt som att falla nedåt. Spiralschaktet byter i stället tyngdriktning vid varje vägg (upp → vänster → upp → höger → ner); stjärnhjälpen vrider då cykeln rätt.
 
-**Loopar** (`loopParts` i `levels.js`): en hel loop i 2D måste korsa sin egen väg i luften. Loopen är träplankor (`woodArc`) med en öppning i botten (230°–310°). En brant rund ramp (60°) skjuter in cykeln genom öppningen; efter varvet faller den ut samma väg och landar i en 32°-backe bakom rampen. Kräver ca 16 m/s vid rampen. Rampvinkel 60° är stabil; 55° och 70° fungerar inte.
+**Loopar** (`loopRide`, anropas via `loopParts` i `levels.js`): man kör rakt in i loopen. Loopens botten ligger strax under vägen som en bro över ett dike; vägen slutar vid en kant och cykeln landar i bottenkurvan, kör varvet och faller efter varvet ut genom öppningen nere till vänster (215°–255°) ner i diket. Dikets vänstervägg är en större cirkel runt samma mittpunkt (avstånd 2,3 m) så att man landar mjukt, och diket leder ut under loopen. Kräver ca 15,5–17 m/s. (Den första versionen sköt in cykeln med en 60°-ramp genom en öppning i botten – den flög rakt upp i taket.)
 
 **Skorstenen** byggdes först som sicksack-balkar med bunny hop, sedan som träklossar med wheelie-kanter. Båda går inte i 2D med den här fysiken: för att vända och klättra samtidigt måste cykeln korsa sin egen väg, och ett hopp eller en wheelie ger bara 0,6–1 m. Därför används blå stjärnor: man faller uppåt genom schaktet.
 
