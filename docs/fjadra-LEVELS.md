@@ -83,6 +83,30 @@ Index fortsätter efter paket 2. Varje bana lär ut en teknik. Kolumnen *Bara ga
 | 42 | fjadra-p3-13 | Berg-och-dalbanan (flow) | meadow | 5 | 30/45 | ✅ 31,8 s | kraschar vid hoppet |
 | 43 | fjadra-p3-14 | Upp och ner (tyngdkraft, tak) | sunset | 1 + 2 blå | 14/24 | ✅ 9,7 s | kraschar |
 | 44 | fjadra-p3-15 | Bromssvingen (hög kant) | winter | 1 | 11/18 | ✅ 7,0 s | kraschar |
+| 45 | fjadra-p3-16 | Vändgrottan (vändning, hål i golvet) | cave | 3 | 30/45 | ✅ 27,0 s | – |
+| 46 | fjadra-p3-17 | Störtloppet (nedfart, landa på avsatser) | winter | 6 | 16/26 | ✅ 11,1 s | kraschar |
+| 47 | fjadra-p3-18 | Gömda fickor (nischer, hål genom vägg) | sunset | 4 | 26/40 | ✅ 20,5 s | kraschar |
+| 48 | fjadra-p3-19 | Dubbelloopen | meadow | 4 | 30/45 | ✅ 48,1 s | klarar looparna |
+| 49 | fjadra-p3-20 | Labyrinten (gångar, schakt) | cave | 4 + 2 blå | 34/50 | ✅ 28,4 s | – |
+| 50 | fjadra-p3-21 | Takgapet (tak med glapp, två gropar) | sunset | 4 + 4 blå | 24/36 | ✅ 18,3 s | kraschar |
+| 51 | fjadra-p3-22 | Svingtornet (fyra väggar) | winter | 4 | 24/36 | ✅ 17,5 s | kraschar sist |
+| 52 | fjadra-p3-23 | Rördrömmen (halfpipe, loop, tunnel) | meadow | 5 | 26/40 | ✅ 18,9 s | kraschar sist |
+| 53 | fjadra-p3-24 | Trånga passet (slingrig tunnel) | cave | 5 | 34/50 | ✅ 28,5 s | kraschar |
+| 54 | fjadra-p3-25 | Fritt fall (stjärnor i luften) | sunset | 6 | 40/60 | ✅ 59,2 s | kraschar |
+| 55 | fjadra-p3-26 | Dit och tillbaka (ut ovan, hem i tunnel) | meadow | 6 | 50/75 | ✅ 47,8 s | – |
+| 56 | fjadra-p3-27 | Spiralschaktet (tyngd upp/vänster/höger) | cave | 2 + 5 blå | 30/45 | ✅ 18,0 s · skript `script_spiral.js` | – |
+| 57 | fjadra-p3-28 | Stora flödet (allt i rytm) | sunset | 7 + 2 blå | 50/75 | ✅ 53,0 s | kraschar |
+| 58 | fjadra-p3-29 | Gatloppet | winter | 6 + 2 blå | 50/75 | ✅ 43,0 s | kraschar |
+| 59 | fjadra-p3-30 | Fjädertoppen (finalen) | winter | 6 + 4 blå | 80/120 | se nedan | kraschar i taket |
+
+Bana 16–30 är längre (100–250 m). Kör testboten med längre tidsgräns: `MAXT=150 node tools/fjadra/test/run.js 59`.
+
+**Lärdomar från 16–30:**
+- *Hål i golvet* (Vändgrottan): rullar man långsamt över kanten tippar cykeln framåt och landar på huvudet. Med 4–8 m/s och ↺ intryckt över kanten landar den rätt. Hålen är 6 m breda och våningarna 4,2 m isär (3,7 m takhöjd) – lägre tak ger huvudkrasch när cykeln studsar.
+- *Bromsa en gång och håll*: broms som slås av och på när fjädern är ihoptryckt ger Elma-studs (upp till 3,8 m/s uppåt) – i låga tunnlar slår huvudet i taket.
+- *Testbotens svaghet*: den jagar närmaste stjärna fågelvägen. Ligger en stjärna rakt under en återvändsgränd fastnar den. Lägg stjärnorna så att "närmast" också är vägen dit.
+- *Loopar* har ett fartfönster på ca 15,5–17,5 m/s vid rampen och behöver ~8 m plan mark före rampen. Fjädertoppen återanvänder Dubbelloopens bevisade loop-par.
+- *Falla uppåt* från en kant är lika våldsamt som att falla nedåt. Spiralschaktet byter i stället tyngdriktning vid varje vägg (upp → vänster → upp → höger → ner); stjärnhjälpen vrider då cykeln rätt.
 
 **Loopar** (`loopParts` i `levels.js`): en hel loop i 2D måste korsa sin egen väg i luften. Loopen är träplankor (`woodArc`) med en öppning i botten (230°–310°). En brant rund ramp (60°) skjuter in cykeln genom öppningen; efter varvet faller den ut samma väg och landar i en 32°-backe bakom rampen. Kräver ca 16 m/s vid rampen. Rampvinkel 60° är stabil; 55° och 70° fungerar inte.
 
