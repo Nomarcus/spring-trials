@@ -159,6 +159,12 @@ for number, (name, width, floors, theme, branches, relief, difficulty) in enumer
     assert component.contains(Point(spawn[0] + .96, spawn[1] + .4)), (name, 'spawn front wheel')
     CAMPAIGN.append(level)
 
+from varied_trials import make_trials
+TRIALS=make_trials()
+ORIGINAL_CAMPAIGN=tuple(CAMPAIGN)
+O={i:l for i,l in enumerate(ORIGINAL_CAMPAIGN,1)}
+CAMPAIGN=[O[1],TRIALS['pump'],O[2],TRIALS[2],O[3],TRIALS[5],O[4],TRIALS[4],TRIALS['peaks'],O[5],TRIALS['islands'],TRIALS[7],O[6],O[7],TRIALS[9],TRIALS[13],TRIALS['low'],O[10],TRIALS['steps'],TRIALS[11],O[13],TRIALS[15],TRIALS['hang'],TRIALS['balance'],O[16],TRIALS[18],TRIALS['centre'],TRIALS['gravity'],O[19],TRIALS[21],TRIALS[24],TRIALS['ravine'],O[22],TRIALS['rocket'],TRIALS[27],O[26],TRIALS['lastflow'],O[30]]
+
 def build():
     target = ROOT / 'game/index.html'
     source = target.read_text()
@@ -169,7 +175,7 @@ def build():
     for level in CAMPAIGN:
         compact = {k:v for k,v in level.items() if k != 'design'}
         data.append('  ' + json.dumps(compact, ensure_ascii=False, separators=(',', ':')))
-    block = '''// ===== Levels: 30-stage maze campaign (generated; see tools/build_level_campaign.py) =====
+    block = '''// ===== Levels: 38-stage mixed trials/maze campaign (generated; see tools/build_level_campaign.py) =====
 const CAMPAIGN_LEVELS = [
 ''' + ',\n'.join(data) + '''
 ];
@@ -181,14 +187,27 @@ function makeLevels(){
     l.bounds=[mnx,mny,mxx,mxy]; return l;
   });
 }
+// Level-authored facing only; the shared physics model remains unchanged.
+function createLevelBike(l){
+  const bk=newBike(l.start[0],l.start[1]);
+  if(l.startDir===-1){bk.dir=-1;bk.flipFrom=-1;const p=riderTarget(bk,0);bk.r.x=bk.b.x+p[0];bk.r.y=bk.b.y+p[1];}
+  return bk;
+}
 '''
-    target.write_text(source[:begin] + block + source[end:])
-    plan = '# Bankampanj: långa labyrinter\n\n30 banor, från helt platt introduktion till åtta våningar. Endast bandata ändras; fysik, grafik, ragdoll, touch och ljud behålls.\n\n'
+    updated=source[:begin] + block + source[end:]
+    updated=updated.replace('bike=newBike(lvl.start[0],lvl.start[1])','bike=createLevelBike(lvl)')
+    updated=updated.replace('cam.x=bike.b.x+2;', 'cam.x=bike.b.x+2*(lvl.startDir||1);').replace('cam.x=bike.b.x+5;', 'cam.x=bike.b.x+5*(lvl.startDir||1);')
+    # Keep generated trees/boulders out of wheel pockets and technical sightlines.
+    updated=updated.replace('const sorted=tops.filter(', 'const sorted=l.noDeco?[]:tops.filter(')
+    target.write_text(updated)
+    plan = '# Bankampanj: blandade trials och labyrinter\n\n38 banor: 14 utvalda labyrinter och 24 individuellt formgivna trialsbanor. De 30 gamla bandefinitionerna finns kvar i byggverktygets ORIGINAL_CAMPAIGN; 16 återkommande labyrintvarianter ingår inte längre i huvudkampanjen. Halvcirklar, fartdalar, rena uppförsbanor, nedfarter från höger, dubbla hjulfickor och en vertikal nedfart. Startorientering är bandata; fysik, grafik, ragdoll och ljud behålls.\n\n'
     plan += 'Valven har en körbar ramp upp och en 2,65 meter hög återvändsgränd under. Ta stjärnan ovanpå, kör ner från änden, vänd tillbaka under valvet och vänd sedan ut igen. Våningarnas nedfarter är avsiktliga envägspassager: ta stjärnorna före nedfarten. Alla stjärnor ligger före öppningen, med plats att bromsa. Vid en miss finns den befintliga omstartsknappen.\n\n'
     plan += '| # | Bana | Svårighet | Våningar | Valv med retur | Avsedd väg, cirka m |\n|---|---|---|---:|---:|---:|\n'
     for i,l in enumerate(CAMPAIGN,1):
         d=l['design']; plan+=f"| {i} | {l['name']} | {l['difficulty']} | {d['floors']} | {d['branches']} | {d['routeLength']} |\n"
-    plan += '\n## Återskapa och kontrollera\n\n`python3 -m pip install "shapely>=2,<3"` följt av `python3 tools/build_level_campaign.py`. Shapely används endast vid banbygge. Spelet är fortfarande en HTML-fil utan nya runtimeberoenden. `node tests/levels.test.cjs` och `node tests/drive-campaign.cjs` kontrollerar genererade banor och skyddar allt utanför bandatablocket mot oavsiktliga ändringar.\n\nDen separata körkontrollen använder en analog återkopplingsregulator i originalets fysikmotor och når alla stjärnor och målet på bana 1–7. Det ersätter inte speltest med touch eller tangentbord. Övriga banor har kontrollerats geometriskt, vid start och genom rendering, men inte körts hela vägen till mål. Medaljtiderna är preliminära designmål. Geometriska kontroller och stabila starter bevisar inte att samtliga avancerade banor är fullständigt speltestade.\n'
+    plan += '\n## Återskapa och kontrollera\n\n`python3 -m pip install "shapely>=2,<3"` följt av `python3 tools/build_level_campaign.py`. Shapely används endast vid banbygge. Spelet är fortfarande en HTML-fil utan nya runtimeberoenden. `node tests/levels.test.cjs`, `node tests/drive-campaign.cjs` och `node tests/trials-drive.cjs` kontrollerar genererade banor och skyddar allt utanför bandatablocket mot oavsiktliga ändringar.\n\nDen separata körkontrollen använder en analog återkopplingsregulator i originalets fysikmotor och når alla stjärnor och målet på bana 1–7. Ytterligare nio trialsbanor – inklusive båda vänsterstarterna, uppförsbanorna och skål-/flowbanor – körs till alla stjärnor och målet av `trials-drive.cjs`. Det ersätter inte speltest med touch eller tangentbord. De övriga teknikbanorna, inklusive Halvmånen, hjulfickorna, gravitationsbanan och expertlabyrinterna, har kontrollerats geometriskt, vid start och genom rendering, men inte körts hela vägen till mål. Medaljtiderna är preliminära designmål. Geometriska kontroller och stabila starter bevisar inte att samtliga avancerade banor är fullständigt speltestade.\n'
+    plan=plan.replace('på bana 1–7','på de första sju ursprungliga labyrintbanorna (kontrollen söker efter namn, inte menyplats)').replace('båda vänsterstarterna','vänsterstarter')
+    plan+='\nHjulfickorna har 1,92 meters centrumavstånd, lika med originalcykelns hjulbas. Övningsfickorna är 1,28 meter breda och 0,62 meter djupa; expertfickorna är 1,10 meter breda och 0,90 meter djupa. Originalhjulens diameter är 0,80 meter. Stjärnorna i expertfickorna ligger nere i urtagen. Inga magnetgrepp eller nya kollisionsregler läggs till.\n'
     (ROOT/'docs/maze-campaign.md').write_text(plan)
     (ROOT/'tests/maze-routes.json').write_text(json.dumps([dict(name=l['name'], **l['design']) for l in CAMPAIGN], ensure_ascii=False, separators=(',', ':'))+'\n')
     print(f'Built {len(CAMPAIGN)} courses; longest route {max(l["design"]["routeLength"] for l in CAMPAIGN)}m')
