@@ -1,4 +1,5 @@
-const C=require('../../../src/core.js'); const {makeLevels}=require('../../../src/levels.js');
+// SUSP=elma node run.js … kör boten med en annan fjädring (hard|soft|elma|bouncy)
+const C=require('../../../src/core.js'); if(process.env.SUSP) C.setSusp(process.env.SUSP); const {makeLevels}=require('../../../src/levels.js');
 const GV={up:[0,10],down:[0,-10],left:[-10,0],right:[10,0]};
 function clone(bk){ return {dir:bk.dir,gx:bk.gx,gy:bk.gy,voltT:bk.voltT,voltD:bk.voltD,lock:bk.lock,impact:0,contact:bk.contact.slice(),thr:bk.thr,flipT:bk.flipT,flipFrom:bk.flipFrom,lean:bk.lean,rider:bk.rider,crouchT:bk.crouchT,relT:bk.relT,hopped:0,assistT:bk.assistT,assistAge:bk.assistAge,assistTurned:bk.assistTurned,r:Object.assign({},bk.r),comp:bk.comp.slice(),compMem:bk.compMem.slice(),noPin:bk.noPin,prevBrake:bk.prevBrake,prevBack:bk.prevBack,backT:bk.backT,pumpCD:bk.pumpCD,bounced:0,pumped:0,
   b:Object.assign({},bk.b), wh:[Object.assign({},bk.wh[0],{pin:bk.wh[0].pin?Object.assign({},bk.wh[0].pin):null}),Object.assign({},bk.wh[1],{pin:bk.wh[1].pin?Object.assign({},bk.wh[1].pin):null})]}; }

@@ -180,6 +180,11 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
 .newb.edb{ background:#f2b81f; color:#18324f; }
 @media (max-height:420px){ .eb{ height:40px; min-width:40px; font-size:14px; } .tl{ height:50px; min-width:52px; font-size:10px; } #edOpt{ height:50px; } .edzoom .eb{ width:42px; height:42px; } .edzoom{ gap:6px; } }
 @media (max-width:700px){ .tl{ min-width:48px; padding:0 5px; } .eb .lbl{ display:none; } }
+.fjad{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:12px; }
+.fjad b{ font-weight:400; font-size:19px; color:var(--ink); }
+#suspBtns{ display:flex; gap:6px; flex-wrap:wrap; }
+#suspBtns .tab{ padding:6px 11px; font-size:15px; }
+#suspTxt{ margin:6px 0 0; font-size:13.5px; color:var(--muted); }
 @media (prefers-reduced-motion:reduce){ #toast{ transition:none; } .k{ transition:none; } #appleTile.pop{ animation:none; } }
 </style>
 </head>
@@ -267,6 +272,8 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
     <div class="tabs"><button class="tab on" id="tabMain">Banor</button><button class="tab" id="tabMine">Mina banor</button></div>
     <div class="row" id="resumeRow" style="margin:0 0 10px;display:none"><button class="btn" id="bResume">Fortsätt köra</button><button class="btn alt" id="bEditCur">✎ Redigera banan</button></div>
     <div class="row" style="margin:0 0 10px;align-items:center"><button class="btn" id="bNextUnplayed">Spela nästa</button><button class="btn" id="bNewLevel" style="display:none">＋ Ny bana</button><span id="progress" style="color:var(--muted);font-size:14px;font-weight:800"></span></div>
+    <div class="fjad" style="margin:0 0 2px"><b class="disp">Fjädring</b><div id="suspBtns"></div></div>
+    <p id="suspTxt" style="margin:0 0 10px"></p>
     <div class="lvls" id="lvls"></div>
     <p class="help"><b>Mobil:</b> GAS och BROMS till höger, pilen vänder cykeln. ↺ ↻ flyttar förarens vikt och voltar cykeln – båda samtidigt ger en extra kraftig volt. <b>Pumpa:</b> luta bak och fram i takt för att ta fart med armarna. <b>Bunny hop:</b> luta bakåt en kort stund och kasta sedan vikten framåt. <b>Studs:</b> tryck ner ett hjul (landning eller volt) och tryck BROMS precis i botten. <b>Broms</b> får också hjulen att greppa – häng i kanter och balkar.<br>
     <b>Tangentbord:</b> ↑ gas, ↓ broms, ← → volta, mellanslag vänd, Enter börja om, Esc meny.</p>

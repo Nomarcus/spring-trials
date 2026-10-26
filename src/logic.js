@@ -138,6 +138,14 @@ $('bNext').onclick=next; $('bEditCur').onclick=()=>{ if(lvl&&li>=0) edOpen(li); 
 $('tabMain').onclick=()=>{ curPack=3; buildMenu(); }; $('tabMine').onclick=()=>{ curPack='mine'; buildMenu(); }; $('bAgain').onclick=restart; $('bLevels').onclick=()=>{ pausedState=null; showMenu(); };
 const fsOK=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen; if(!fsOK) $('bFull').style.display='none';
 $('bMusic').onclick=()=>setMusic(!musicOn);
+// fjädringsval: ändrar bara fjäder, dämpning och fjäderväg (setSusp i core.js); gäller direkt, även mitt i en åkning
+const SUSP_UI=[['hard','Hård','Stum och stabil. Nästan inget gung.'],['normal','Normal','Som banorna är byggda och testade.'],['soft','Mjuk','Mer fjädring och lite gung efter landningar.'],
+  ['elma','Elma','Elasto Mania-känsla: djup fjädring som gungar länge och studsar högt.'],['bouncy','Studsboll','Extremt studsig. Gungar och studsar mest av allt.']];
+let suspK='normal'; try{ const v=localStorage.getItem('fjadra.susp'); if(SUSP_UI.some(o=>o[0]===v)) suspK=v; }catch(e){}
+function setSuspension(k){ suspK=k; setSusp(k); try{ localStorage.setItem('fjadra.susp',k); }catch(e){}
+  const box=$('suspBtns'); box.innerHTML=''; for(const [id,name] of SUSP_UI){ const b=document.createElement('button'); b.className='tab'+(id===k?' on':''); b.textContent=name; b.onclick=()=>setSuspension(id); box.appendChild(b); }
+  $('suspTxt').textContent=SUSP_UI.find(o=>o[0]===k)[2]; }
+setSuspension(suspK);
 function setStyle(s){ STYLE=s; try{ localStorage.setItem('fjadra.style',s); }catch(e){} document.body.classList.toggle('neon',s==='neon'); $('bStyle').textContent='Stil: '+(s==='neon'?'Neon':'Tecknad'); curTheme=''; if(lvl) setTheme(lvl.theme); buildMenu(); }
 $('bStyle').onclick=()=>setStyle(STYLE==='neon'?'cartoon':'neon');
 $('bNextUnplayed').onclick=()=>{ audioInit(); pausedState=null; let i=LEVELS.findIndex(l=>l.pack===curPack&&best[l.id]==null); if(i<0) i=LEVELS.findIndex((l,k)=>l.pack===curPack&&medalOf(k,best[l.id])<3); if(i<0) i=LEVELS.findIndex(l=>l.pack===curPack); loadLevel(i); };
