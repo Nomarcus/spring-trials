@@ -52,7 +52,7 @@ Index fortsätter efter paket 2. Varje bana lär ut en teknik. Kolumnen *Bara ga
 | 36 | fjadra-p3-07 | Halfpipe-gungan (halfpipe) | sunset | 4 | 14/24 | ✅ 7,8 s | kraschar |
 | 37 | fjadra-p3-08 | Första loopen (loop) | meadow | 1 | 16/26 | ✅ 35,4 s | klarar 10,5 s |
 | 38 | fjadra-p3-09 | Grytet (tunnel) | meadow | 1 | 11/18 | ✅ 7,2 s | missar stjärnan |
-| 39 | fjadra-p3-10 | Skorstenen (tyngdkraft, schakt) | cave | 2 + 2 blå | 14/22 | ✅ 9,1 s | – |
+| 39 | fjadra-p3-10 | Plankbron (grop, plankbro, fall ner i dalen) | cave | 3 | 14/22 | ✅ 11,2 s | ersatte Skorstenen (för svår) |
 | 40 | fjadra-p3-11 | Fram och tillbaka (vändning) | winter | 2 | 30/45 | ✅ 23,3 s | kraschar |
 | 41 | fjadra-p3-12 | Vågor och gap (pump + hopp) | sunset | 3 | 15/24 | ✅ 10,7 s | kraschar |
 | 42 | fjadra-p3-13 | Berg-och-dalbanan (flow) | meadow | 5 | 30/45 | ✅ 31,8 s | kraschar vid hoppet |
@@ -61,7 +61,7 @@ Index fortsätter efter paket 2. Varje bana lär ut en teknik. Kolumnen *Bara ga
 | 45 | fjadra-p3-16 | Vändgrottan (vändning, hål i golvet) | cave | 3 | 30/45 | ✅ 27,0 s | – |
 | 46 | fjadra-p3-17 | Störtloppet (nedfart, landa på avsatser) | winter | 6 | 16/26 | ✅ 11,1 s | kraschar |
 | 47 | fjadra-p3-18 | Gömda fickor (nischer, hål genom vägg) | sunset | 4 | 26/40 | ✅ 20,5 s | kraschar |
-| 48 | fjadra-p3-19 | Dubbelloopen | meadow | 4 | 30/45 | ✅ 48,1 s | klarar looparna |
+| 48 | fjadra-p3-19 | Dubbelloopen | meadow | 4 | 36/52 | ✅ 31,6 s | andra loopen flyttad efter backen |
 | 49 | fjadra-p3-20 | Labyrinten (gångar, schakt) | cave | 4 + 2 blå | 34/50 | ✅ 28,4 s | – |
 | 50 | fjadra-p3-21 | Takgapet (tak med glapp, två gropar) | sunset | 4 + 4 blå | 24/36 | ✅ 18,3 s | kraschar |
 | 51 | fjadra-p3-22 | Svingtornet (fyra väggar) | winter | 4 | 24/36 | ✅ 17,5 s | kraschar sist |
@@ -85,7 +85,9 @@ Bana 16–30 är längre (100–250 m). Kör testboten med längre tidsgräns: `
 
 **Loopar** (`loopRide`, anropas via `loopParts` i `levels.js`): man kör rakt in i loopen. Loopens botten ligger strax under vägen som en bro över ett dike; vägen slutar vid en kant och cykeln landar i bottenkurvan, kör varvet och faller efter varvet ut genom öppningen nere till vänster (215°–255°) ner i diket. Dikets vänstervägg är en större cirkel runt samma mittpunkt (avstånd 2,3 m) så att man landar mjukt, och diket leder ut under loopen. Kräver ca 15,5–17 m/s. (Den första versionen sköt in cykeln med en 60°-ramp genom en öppning i botten – den flög rakt upp i taket.)
 
-**Skorstenen** byggdes först som sicksack-balkar med bunny hop, sedan som träklossar med wheelie-kanter. Båda går inte i 2D med den här fysiken: för att vända och klättra samtidigt måste cykeln korsa sin egen väg, och ett hopp eller en wheelie ger bara 0,6–1 m. Därför används blå stjärnor: man faller uppåt genom schaktet.
+**Skorstenen** (bana 10, tyngdkraftsschakt) är borttagen eftersom Marcus tyckte att den var för svår så tidigt. Ersattes av **Plankbron**: en lätt rak bana som lär ut plankor (huvudet går igenom, hjulen kör på) och att ett fall på 4 m är ofarligt.
+
+**Dubbelloopen** (bana 19): när looparna gjordes om till inkörningsloopar flyttades loopens start ~6 m åt vänster. Den andra loopen hamnade då mitt i nerförsbacken, så backen gick rakt igenom loopen. `P19.c2` är nu 112 (var 94), så backen planar ut innan loopen.
 
 Lärdom från bana 2: broms under `PIN_V` (3,8 m/s) låser hjulet mot marken. Tvärbroms utan att luta bakåt i en brant nedförsbacke slår runt cykeln framåt, och broms när framhjulet landar ger en Elma-studs. Håll nedförsbackar i nybörjarbanor under ~30° med breda krön.
 
