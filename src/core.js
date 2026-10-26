@@ -5,6 +5,12 @@ const P = {G:10, WR:0.4, WM:1, WI:0.13, BM:2.3, BI:2.3, AX:0.96, AY:-0.55,
   MR:2.0, KR:500, CR:12, RBX:-0.1, RBY:0.52, RLX:0.3, RCROUCH:0.24, REXT:0.08, RMAX:0.5,
   THR_RATE:3.5, FLIP_T:0.38, BOUNCE:13, BOUNCE_MAX:3.8, BOUNCE_MIN:0.07, PUMP:1.1, PUMP_VMAX:8.5, PUMP_CD:0.3, VOLT_BRAKE:1.35, HOP:3.6, HOP_MIN:0.09, HOP_WIN:0.22, STRETCH:1.3, HOX:0.2, HOY:0.43, HR:0.23, TRAVEL:0.3, HEAD_SAFE:3.2, SAVE:9, ASSIST_K:30, ASSIST_D:8, ASSIST_T:1.6, KBUMP:2400, CBUMP:60, RDOWN:0.2, KRBUMP:2600, BRK_SHIFT:0.16, ANTI_LOOP:14, GAS_LOW:0.45, GAS_LOW_V:4.0, KPIN:2600, CPIN:45, PIN_MAX:170, PIN_REL:0.24, PIN_V:3.8, HANG_DAMP:1.8, HANG_LEAN:1.6, H:1/600};
 
+// Fjädringsval (menyn → Fjädring). 'normal' = värdena i P ovan; fysiktesterna och BASELINE.txt gäller den.
+// Mjukare = större fjäderväg, mjukare fjäder och mindre dämpning: cykeln sjunker ihop mer, gungar längre och studsar högre (Elasto Mania-känsla).
+const SUSP={hard:{KY:240,CY:9,TRAVEL:0.22}, normal:{}, soft:{KY:85,CY:2.4,TRAVEL:0.45}, elma:{KY:70,CY:1.2,TRAVEL:0.6,BOUNCE_MAX:4.6}, bouncy:{KY:62,CY:0.5,TRAVEL:0.7,BOUNCE_MAX:5.4}};
+const SUSP_BASE={KY:P.KY,CY:P.CY,TRAVEL:P.TRAVEL,BOUNCE_MAX:P.BOUNCE_MAX};
+function setSusp(name){ Object.assign(P,SUSP_BASE,SUSP[name]||{}); }
+
 function buildSegs(rings){
   const segs=[];
   for(const r of rings){ const pts=r.pts||r;
@@ -240,4 +246,4 @@ function stepRagdoll(rd,segs,dt){
     }
   }
 }
-if(typeof module!=='undefined') module.exports={P,step,newBike,headHit,headPos,nearest,buildSegs,volt,turn,facing,riderLocal,riderPose,makeRagdoll,stepRagdoll,setGravity,headResolve};
+if(typeof module!=='undefined') module.exports={P,SUSP,setSusp,step,newBike,headHit,headPos,nearest,buildSegs,volt,turn,facing,riderLocal,riderPose,makeRagdoll,stepRagdoll,setGravity,headResolve};

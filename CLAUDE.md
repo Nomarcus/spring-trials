@@ -18,7 +18,7 @@ Spelet öppnas direkt som fil i webbläsaren, ingen server behövs.
 ## Filkarta
 | Fil | Innehåll | Rör bara om uppgiften gäller… |
 |---|---|---|
-| `src/core.js` | **Fysik** (ingen DOM): cykel, fjädring, förare, broms/häng, studs, bunny hop, pumpning, vändning, ragdoll, tyngdkraftsbyte. Konstanter i objektet `P`. | fysik |
+| `src/core.js` | **Fysik** (ingen DOM): cykel, fjädring, förare, broms/häng, studs, bunny hop, pumpning, vändning, ragdoll, tyngdkraftsbyte. Konstanter i objektet `P`; fjädringsvalen i `SUSP`/`setSusp()` (standard `normal` = `P`). | fysik |
 | `src/levels.js` | **Bandata** + hjälpfunktioner (`sample`, `arc`, `cr`, `rect`, `crate`, `log`, `pillar`, `blob`, `loopRide`). Banor i `LV3` (30 banor), inbakade editorändringar i `EDITS`. | banor |
 | `src/editor.js` | **Baneditorn** i spelet: forma mark, stjärnor, block, testa, spara egna/ändrade banor, kopiera/klistra in bankod. | editorn |
 | `src/logic.js` | Spelloop, input, meny, ljud/musik, rekord/spöke, kamera, översikt, pilar, kraschar/vinst. | spelregler/UI-logik |
@@ -53,4 +53,4 @@ Spelet öppnas direkt som fil i webbläsaren, ingen server behövs.
 - ChatGPT:s grafikuppdatering (palett, sandstensjord, bergsryggar, bronsbalk, kopparcykel) **är** inbyggd. Originalpatchen ligger i `docs/reference/chatgpt-grafik-patch.diff`.
 
 ## Lagring (localStorage)
-`fjadra4.best` {banID: bästa tid}, `fjadra.g4.<banID>` spöke (30 Hz-inspelning), `fjadra.mute`, `fjadra.music`, `fjadra.style` (`cartoon`|`neon`), `fjadra.mine` (egna banor från editorn), `fjadra.edits` {banID: ändrad bana}. Äldre nycklar (`fjadra3.best`, `fjadra.ghost.<namn>`) migreras en gång. **Banor identifieras av stabilt ID, aldrig av namn.**
+`fjadra4.best` {banID: bästa tid}, `fjadra.g4.<banID>` spöke (30 Hz-inspelning), `fjadra.mute`, `fjadra.music`, `fjadra.style` (`cartoon`|`neon`), `fjadra.susp` (fjädringsval: hard|normal|soft|elma|bouncy), `fjadra.mine` (egna banor från editorn), `fjadra.edits` {banID: ändrad bana}. Äldre nycklar (`fjadra3.best`, `fjadra.ghost.<namn>`) migreras en gång. **Banor identifieras av stabilt ID, aldrig av namn.**
