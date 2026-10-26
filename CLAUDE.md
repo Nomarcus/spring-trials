@@ -10,7 +10,8 @@ Live-version (senast publicerad): https://claude.ai/artifact/BXq7d8PwweYmL2PzYkV
 python3 tools/fjadra/build.py                   # src/* -> game/index.html (ska vara byte-identisk med nuvarande fil innan du ändrar något)
 tools/fjadra/test/all-physics.sh                # fysiktester; jämför mot tools/fjadra/test/BASELINE.txt
 node tools/fjadra/test/run.js 0 1 2             # testbot: kan banor 0,1,2 klaras? (utan argument = alla banor, långsamt)
-python3 tools/fjadra/shot.py --pack 2 --level 2 --hold 2 --out shot.png   # skärmdump i mobilformat (kräver playwright)
+python3 tools/fjadra/shot.py --level 2 --hold 2 --out shot.png   # skärmdump i mobilformat (kräver playwright)
+python3 tools/fjadra/import_level.py bana.json   # bakar in en bankod från baneditorn i src/levels.js (EDITS)
 ```
 Spelet öppnas direkt som fil i webbläsaren, ingen server behövs.
 
@@ -18,14 +19,15 @@ Spelet öppnas direkt som fil i webbläsaren, ingen server behövs.
 | Fil | Innehåll | Rör bara om uppgiften gäller… |
 |---|---|---|
 | `src/core.js` | **Fysik** (ingen DOM): cykel, fjädring, förare, broms/häng, studs, bunny hop, pumpning, vändning, ragdoll, tyngdkraftsbyte. Konstanter i objektet `P`. | fysik |
-| `src/levels.js` | **Bandata** + hjälpfunktioner (`sample`, `arc`, `cr`, `rect`, `crate`, `log`, `pillar`, `blob`). Banor i `LV` (paket 1) och `LV2` (paket 2). | banor |
+| `src/levels.js` | **Bandata** + hjälpfunktioner (`sample`, `arc`, `cr`, `rect`, `crate`, `log`, `pillar`, `blob`, `loopRide`). Banor i `LV3` (30 banor), inbakade editorändringar i `EDITS`. | banor |
+| `src/editor.js` | **Baneditorn** i spelet: forma mark, stjärnor, block, testa, spara egna/ändrade banor, kopiera/klistra in bankod. | editorn |
 | `src/logic.js` | Spelloop, input, meny, ljud/musik, rekord/spöke, kamera, översikt, pilar, kraschar/vinst. | spelregler/UI-logik |
 | `src/gfx.js` | All ritning: teman (`THEMES`, `NEON`), bakgrund, mark, cykel + förare, partiklar, banförhandsvisning. | grafik |
 | `src/shell.html` | HTML + CSS (HUD, knappar, meny) med platshållare `/*CORE*/ /*LEVELS*/ /*GAME*/`. | UI-layout |
 | `tools/fjadra/build.py` | Limmar ihop allt till `game/index.html` (se kommentaren överst). | bygget |
 | `tools/fjadra/test/*` | Fysiktester och testboten `beam.js`/`run.js`. | alltid, vid ändringar |
 
-`logic.js` delas vid raden `// ---------- audio` och `gfx.js` sätts in mitt emellan (så att grafikfunktionerna ligger i samma closure). Ändra inte den raden utan att uppdatera `build.py`.
+`logic.js` delas vid raden `// ---------- audio` och `gfx.js` + `editor.js` sätts in mitt emellan (så att grafikfunktionerna ligger i samma closure). Ändra inte den raden utan att uppdatera `build.py`.
 
 ## Regler (från Marcus)
 1. **En ändring i taget:** fysik, grafik och banor i separata grenar/PR:er. Pusha inte direkt till `main`.
@@ -44,8 +46,6 @@ Spelet öppnas direkt som fil i webbläsaren, ingen server behövs.
 
 ## Nuläge och kända luckor (läs innan du börjar)
 - **Testboten har inte körts om på alla banor med nuvarande fysik (v11).** Verifierade: se tabellen i `docs/fjadra-LEVELS.md` (✅). Kör hela sviten först: `node tools/fjadra/test/run.js` (delas gärna upp i batcher, den är CPU-tung).
-- *Gruvans andra våning* (bana 28) kan inte lösas av botens målsökning (målen ligger under start). Använd `tools/fjadra/test/script_gruvan.js`.
-- *Stenhyllan* saknar väg tillbaka upp till hyllan från gropen (man startar om).
 - Medaljtider är satta efter botens körningar, inte mänskliga rekord.
 - Musiken i spelet är genererad (Web Audio). Suno-spåren i `assets/music/` är **inte inkopplade**.
 - Neon är en palett + glödande kanter; HUD:en har bara färgvariabler, inga egna neon-detaljer.
@@ -53,4 +53,4 @@ Spelet öppnas direkt som fil i webbläsaren, ingen server behövs.
 - ChatGPT:s grafikuppdatering (palett, sandstensjord, bergsryggar, bronsbalk, kopparcykel) **är** inbyggd. Originalpatchen ligger i `docs/reference/chatgpt-grafik-patch.diff`.
 
 ## Lagring (localStorage)
-`fjadra4.best` {banID: bästa tid}, `fjadra.g4.<banID>` spöke (30 Hz-inspelning), `fjadra.mute`, `fjadra.music`, `fjadra.style` (`cartoon`|`neon`). Äldre nycklar (`fjadra3.best`, `fjadra.ghost.<namn>`) migreras en gång. **Banor identifieras av stabilt ID, aldrig av namn.**
+`fjadra4.best` {banID: bästa tid}, `fjadra.g4.<banID>` spöke (30 Hz-inspelning), `fjadra.mute`, `fjadra.music`, `fjadra.style` (`cartoon`|`neon`), `fjadra.mine` (egna banor från editorn), `fjadra.edits` {banID: ändrad bana}. Äldre nycklar (`fjadra3.best`, `fjadra.ghost.<namn>`) migreras en gång. **Banor identifieras av stabilt ID, aldrig av namn.**

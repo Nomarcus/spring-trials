@@ -7,7 +7,7 @@
 Fyra källor limmas in i src/shell.html:
   /*CORE*/    <- src/core.js    (fysik, ingen DOM; module.exports-raden tas bort)
   /*LEVELS*/  <- src/levels.js  (banor; allt från 'if(typeof module' och ner tas bort)
-  /*GAME*/    <- src/logic.js (före '// ---------- audio') + src/gfx.js + resten av src/logic.js
+  /*GAME*/    <- src/logic.js (före '// ---------- audio') + src/gfx.js + src/editor.js + resten av src/logic.js
 """
 import os, sys
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -19,10 +19,10 @@ mark = "if(typeof module!=='undefined') module.exports="
 i = core.index(mark); j = core.index('\n', i) if '\n' in core[i:] else len(core)
 core = core[:i] + core[j:]
 lv = rd('src/levels.js'); lv = lv[:lv.index("if(typeof module!=='undefined')")]
-logic = rd('src/logic.js'); gfx = rd('src/gfx.js')
+logic = rd('src/logic.js'); gfx = rd('src/gfx.js'); editor = rd('src/editor.js')
 SPLIT = '// ---------- audio'
 a, b = logic.split(SPLIT, 1)
-game = '(()=>{\n' + a + '\n' + gfx + '\n' + SPLIT + b + '\n})();'
+game = '(()=>{\n' + a + '\n' + gfx + '\n' + editor + '\n' + SPLIT + b + '\n})();'
 out = shell.replace('/*CORE*/', core).replace('/*LEVELS*/', lv).replace('/*GAME*/', game)
 dst = os.path.join(ROOT, 'game', 'index.html')
 if '--out' in sys.argv: dst = sys.argv[sys.argv.index('--out') + 1]

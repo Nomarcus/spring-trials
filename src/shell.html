@@ -138,6 +138,48 @@ body.neon .tab.on{ background:#ff3ea5; color:#1b1034; }
 @keyframes pop{ 0%{ transform:scale(1); } 40%{ transform:scale(1.25); background:rgba(242,184,31,.85); } 100%{ transform:scale(1); } }
 .lv{ position:relative; }
 .newb{ position:absolute; top:6px; right:6px; background:var(--red); color:#fff; font-family:'Lilita One',sans-serif; font-size:12px; padding:2px 7px; border-radius:8px; border:2px solid var(--navy); }
+
+/* Baneditor */
+#ed{ display:none; position:absolute; inset:0; pointer-events:none; z-index:3; }
+body.editing #ed{ display:block; }
+body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
+#bEdBack{ display:none; } body.testing #bEdBack{ display:grid; } body.testing #bMenu{ display:none; }
+.edbar{ position:absolute; left:0; right:0; display:flex; align-items:center; gap:6px; pointer-events:none;
+  padding:0 max(10px,env(safe-area-inset-right,0px)) 0 max(10px,env(safe-area-inset-left,0px)); }
+.edtop{ top:8px; } .edbot{ bottom:10px; align-items:flex-end; }
+.edbar>*{ pointer-events:auto; } .edbar .sp{ flex:1; pointer-events:none; }
+.eb{ height:44px; min-width:44px; border-radius:13px; border:2px solid var(--navyLine); background:var(--hud); color:#fff; display:inline-flex; align-items:center; justify-content:center; gap:5px;
+  padding:0 10px; font-family:'Lilita One',sans-serif; font-size:15px; letter-spacing:.02em; cursor:pointer; box-shadow:0 3px 0 rgba(10,22,38,.45); -webkit-tap-highlight-color:transparent; white-space:nowrap; }
+.eb svg{ width:22px; height:22px; flex:none; }
+.eb:disabled{ opacity:.4; }
+.eb.go{ background:rgba(63,174,55,.95); border-color:rgba(210,255,200,.85); }
+.eb.save.dirty{ background:#f2b81f; color:#18324f; border-color:#ffe08a; }
+#edName{ max-width:30vw; overflow:hidden; text-overflow:ellipsis; justify-content:flex-start; }
+#edRead{ color:#fff; background:var(--hud); border-radius:10px; padding:3px 9px; font-size:13px; font-variant-numeric:tabular-nums; pointer-events:none; }
+#edRead:empty{ display:none; }
+.tl{ flex-direction:column; height:56px; min-width:58px; gap:2px; padding:0 8px; font-size:11px; }
+.tl svg{ width:24px; height:24px; }
+.tl.on{ background:#f2b81f; color:#18324f; border-color:#ffe08a; }
+.tl.on svg *{ stroke:#18324f; }
+#edOpt{ height:56px; min-width:92px; background:var(--panel); color:var(--ink); border-color:var(--navy); }
+.edzoom{ position:absolute; right:max(10px,env(safe-area-inset-right,0px)); top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:8px; pointer-events:auto; }
+.edzoom .eb{ width:46px; height:46px; font-size:24px; padding:0; }
+#edMore .card{ width:min(560px,100%); }
+#edMore h2{ margin:0 0 8px; font-size:26px; color:var(--navy); }
+:root[data-theme="dark"] #edMore h2{ color:var(--cream); }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) #edMore h2{ color:var(--cream); } }
+.fld{ display:flex; flex-direction:column; gap:4px; margin:0 0 10px; font-size:14px; color:var(--muted); font-weight:800; }
+.fld input, #edCode{ font:inherit; font-size:16px; color:var(--ink); background:var(--panel); border:2.5px solid var(--navy); border-radius:12px; padding:8px 10px; -webkit-user-select:text; user-select:text; touch-action:auto; }
+#edCode{ width:100%; height:90px; font-size:12px; font-family:ui-monospace,Menlo,monospace; display:none; margin-top:8px; resize:none; }
+#edThemes{ display:flex; gap:6px; flex-wrap:wrap; }
+#edInfo{ color:var(--muted); font-size:13px; margin:2px 0 0; }
+.btn.warn{ background:var(--red); }
+.lvw{ position:relative; display:flex; } .lvw>.lv{ flex:1; min-width:0; }
+.edp{ position:absolute; left:6px; top:6px; width:34px; height:34px; border-radius:11px; border:2px solid var(--navy); background:rgba(251,247,234,.92); display:grid; place-items:center; padding:0; cursor:pointer; box-shadow:0 2px 0 rgba(10,22,38,.35); }
+.edp svg{ width:20px; height:20px; }
+.newb.edb{ background:#f2b81f; color:#18324f; }
+@media (max-height:420px){ .eb{ height:40px; min-width:40px; font-size:14px; } .tl{ height:50px; min-width:52px; font-size:10px; } #edOpt{ height:50px; } .edzoom .eb{ width:42px; height:42px; } .edzoom{ gap:6px; } }
+@media (max-width:700px){ .tl{ min-width:48px; padding:0 5px; } .eb .lbl{ display:none; } }
 @media (prefers-reduced-motion:reduce){ #toast{ transition:none; } .k{ transition:none; } #appleTile.pop{ animation:none; } }
 </style>
 </head>
@@ -154,6 +196,7 @@ body.neon .tab.on{ background:#ff3ea5; color:#1b1034; }
     <button class="hb" id="bRestart" aria-label="Börja om banan"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M8.5 4.5A9.5 9.5 0 1 1 6.2-7.5" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M2.6-12.6l7.6 2.6-5.8 5.6z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg></button>
     <button class="hb" id="bSound" aria-label="Ljud av eller på"><svg viewBox="-12 -12 24 24"><path id="sndPath" d="M-8-3h4l5-5v16l-5-5h-4z" fill="#fff"/><path id="sndWave" d="M4-4a6 6 0 0 1 0 8M6.5-7a10 10 0 0 1 0 14" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
     <button class="hb" id="bMap" aria-label="Översikt över banan"><svg viewBox="-12 -12 24 24"><path d="M-9-6l6-3 6 3 6-3v15l-6 3-6-3-6 3z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M-3-9v15M3-6v15" stroke="#fff" stroke-width="2"/></svg></button>
+    <button class="hb" id="bEdBack" aria-label="Tillbaka till editorn"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-7 7l1.2-4.8L4.5-8.1a1.6 1.6 0 0 1 2.3 0l1.3 1.3a1.6 1.6 0 0 1 0 2.3L-2.2 5.8z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></button>
     <button class="hb" id="bMenu" aria-label="Paus och meny"><svg viewBox="-12 -12 24 24"><rect x="-6" y="-7" width="4" height="14" rx="1.5" fill="#fff"/><rect x="2" y="-7" width="4" height="14" rx="1.5" fill="#fff"/></svg></button>
   </div>
 </div>
@@ -177,12 +220,53 @@ body.neon .tab.on{ background:#ff3ea5; color:#1b1034; }
 
 <div id="toast"></div>
 
+<div id="ed">
+  <div class="edbar edtop">
+    <button class="eb" id="edClose" aria-label="Stäng editorn"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-6-6L6 6M6-6L-6 6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="eb" id="edName" aria-label="Baninställningar">Min bana</button>
+    <span id="edRead"></span>
+    <span class="sp"></span>
+    <button class="eb" id="edUndo" aria-label="Ångra"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-7-2h9a5 5 0 0 1 0 10H-2" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M-3-7l-5 5 5 5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="eb" id="edRedo" aria-label="Gör om"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M7-2h-9a5 5 0 0 0 0 10H2" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3-7l5 5-5 5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="eb" id="edFitB" aria-label="Visa hela banan"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-8-3v-5h5M8-3v-5H3M-8 3v5h5M8 3v5H3" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="eb" id="edMoreB" aria-label="Fler inställningar"><svg viewBox="-12 -12 24 24" aria-hidden="true"><circle cx="-6" r="1.8" fill="#fff"/><circle r="1.8" fill="#fff"/><circle cx="6" r="1.8" fill="#fff"/></svg></button>
+    <button class="eb save" id="edSave">Spara</button>
+    <button class="eb go" id="edTest"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-5-8L8 0-5 8z" fill="#fff"/></svg><span class="lbl">Testa</span></button>
+  </div>
+  <div class="edzoom"><button class="eb" id="edZin" aria-label="Zooma in">+</button><button class="eb" id="edZout" aria-label="Zooma ut">−</button></div>
+  <div class="edbar edbot">
+    <button class="eb tl on" data-tool="move"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M0-9v18M-9 0h18M0-9l-3 3M0-9l3 3M0 9l-3-3M0 9l3-3M-9 0l3-3M-9 0l3 3M9 0l-3-3M9 0l-3 3" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Flytta</button>
+    <button class="eb tl" data-tool="add"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-9 5L-3-2 3 3 9-4" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="-3" cy="-2" r="2.4" fill="#fff"/><path d="M5-10v6M2-7h6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Punkt</button>
+    <button class="eb tl" data-tool="del"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-9 4L-3-2 3 3 9-4" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M-5-10l6 6M1-10l-6 6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Radera</button>
+    <button class="eb tl" data-tool="star"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M0-9l2.6 5.6 6 .7-4.5 4.1 1.3 6L0 4.4l-5.4 3 1.3-6-4.5-4.1 6-.7z" fill="#ffd23f" stroke="#1d2633" stroke-width="1.2" stroke-linejoin="round"/></svg>Stjärna</button>
+    <button class="eb tl" data-tool="gstar"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M0-9l2.6 5.6 6 .7-4.5 4.1 1.3 6L0 4.4l-5.4 3 1.3-6-4.5-4.1 6-.7z" fill="#5fb8ff" stroke="#1d2633" stroke-width="1.2" stroke-linejoin="round"/></svg>Blå</button>
+    <button class="eb tl" data-tool="block"><svg viewBox="-12 -12 24 24" aria-hidden="true"><rect x="-9" y="-4" width="18" height="8" rx="1.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M-3-4v8M3-4v8" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Block</button>
+    <span class="sp"></span>
+    <button class="eb" id="edOpt">Mjuk 2 m</button>
+  </div>
+</div>
+<div class="ov" id="edMore">
+  <div class="card">
+    <h2 class="disp">Baninställningar</h2>
+    <label class="fld">Namn<input id="edNameIn" maxlength="40" autocomplete="off"></label>
+    <div class="fld">Tema<div id="edThemes"></div></div>
+    <label class="fld">Tips när banan startar<input id="edHintIn" maxlength="200" autocomplete="off" placeholder="T.ex. Ta sats före hoppet!"></label>
+    <div class="row" style="margin-top:4px"><button class="btn alt" id="edExtendB">Förläng 20 m →</button><button class="btn alt" id="edSplitB">Dela långa linjer</button></div>
+    <div class="row"><button class="btn alt" id="edCopyB">Kopiera bankod</button><button class="btn alt" id="edPasteB">Klistra in bankod</button><button class="btn" id="edCodeGo" style="display:none">Läs in</button></div>
+    <textarea id="edCode" spellcheck="false" aria-label="Bankod"></textarea>
+    <p id="edInfo"></p>
+    <div class="row"><button class="btn" id="edMoreOk">Klar</button><button class="btn warn" id="edReset">Återställ original</button><button class="btn warn" id="edDelete">Ta bort banan</button></div>
+  </div>
+</div>
+
+
 <div class="ov show" id="menu">
   <div class="card">
     <div class="head"><h1 class="title disp">Fjädra</h1></div>
     <p class="sub">Trialspussel på fjädrar. Samla alla stjärnor och kör till blomman. Ta det lugnt, läs banan och hitta vägen. Bara hjulen och huvudet rör marken – och huvudet tål ingenting.</p>
-    <div class="row" id="resumeRow" style="margin:0 0 10px;display:none"><button class="btn" id="bResume">Fortsätt köra</button></div>
-    <div class="row" style="margin:0 0 10px;align-items:center"><button class="btn" id="bNextUnplayed">Spela nästa</button><span id="progress" style="color:var(--muted);font-size:14px;font-weight:800"></span></div>
+    <div class="tabs"><button class="tab on" id="tabMain">Banor</button><button class="tab" id="tabMine">Mina banor</button></div>
+    <div class="row" id="resumeRow" style="margin:0 0 10px;display:none"><button class="btn" id="bResume">Fortsätt köra</button><button class="btn alt" id="bEditCur">✎ Redigera banan</button></div>
+    <div class="row" style="margin:0 0 10px;align-items:center"><button class="btn" id="bNextUnplayed">Spela nästa</button><button class="btn" id="bNewLevel" style="display:none">＋ Ny bana</button><span id="progress" style="color:var(--muted);font-size:14px;font-weight:800"></span></div>
     <div class="lvls" id="lvls"></div>
     <p class="help"><b>Mobil:</b> GAS och BROMS till höger, pilen vänder cykeln. ↺ ↻ flyttar förarens vikt och voltar cykeln – båda samtidigt ger en extra kraftig volt. <b>Pumpa:</b> luta bak och fram i takt för att ta fart med armarna. <b>Bunny hop:</b> luta bakåt en kort stund och kasta sedan vikten framåt. <b>Studs:</b> tryck ner ett hjul (landning eller volt) och tryck BROMS precis i botten. <b>Broms</b> får också hjulen att greppa – häng i kanter och balkar.<br>
     <b>Tangentbord:</b> ↑ gas, ↓ broms, ← → volta, mellanslag vänd, Enter börja om, Esc meny.</p>
@@ -200,6 +284,7 @@ body.neon .tab.on{ background:#ff3ea5; color:#1b1034; }
       <button class="btn" id="bNext">Nästa bana</button>
       <button class="btn alt" id="bAgain">Kör igen</button>
       <button class="btn alt" id="bLevels">Banor</button>
+      <button class="btn alt" id="bToEd" style="display:none">✎ Till editorn</button>
     </div>
   </div>
 </div>
