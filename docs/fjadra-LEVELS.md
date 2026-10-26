@@ -61,7 +61,7 @@ Index fortsätter efter paket 2. Varje bana lär ut en teknik. Kolumnen *Bara ga
 | 45 | fjadra-p3-16 | Vändgrottan (vändning, hål i golvet) | cave | 3 | 30/45 | ✅ 27,0 s | – |
 | 46 | fjadra-p3-17 | Störtloppet (nedfart, landa på avsatser) | winter | 6 | 16/26 | ✅ 11,1 s | kraschar |
 | 47 | fjadra-p3-18 | Gömda fickor (nischer, hål genom vägg) | sunset | 4 | 26/40 | ✅ 20,5 s | kraschar |
-| 48 | fjadra-p3-19 | Dubbelloopen | meadow | 4 | 30/45 | ✅ 48,1 s | klarar looparna |
+| 48 | fjadra-p3-19 | Dubbelloopen | meadow | 4 | 36/52 | ✅ 31,6 s | andra loopen flyttad efter backen |
 | 49 | fjadra-p3-20 | Labyrinten (gångar, schakt) | cave | 4 + 2 blå | 34/50 | ✅ 28,4 s | – |
 | 50 | fjadra-p3-21 | Takgapet (tak med glapp, två gropar) | sunset | 4 + 4 blå | 24/36 | ✅ 18,3 s | kraschar |
 | 51 | fjadra-p3-22 | Svingtornet (fyra väggar) | winter | 4 | 24/36 | ✅ 17,5 s | kraschar sist |
