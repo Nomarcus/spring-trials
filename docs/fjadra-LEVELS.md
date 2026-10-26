@@ -3,7 +3,7 @@
 ## Format (`src/levels.js`)
 Enheter är **meter, y uppåt**. Ett bana-objekt:
 ```js
-{ id:'fjadra-pack2-01',          // STABILT ID (krävs för paket 2; paket 1 får 'p1-'+slug(name) automatiskt). Rekord och spöken lagras på ID.
+{ id:'fjadra-p3-01',             // STABILT ID. Rekord och spöken lagras på ID.
   name:'Dalens rytm', theme:'meadow',   // meadow | sunset | winter | cave (neon byter palett för alla)
   hint:'Text som visas när banan startar',
   stuck:'Valfri ledtråd efter 4,5 s stillastående',     // annars visas en generell tips-ruta
@@ -16,7 +16,7 @@ Enheter är **meter, y uppåt**. Ett bana-objekt:
 ```
 - **Terrängen** är alla ringars segment. Hjul och huvud kolliderar mot dem. **Ringar med `style:'steel'|'wood'` är tunna balkar:** hjulen kolliderar, men huvudet går igenom (och kroppen alltid). Andra stilar: `crate`, `stone`, `log` (hjul och huvud kolliderar, rent visuellt olika).
 - **Hjälpfunktioner:** `sample(f,x0,x1,steg)` höjdfunktion → punkter; `cr(ctrl,steg)` Catmull-Rom-kurva genom kontrollpunkter; `arc(cx,cy,r,a0,a1,n)`; `rect`, `crate(x,y,s)`, `log(x,y,r)`, `pillar(x0,x1,h)`, `blob(cx,cy,w,h,seed)` (svävande ö), `sm(e0,e1,x)` mjuk stegfunktion.
-- **Registrera en bana:** `LV.push(()=>({...}))` (paket 1) eller `LV2.push(...)` (paket 2). Medaljtider (guld/silver, sekunder) i `MEDALS` (efter namn, paket 1) eller `MEDALS2` (efter ID). Flikarna i menyn byggs av `l.pack`. `makeLevels()` räknar ut `segs`, `bounds` och `vbounds` (översiktskartan).
+- **Registrera en bana:** `LV3.push(()=>({...}))`. Medaljtider (guld/silver, sekunder) i `MEDALS3` (efter ID). `makeLevels()` räknar ut segment och gränser med `finishLevel(l)`.
 - **Mjuka kanter:** runda av toppar och rampers krön. Vassa vinklar kastar iväg cykeln.
 - **Plats:** Marcus vill ha rymliga banor. Cykeln är ca 1,9 m mellan hjulaxlarna och 2,1 m hög med förare. Kör man upp och ner behövs minst ~4 m takhöjd.
 - **Nya banor ska vara lösbara av boten eller av ett skript** innan de släpps. Lägg till dem i `NEWLV` i `logic.js` för NY-märket i menyn.
@@ -25,7 +25,14 @@ Enheter är **meter, y uppåt**. Ett bana-objekt:
 ```bash
 node tools/fjadra/test/run.js <index>        # 3 försök: bred stråle, bredare, ordnade stjärnor
 ```
-Boten hittar inte vägen om målen ligger "bakåt" under starten; skriv då ett skript efter `tools/fjadra/test/script_gruvan.js` (en enkel tillståndsmaskin med gas/broms/luta/vänd).
+Boten hittar inte vägen om målen ligger "bakåt" under starten; skriv då ett skript efter `tools/fjadra/test/script_spiral.js` (en enkel tillståndsmaskin med gas/broms/luta/vänd).
+
+## Baneditorn (i spelet)
+Menyn → pennan på en bana (eller *Mina banor* → **＋ Ny bana**). Koden ligger i `src/editor.js`.
+- **Verktyg:** Flytta (dra marken med *Mjuk*-radie 0–8 m, dra stjärnor/start/blomma/block, dra i luften = panorera), Punkt (tryck på en linje), Radera, Stjärna, Blå stjärna (tryck igen = byt riktning), Block (trä, stål, sten, låda, stock, mark). Två fingrar panorerar och zoomar. Ångra/gör om (40 steg).
+- **Testa** kör banan direkt (inga rekord sparas); pennan uppe till höger tar en tillbaka.
+- **Spara:** egna banor → `localStorage['fjadra.mine']` (fliken *Mina banor*). Ändrade inbyggda banor → `localStorage['fjadra.edits']`; de ersätter originalet på den enheten och får märket ÄNDRAD tills man trycker *Återställ original*.
+- **Baka in i spelet:** editorn → ⋯ → *Kopiera bankod*. Spara koden i en fil och kör `python3 tools/fjadra/import_level.py bana.json` (ID för en inbyggd bana ersätter den, `mine-…` blir en ny bana `fjadra-p3-NN` sist). Koden hamnar i `EDITS` i `src/levels.js`. Bygg och kör testboten innan det släpps.
 
 ## Banlista
 Banpaket 1 och 2 är borttagna (Marcus beslut). Spelet har bara banpaket 3 (30 banor). Index nedan är ordningen i `makeLevels()`; i tabellen står de gamla indexen 30–59, dra av 30.

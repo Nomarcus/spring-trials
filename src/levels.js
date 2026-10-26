@@ -320,17 +320,28 @@ const MEDALS3={'fjadra-p3-01':[16,26],'fjadra-p3-02':[14,24],'fjadra-p3-03':[24,
   'fjadra-p3-16':[30,45],'fjadra-p3-17':[16,26],'fjadra-p3-18':[26,40],'fjadra-p3-19':[30,45],'fjadra-p3-20':[34,50],'fjadra-p3-21':[24,36],'fjadra-p3-22':[24,36],'fjadra-p3-23':[26,40],'fjadra-p3-24':[34,50],'fjadra-p3-25':[40,60],
   'fjadra-p3-26':[50,75],'fjadra-p3-27':[30,45],'fjadra-p3-28':[50,75],'fjadra-p3-29':[50,75],'fjadra-p3-30':[300,450]};
 const slug=n=>n.toLowerCase().replace(/å/g,'a').replace(/ä/g,'a').replace(/ö/g,'o').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+// Ändringar och nya banor från baneditorn som är inbakade i spelet (läggs in med tools/fjadra/import_level.py).
+// Nyckel = ban-ID. En inbyggd bana byts ut mot sin ändrade version, ett okänt ID blir en ny bana sist i paketet.
+const EDITS={
+// EDITS-START
+// EDITS-END
+};
+// räknar fram det spelet behöver av rena bandata: kollisionssegment, gränser och översiktens gränser (utan det osynliga taket)
+function finishLevel(l){ l.segs=buildSegs(l.rings);
+  let mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9; for(const r of l.rings) for(const p of r.pts){ mnx=Math.min(mnx,p[0]);mxx=Math.max(mxx,p[0]);mny=Math.min(mny,p[1]);mxy=Math.max(mxy,p[1]); }
+  l.bounds=[mnx,mny,mxx,mxy];
+  let vx0=1e9,vx1=-1e9,vy0=1e9,vy1=-1e9; const add=(x,y)=>{ vx0=Math.min(vx0,x); vx1=Math.max(vx1,x); vy0=Math.min(vy0,y); vy1=Math.max(vy1,y); };
+  for(const r of l.rings) for(const p of r.pts) if(p[1]<(l.top||TOP)-1) add(p[0],p[1]); for(const a of l.apples) add(a[0],a[1]+1); add(l.flower[0],l.flower[1]+2); add(l.start[0],l.start[1]+2.5);
+  l.vbounds=[vx0,vy0,vx1,vy1]; return l; }
+// banfil från editorn → bana (egen kopia; fält som banfilen saknar tas från base)
+function levelFromDoc(d,base){ const c=JSON.parse(JSON.stringify(d)); const l=Object.assign({killers:[],hint:'',stuck:''},base||{},c);
+  delete l.v; delete l.segs; delete l.vis; for(const r of l.rings) if(!r.style) delete r.style; return finishLevel(l); }
 function makeLevels(){
-  const L3=LV3.map(f=>f());
-  for(const l of L3){ l.pack=3; l.medal=MEDALS3[l.id]||[20,35]; }
-  const L=L3;
-  for(const l of L){ l.segs=buildSegs(l.rings);
-    let mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9; for(const r of l.rings) for(const p of r.pts){ mnx=Math.min(mnx,p[0]);mxx=Math.max(mxx,p[0]);mny=Math.min(mny,p[1]);mxy=Math.max(mxy,p[1]); }
-    l.bounds=[mnx,mny,mxx,mxy];
-    // "view" bounds for the overview map: ignore the invisible sky lid at TOP
-    let vx0=1e9,vx1=-1e9,vy0=1e9,vy1=-1e9; const add=(x,y)=>{ vx0=Math.min(vx0,x); vx1=Math.max(vx1,x); vy0=Math.min(vy0,y); vy1=Math.max(vy1,y); };
-    for(const r of l.rings) for(const p of r.pts) if(p[1]<(l.top||TOP)-1) add(p[0],p[1]); for(const a of l.apples) add(a[0],a[1]+1); add(l.flower[0],l.flower[1]+2); add(l.start[0],l.start[1]+2.5);
-    l.vbounds=[vx0,vy0,vx1,vy1]; }
+  let L=LV3.map(f=>f());
+  for(const l of L){ l.pack=3; l.medal=MEDALS3[l.id]||[20,35]; }
+  L=L.map(l=>EDITS[l.id]?levelFromDoc(EDITS[l.id],{pack:l.pack,medal:l.medal,stuck:l.stuck}):l);
+  for(const id in EDITS) if(!L.some(l=>l.id===id)) L.push(levelFromDoc(EDITS[id],{pack:3,medal:EDITS[id].medal||[30,50]}));
+  for(const l of L) if(!l.segs) finishLevel(l);
   return L;
 }
-if(typeof module!=='undefined'){ const C=require('./core.js'); global.buildSegs=C.buildSegs; module.exports={makeLevels}; }
+if(typeof module!=='undefined'){ const C=require('./core.js'); global.buildSegs=C.buildSegs; module.exports={makeLevels,finishLevel,levelFromDoc}; }
