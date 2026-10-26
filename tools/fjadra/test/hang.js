@@ -1,4 +1,7 @@
-const C=require(process.argv[2]||'../../../src/core.js'); const {makeLevels}=require(process.argv[3]||'../../../src/levels.js'); const L=makeLevels(); const l=L.find(x=>x.id==='fjadra-pack2-11');
+const C=require(process.argv[2]||'../../../src/core.js');
+// Stenhyllans geometri (den gamla paket 2-banan) ligger kvar här som testbana för hänget
+const TOP=40, l={start:[-10,4.5], apples:[[4,5.25],[8.2,2.85],[25.5,2.95]], rings:[{pts:[[-14,TOP],[-14,4.5],[9.3,4.5],[9.55,4.62],[9.95,4.64],[10.05,4.55],[10.05,4.08],[8.5,3.98],[6.5,3.9],[5.2,3.6],[5,3.1],[5,2.3],[8,1.6],[11,0.75],[14,0.1],[15,0],[22,0],[29,4.5],[38,4.5],[38,TOP]]}]};
+l.segs=C.buildSegs(l.rings);
 function trial(v,brakeAt,leanPol){ const bk=C.newBike(-2,4.5); let t=0, braking=false, maxImp=0, res='ok', hangT=0, gotStar=false; const st=l.apples[1];
   for(let i=0;i<600*14;i++){ let inp;
     if(!braking){ inp={gas:bk.b.vx<v?1:0, brake:bk.b.vx>v+0.6?1:0}; if(bk.wh[0].x>brakeAt) braking=true; } else inp={brake:1, lean:leanPol?leanPol(bk,t):0};

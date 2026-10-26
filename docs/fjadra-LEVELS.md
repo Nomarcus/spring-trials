@@ -27,41 +27,9 @@ node tools/fjadra/test/run.js <index>        # 3 försök: bred stråle, bredare
 ```
 Boten hittar inte vägen om målen ligger "bakåt" under starten; skriv då ett skript efter `tools/fjadra/test/script_gruvan.js` (en enkel tillståndsmaskin med gas/broms/luta/vänd).
 
-## Banlista (index = ordning i `makeLevels()`)
-✅ = klarad av boten med fysik **v11** (nuvarande). ⚠️ = inte omkörd på v11 (klarades senast på v9/v10). Kör hela sviten innan nästa release.
-
-| # | ID | Namn | Paket | Tema | Stjärnor | Medalj guld/silver | v11 |
-|---|---|---|---|---|---|---|---|
-| 0 | p1-forsta-stegen | Första stegen | 1 | meadow | 3 | 10/16 | ✅ |
-| 1 | p1-ladorna | Lådorna | 1 | meadow | 3 | 16/26 | ✅ |
-| 2 | p1-stockarna | Stockarna | 1 | meadow | 3 | 9/15 | ✅ |
-| 3 | p1-vandplatsen | Vändplatsen | 1 | sunset | 3 | 12/20 | ✅ |
-| 4 | p1-trappan | Trappan | 1 | sunset | 3 | 11/17 | ✅ |
-| 5 | p1-hakarna | Hakarna | 1 | meadow | 3 | 16/26 | ✅ |
-| 6 | p1-svavande-oar | Svävande öar | 1 | meadow | 4 | 16/25 | ⚠️ |
-| 7 | p1-volten | Volten | 1 | sunset | 3 | 9/15 | ⚠️ |
-| 8 | p1-bron | Bron | 1 | meadow | 3 | 14/22 | ✅ |
-| 9 | p1-grottan | Grottan | 1 | cave | 3 | 10/16 | ✅ |
-| 10 | p1-pelarna | Pelarna | 1 | sunset | 3 | 14/24 | ✅ |
-| 11 | p1-skalen | Skålen | 1 | sunset | 3 | 25/45 | ⚠️ |
-| 12 | p1-hinderbanan | Hinderbanan | 1 | sunset | 3 | 13/20 | ⚠️ |
-| 13 | p1-vinterberget | Vinterberget | 1 | winter | 3 | 12/19 | ⚠️ |
-| 14 | p1-klippan | Klippan | 1 | winter | 3 | 16/26 | ✅ |
-| 15 | p1-upp-och-ner | Upp och ner | 1 | cave | 5 (2 grav) | 14/24 | ⚠️ |
-| 16 | p1-hanget | Hänget | 1 | meadow | 3 | 16/28 | ✅ |
-| 17 | p1-svavaren | Svävaren | 1 | sunset | 5 (2 grav) | 14/24 | ⚠️ |
-| 18 | p1-balkarna | Balkarna | 1 | winter | 4 | 14/24 | ✅ |
-| 19 | p1-pumpbanan | Pumpbanan | 1 | meadow | 4 | 14/22 | ⚠️ |
-| 20 | p1-studsen | Studsen | 1 | sunset | 3 | 12/20 | ⚠️ |
-| 21 | p1-schaktet | Schaktet | 1 | cave | 4 | 22/34 | ⚠️ |
-| 22 | p1-klattervaggen | Klätterväggen | 1 | winter | 4 | 18/30 | ⚠️ |
-| 23 | p1-finalen | Finalen | 1 | sunset | 6 | 28/45 | ⚠️ |
-| 24 | p1-spegeln | Spegeln | 1 | cave | 5 (2 grav) | 16/26 | ⚠️ |
-| 25 | p1-trapphoppet | Trapphoppet | 1 | winter | 5 | 16/26 | ⚠️ |
-| 26 | p1-flowbanan | Flowbanan | 1 | meadow | 4 | 14/22 | ⚠️ |
-| 27 | fjadra-pack2-01 | Dalens rytm | 2 | meadow | 3 | 12/20 | ⚠️ |
-| 28 | fjadra-pack2-08 | Gruvans andra våning | 2 | cave | 4 | 26/40 | ⚠️ |
-| 29 | fjadra-pack2-11 | Stenhyllan | 2 | sunset | 3 | 14/24 | ✅ |
+## Banlista
+Banpaket 1 och 2 är borttagna (Marcus beslut). Spelet har bara banpaket 3 (30 banor). Index nedan är ordningen i `makeLevels()`; i tabellen står de gamla indexen 30–59, dra av 30.
+Stenhyllans geometri finns kvar i `tools/fjadra/test/hang.js` som testbana för hänget.
 
 ### Banpaket 3 (30 banor efter skisserna i `fjadra_30_banor.zip`, lätt → svår)
 Index fortsätter efter paket 2. Varje bana lär ut en teknik. Kolumnen *Bara gas* visar om banan går att klara utan tekniken (enkel förare som bara håller gas).
@@ -97,7 +65,7 @@ Index fortsätter efter paket 2. Varje bana lär ut en teknik. Kolumnen *Bara ga
 | 56 | fjadra-p3-27 | Spiralschaktet (tyngd upp/vänster/höger) | cave | 2 + 5 blå | 30/45 | ✅ 18,0 s · skript `script_spiral.js` | – |
 | 57 | fjadra-p3-28 | Stora flödet (allt i rytm) | sunset | 7 + 2 blå | 50/75 | ✅ 53,0 s | kraschar |
 | 58 | fjadra-p3-29 | Gatloppet | winter | 6 + 2 blå | 50/75 | ✅ 43,0 s | kraschar |
-| 59 | fjadra-p3-30 | Fjädertoppen (finalen) | winter | 6 + 4 blå | 80/120 | ⚠️ ej bevisad – testas manuellt av Marcus | loopar + rör ok, kraschar i taket |
+| 59 | fjadra-p3-30 | Maraton (ersätter Fjädertoppen) | meadow | se nedan | se nedan | del för del, se nedan | – |
 
 Bana 16–30 är längre (100–250 m). Kör testboten med längre tidsgräns: `MAXT=150 node tools/fjadra/test/run.js 59`.
 
@@ -118,3 +86,13 @@ Lärdom från bana 2: broms under `PIN_V` (3,8 m/s) låser hjulet mot marken. Tv
 - `docs/reference/atlas-20-banor.jpg` + `chatgpt-20-banor-prompt.txt`: ChatGPT:s atlas med 20 bankoncept (Dalens rytm, Åttans hemlighet, Spiralbrunnen, Nyckelhålet …). Bedömning: 01, 03, 05, 07, 09 enkla; 02, 04, 06, 08, 10, 14, 15, 16 medel (tak, flera våningar); 11, 12, 19 beror på bromshäng; 13, 17, 18, 20 för tajta som ritade och måste byggas bredare med körbara lutningar under ~35°. Tre av dem är byggda (01 Dalens rytm, 08 Gruvans andra våning, 11 Stenhyllan).
 - Marcus och Rocco planerar **helt nya banor**. De 43 banorna från Rocco i `main` (labyrinter, bromsbalans, hjulhäng) är gjorda mot den äldre fysiken och ingår inte här.
 - Förslag på fler mekanikbanor: studs-kedja, häng under flera balkar i rad, tyngdkraftsloop med två vändningar, dubbelstudskanten (Dubbelstudsen i atlasen).
+
+
+## Maraton (bana 30)
+Byggd efter `docs/reference/marathon/` (10 delar, 48 punkter): fem klättringsdelar upp till toppen, toppen, fyra delar downhill. Ca 2,3 km.
+- **Höjderna är halverade** (topp 120 m i stället för 240 m): fysiken har inget luftmotstånd, så 240 m nerför ger orimliga farter.
+- Klättringen håller max ~18° (`ease(dy*5, dy)`): 25° går men cykeln kryper i 3–4 m/s.
+- Byggs med en "penna" (`flat`, `ease`, `hills`, `dips`, `gap`, `canyon`, `pipe`, `loop`, `wall`, `tunnel`, `pocket`, `shaft`, `ceiling`, `overhang`, `rest`) – se koden.
+- Stjärnorna ligger där man inte kan missa dem (platåer, tunnlar, fickor, tak-körning) – inga stjärnor i looparna, så en misslyckad loop tvingar inte fram omstart av hela banan.
+- `l.parts` = viloplatåerna mellan delarna. `node tools/fjadra/test/run_marathon.js [del…]` kör testboten på en del i taget (startar stilla på platån, ska nå nästa med alla stjärnor däremellan; bara segmenten runt delen används så att det går fort).
+- Prestanda: ca 5 200 segment, ~35 ms fysik per spelsekund på en dator (övriga banor 7–13 ms).
