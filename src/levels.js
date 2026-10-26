@@ -15,7 +15,7 @@ const TOP=40;
 var P28={cx:92,h:22};
 var P30={c1:76,c2:134,f2:-15,h:24,k2:2.5};
 var P23={cx:76,cy:6.5,h:19,s:12.6};
-var P19={c1:48,c2:94,f2:-7};
+var P19={c1:48,c2:112,f2:-7};   // c2: andra loopen måste ligga efter nerförsbacken (A.end+31) plus en platt sträcka
 var P13={cx:66,cy:6.5,R:4.6,kx:63.5,kr:3.5,ka:60};
 // ================= BANPAKET 3 (30 banor, lätt → svår) =================
 const LV3=[];
@@ -81,16 +81,15 @@ LV3.push(()=>{ const F=-4.5, C=F+2.8;
   return {id:'fjadra-p3-09', name:'Grytet', theme:'meadow', hint:'Ner i hålet och in i tunneln. Lågt i tak – ta det lugnt så huvudet inte slår i.',
     stuck:'Stjärnan sitter i nischen i taket. Lyft framhjulet en aning under den.',
     rings:[{pts:ground}, roof], apples:[[30.3,F+2.55]], killers:[], flower:[60,0.5], start:[2,0]}; });
-// 10 Skorstenen — smalt lodrätt schakt. Blå stjärna vänder tyngden: fall uppåt, kör på avsatsernas undersidor i sicksack, ut genom toppen
-LV3.push(()=>{ const W=6.4, rings=[];
-  const ledge=(left,y)=>{ const x0=left?0:2.4, x1=left?4.0:W; return {pts:[[x0,y],[x1,y],[x1+(left?0.25:0),y-0.25],[x1,y-0.55],[x0,y-0.55]].map(p=>[+p[0].toFixed(2),p[1]])}; };
-  for(let k=1;k<=4;k++) rings.push(ledge(k%2===1,3.2*k));
-  const top=16;
-  rings.unshift({pts:[[-8,TOP],[-8,top+4],[0,top+4],[0,0],[W,0],[W,13.3],[W+0.2,13.1],[24,13.1],[24,TOP]]});
-  rings.push({pts:[[-0.5,top],[W+1.2,top],[W+1.2,top+0.7],[-0.5,top+0.7]]});
-  return {id:'fjadra-p3-10', name:'Skorstenen', theme:'cave', hint:'Blå stjärna vänder tyngden – du faller uppåt genom skorstenen. Kör längs undersidorna, ut genom öppningen i toppen och ta den blå stjärnan där.',
-    stuck:'Kör till kanten av avsatsen så faller du upp till nästa. Vänd med pilknappen om du landar åt fel håll.',
-    rings, apples:[[3.0,0.75,'up'],[W-0.7,2*3.2-0.55-0.75],[0.7,3*3.2-0.55-0.75],[W+0.9,14.6,'down']], killers:[], flower:[19,13.1], start:[1.2,0]}; });
+// 10 Plankbron — grop med stjärna, lång uppförsbacke, plankbro med stjärna, släpp dig ner i dalen (stjärna där man landar), upp till blomman
+// (ersätter Skorstenen, som var för svår så tidigt)
+LV3.push(()=>{ const B=2.4, F=-2;
+  const g=[[-4,TOP],[-4,0],[10,0],...cr([[10,0],[13,-0.4],[17,-1.4],[21,-0.4],[24,0],[28,0],[32,0.5],[36,1.8],[39,2.35],[40,B],[44,B],[45.5,B-0.6],[47.5,F+1.2],[49.5,F+0.1],[51,F]],0.3).slice(1),
+    [66,F],...cr([[66,F],[71,F+0.3],[77,-1.0],[82,-0.2],[85,0],[100,0]],0.3).slice(1),[100,TOP]];
+  const plank={style:'wood',pts:[[43.6,B],[62,B],[62.15,B-0.17],[62,B-0.34],[43.6,B-0.34]]};
+  return {id:'fjadra-p3-10', name:'Plankbron', theme:'cave', hint:'Över plankbron och ta stjärnan. Kör rakt ut över kanten i slutet – du landar mjukt nere i dalen.',
+    stuck:'Missade du stjärnan på bron? Kör upp igen i lugn takt – eller tryck OMSTART.',
+    rings:[{pts:g}, plank], apples:[[17,-0.65],[53,B+0.75],[67,F+0.75]], killers:[], flower:[95,0], start:[2,0]}; });
 // 11 Fram och tillbaka — ner för två trappsteg ut till väggen, vänd, och klättra tillbaka till blomman bakom starten
 LV3.push(()=>{ const bump=(x,c,h,w)=>Math.abs(x-c)<w? h*0.5*(1+Math.cos(Math.PI*(x-c)/w)) : 0;
   const pts=[[-16,TOP],[-16,1.6],[11.85,1.6],[11.96,1.56],[12,1.48],[12,0.8],[29.85,0.8],[29.96,0.76],[30,0.68],[30,0],
