@@ -63,11 +63,14 @@ body{ background:#18324f; color:var(--ink); font-family:'Nunito',system-ui,-appl
 #kBrake.on{ background:rgba(200,72,58,.95); border-color:#ffe08a; }
 .rpad{ flex-direction:column; align-items:flex-end; gap:10px; }
 .srow, .brow{ display:flex; gap:12px; }
+.k.turn{ width:90px; height:70px; border-radius:24px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; }
+.k.turn svg{ width:34px; height:34px; }
+.k.turn span{ font-family:'Lilita One',sans-serif; font-size:13px; letter-spacing:.06em; line-height:1; }
 .k.small{ width:64px; height:58px; border-radius:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
   background:rgba(24,50,79,.55); border-color:rgba(160,195,230,.45); }
 .k.small svg{ width:26px; height:26px; }
 .k.small span{ font-family:'Lilita One',sans-serif; font-size:10px; letter-spacing:.06em; line-height:1; opacity:.92; }
-@media (max-height:420px){ .k{ width:64px; height:64px; border-radius:19px; } .k.lean,.k.big{ width:78px; height:78px; border-radius:24px; } .k.lean svg{ width:36px; height:36px; } .k.small{ width:56px; height:48px; border-radius:16px; } .k.small svg{ width:22px; height:22px; } .k.small span{ font-size:9px; } .rpad{ gap:7px; } }
+@media (max-height:420px){ .k{ width:64px; height:64px; border-radius:19px; } .k.lean,.k.big{ width:78px; height:78px; border-radius:24px; } .k.lean svg{ width:36px; height:36px; } .k.small{ width:56px; height:48px; border-radius:16px; } .k.small svg{ width:22px; height:22px; } .k.small span{ font-size:9px; } .k.turn{ width:78px; height:60px; border-radius:20px; } .k.turn svg{ width:30px; height:30px; } .k.turn span{ font-size:11px; } .rpad{ gap:7px; } }
 .tabs{ display:flex; gap:8px; margin:0 0 10px; }
 .tab{ border:2.5px solid var(--navy); background:var(--panel); color:var(--ink); border-radius:14px; padding:7px 14px; font-family:'Lilita One',sans-serif; font-size:16px; cursor:pointer; box-shadow:0 3px 0 rgba(10,22,38,.3); display:flex; align-items:center; }
 .tab.on{ background:var(--navy); color:#fff; }
@@ -148,6 +151,7 @@ body.neon .tab.on{ background:#ff3ea5; color:#1b1034; }
   </div>
   <div class="tile disp" id="timerTile"><svg width="22" height="22" viewBox="-12 -12 24 24" aria-hidden="true"><circle r="9" cy="1.5" fill="none" stroke="#fff" stroke-width="2.4"/><path d="M0 1.5V-3.5M0 1.5l3 2.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><path d="M-3-10h6M0-10v2.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg><span id="timer">00:00.00</span></div>
   <div class="hbtns">
+    <button class="hb" id="bRestart" aria-label="Börja om banan"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M8.5 4.5A9.5 9.5 0 1 1 6.2-7.5" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M2.6-12.6l7.6 2.6-5.8 5.6z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg></button>
     <button class="hb" id="bSound" aria-label="Ljud av eller på"><svg viewBox="-12 -12 24 24"><path id="sndPath" d="M-8-3h4l5-5v16l-5-5h-4z" fill="#fff"/><path id="sndWave" d="M4-4a6 6 0 0 1 0 8M6.5-7a10 10 0 0 1 0 14" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
     <button class="hb" id="bMap" aria-label="Översikt över banan"><svg viewBox="-12 -12 24 24"><path d="M-9-6l6-3 6 3 6-3v15l-6 3-6-3-6 3z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M-3-9v15M3-6v15" stroke="#fff" stroke-width="2"/></svg></button>
     <button class="hb" id="bMenu" aria-label="Paus och meny"><svg viewBox="-12 -12 24 24"><rect x="-6" y="-7" width="4" height="14" rx="1.5" fill="#fff"/><rect x="2" y="-7" width="4" height="14" rx="1.5" fill="#fff"/></svg></button>
@@ -162,8 +166,7 @@ body.neon .tab.on{ background:#ff3ea5; color:#1b1034; }
   </div>
   <div class="pad rpad">
     <div class="srow">
-      <button class="k small" id="bRestart" aria-label="Börja om banan"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M8.5 4.5A9.5 9.5 0 1 1 6.2-7.5" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M2.6-12.6l7.6 2.6-5.8 5.6z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg><span>OMSTART</span></button>
-      <button class="k small" id="kTurn" data-k="turn" aria-label="Vänd cykeln"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M-11-3C-8-10 6-11 10-4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M12.6-9.6l-1 8.4-7.6-3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/><path d="M11 4C8 11-6 11-10 4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M-12.6 9.6l1-8.4 7.6 3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg><span>VÄND</span></button>
+      <button class="k turn" id="kTurn" data-k="turn" aria-label="Vänd cykeln"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M-11-3C-8-10 6-11 10-4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M12.6-9.6l-1 8.4-7.6-3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/><path d="M11 4C8 11-6 11-10 4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M-12.6 9.6l1-8.4 7.6 3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg><span>VÄND</span></button>
     </div>
     <div class="brow">
       <button class="k big" id="kBrake" data-k="brake" aria-label="Broms"><small>BROMS</small></button>
@@ -180,7 +183,6 @@ body.neon .tab.on{ background:#ff3ea5; color:#1b1034; }
     <p class="sub">Trialspussel på fjädrar. Samla alla stjärnor och kör till blomman. Ta det lugnt, läs banan och hitta vägen. Bara hjulen och huvudet rör marken – och huvudet tål ingenting.</p>
     <div class="row" id="resumeRow" style="margin:0 0 10px;display:none"><button class="btn" id="bResume">Fortsätt köra</button></div>
     <div class="row" style="margin:0 0 10px;align-items:center"><button class="btn" id="bNextUnplayed">Spela nästa</button><span id="progress" style="color:var(--muted);font-size:14px;font-weight:800"></span></div>
-    <div class="tabs" role="tablist"><button class="tab on" id="tab1" role="tab" aria-selected="true">Banpaket 1</button><button class="tab" id="tab2" role="tab" aria-selected="false">Banpaket 2</button><button class="tab" id="tab3" role="tab" aria-selected="false">Banpaket 3 <span class="newb" style="position:static;margin-left:6px">NY</span></button></div>
     <div class="lvls" id="lvls"></div>
     <p class="help"><b>Mobil:</b> GAS och BROMS till höger, pilen vänder cykeln. ↺ ↻ flyttar förarens vikt och voltar cykeln – båda samtidigt ger en extra kraftig volt. <b>Pumpa:</b> luta bak och fram i takt för att ta fart med armarna. <b>Bunny hop:</b> luta bakåt en kort stund och kasta sedan vikten framåt. <b>Studs:</b> tryck ner ett hjul (landning eller volt) och tryck BROMS precis i botten. <b>Broms</b> får också hjulen att greppa – häng i kanter och balkar.<br>
     <b>Tangentbord:</b> ↑ gas, ↓ broms, ← → volta, mellanslag vänd, Enter börja om, Esc meny.</p>

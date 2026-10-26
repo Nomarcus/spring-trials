@@ -63,11 +63,14 @@ body{ background:#18324f; color:var(--ink); font-family:'Nunito',system-ui,-appl
 #kBrake.on{ background:rgba(200,72,58,.95); border-color:#ffe08a; }
 .rpad{ flex-direction:column; align-items:flex-end; gap:10px; }
 .srow, .brow{ display:flex; gap:12px; }
+.k.turn{ width:90px; height:70px; border-radius:24px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; }
+.k.turn svg{ width:34px; height:34px; }
+.k.turn span{ font-family:'Lilita One',sans-serif; font-size:13px; letter-spacing:.06em; line-height:1; }
 .k.small{ width:64px; height:58px; border-radius:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
   background:rgba(24,50,79,.55); border-color:rgba(160,195,230,.45); }
 .k.small svg{ width:26px; height:26px; }
 .k.small span{ font-family:'Lilita One',sans-serif; font-size:10px; letter-spacing:.06em; line-height:1; opacity:.92; }
-@media (max-height:420px){ .k{ width:64px; height:64px; border-radius:19px; } .k.lean,.k.big{ width:78px; height:78px; border-radius:24px; } .k.lean svg{ width:36px; height:36px; } .k.small{ width:56px; height:48px; border-radius:16px; } .k.small svg{ width:22px; height:22px; } .k.small span{ font-size:9px; } .rpad{ gap:7px; } }
+@media (max-height:420px){ .k{ width:64px; height:64px; border-radius:19px; } .k.lean,.k.big{ width:78px; height:78px; border-radius:24px; } .k.lean svg{ width:36px; height:36px; } .k.small{ width:56px; height:48px; border-radius:16px; } .k.small svg{ width:22px; height:22px; } .k.small span{ font-size:9px; } .k.turn{ width:78px; height:60px; border-radius:20px; } .k.turn svg{ width:30px; height:30px; } .k.turn span{ font-size:11px; } .rpad{ gap:7px; } }
 .tabs{ display:flex; gap:8px; margin:0 0 10px; }
 .tab{ border:2.5px solid var(--navy); background:var(--panel); color:var(--ink); border-radius:14px; padding:7px 14px; font-family:'Lilita One',sans-serif; font-size:16px; cursor:pointer; box-shadow:0 3px 0 rgba(10,22,38,.3); display:flex; align-items:center; }
 .tab.on{ background:var(--navy); color:#fff; }
@@ -148,6 +151,7 @@ body.neon .tab.on{ background:#ff3ea5; color:#1b1034; }
   </div>
   <div class="tile disp" id="timerTile"><svg width="22" height="22" viewBox="-12 -12 24 24" aria-hidden="true"><circle r="9" cy="1.5" fill="none" stroke="#fff" stroke-width="2.4"/><path d="M0 1.5V-3.5M0 1.5l3 2.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><path d="M-3-10h6M0-10v2.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg><span id="timer">00:00.00</span></div>
   <div class="hbtns">
+    <button class="hb" id="bRestart" aria-label="Börja om banan"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M8.5 4.5A9.5 9.5 0 1 1 6.2-7.5" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M2.6-12.6l7.6 2.6-5.8 5.6z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg></button>
     <button class="hb" id="bSound" aria-label="Ljud av eller på"><svg viewBox="-12 -12 24 24"><path id="sndPath" d="M-8-3h4l5-5v16l-5-5h-4z" fill="#fff"/><path id="sndWave" d="M4-4a6 6 0 0 1 0 8M6.5-7a10 10 0 0 1 0 14" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
     <button class="hb" id="bMap" aria-label="Översikt över banan"><svg viewBox="-12 -12 24 24"><path d="M-9-6l6-3 6 3 6-3v15l-6 3-6-3-6 3z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M-3-9v15M3-6v15" stroke="#fff" stroke-width="2"/></svg></button>
     <button class="hb" id="bMenu" aria-label="Paus och meny"><svg viewBox="-12 -12 24 24"><rect x="-6" y="-7" width="4" height="14" rx="1.5" fill="#fff"/><rect x="2" y="-7" width="4" height="14" rx="1.5" fill="#fff"/></svg></button>
@@ -162,8 +166,7 @@ body.neon .tab.on{ background:#ff3ea5; color:#1b1034; }
   </div>
   <div class="pad rpad">
     <div class="srow">
-      <button class="k small" id="bRestart" aria-label="Börja om banan"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M8.5 4.5A9.5 9.5 0 1 1 6.2-7.5" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M2.6-12.6l7.6 2.6-5.8 5.6z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg><span>OMSTART</span></button>
-      <button class="k small" id="kTurn" data-k="turn" aria-label="Vänd cykeln"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M-11-3C-8-10 6-11 10-4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M12.6-9.6l-1 8.4-7.6-3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/><path d="M11 4C8 11-6 11-10 4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M-12.6 9.6l1-8.4 7.6 3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg><span>VÄND</span></button>
+      <button class="k turn" id="kTurn" data-k="turn" aria-label="Vänd cykeln"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M-11-3C-8-10 6-11 10-4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M12.6-9.6l-1 8.4-7.6-3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/><path d="M11 4C8 11-6 11-10 4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M-12.6 9.6l1-8.4 7.6 3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg><span>VÄND</span></button>
     </div>
     <div class="brow">
       <button class="k big" id="kBrake" data-k="brake" aria-label="Broms"><small>BROMS</small></button>
@@ -180,7 +183,6 @@ body.neon .tab.on{ background:#ff3ea5; color:#1b1034; }
     <p class="sub">Trialspussel på fjädrar. Samla alla stjärnor och kör till blomman. Ta det lugnt, läs banan och hitta vägen. Bara hjulen och huvudet rör marken – och huvudet tål ingenting.</p>
     <div class="row" id="resumeRow" style="margin:0 0 10px;display:none"><button class="btn" id="bResume">Fortsätt köra</button></div>
     <div class="row" style="margin:0 0 10px;align-items:center"><button class="btn" id="bNextUnplayed">Spela nästa</button><span id="progress" style="color:var(--muted);font-size:14px;font-weight:800"></span></div>
-    <div class="tabs" role="tablist"><button class="tab on" id="tab1" role="tab" aria-selected="true">Banpaket 1</button><button class="tab" id="tab2" role="tab" aria-selected="false">Banpaket 2</button><button class="tab" id="tab3" role="tab" aria-selected="false">Banpaket 3 <span class="newb" style="position:static;margin-left:6px">NY</span></button></div>
     <div class="lvls" id="lvls"></div>
     <p class="help"><b>Mobil:</b> GAS och BROMS till höger, pilen vänder cykeln. ↺ ↻ flyttar förarens vikt och voltar cykeln – båda samtidigt ger en extra kraftig volt. <b>Pumpa:</b> luta bak och fram i takt för att ta fart med armarna. <b>Bunny hop:</b> luta bakåt en kort stund och kasta sedan vikten framåt. <b>Studs:</b> tryck ner ett hjul (landning eller volt) och tryck BROMS precis i botten. <b>Broms</b> får också hjulen att greppa – häng i kanter och balkar.<br>
     <b>Tangentbord:</b> ↑ gas, ↓ broms, ← → volta, mellanslag vänd, Enter börja om, Esc meny.</p>
@@ -463,165 +465,6 @@ function cr(ctrl,st){ const out=[]; for(let i=0;i<ctrl.length-1;i++){ const p0=c
   for(let k=0;k<n;k++){ const t=k/n,t2=t*t,t3=t2*t; const f=(a,b,c,d)=>0.5*((2*b)+(-a+c)*t+(2*a-5*b+4*c-d)*t2+(-a+3*b-3*c+d)*t3); out.push([+f(p0[0],p1[0],p2[0],p3[0]).toFixed(3),+f(p0[1],p1[1],p2[1],p3[1]).toFixed(3)]); } } out.push(ctrl[ctrl.length-1]); return out; }
 const sm=(e0,e1,x)=>{ const t=Math.max(0,Math.min(1,(x-e0)/(e1-e0))); return t*t*(3-2*t); };
 const TOP=40;
-const LV=[];
-// 1 Första stegen — a low log, a gentle wide dip and a small crate
-LV.push(()=>{ const f=x=> x<12?0 : x<24? -0.45*Math.sin(Math.PI*(x-12)/12) : x<30?0 : x<38? 0.8*Math.sin(Math.PI*(x-30)/8) : 0;
-  return {name:'Första stegen', theme:'meadow', hint:'Luta bakåt (↺) för att lyfta framhjulet över stocken och lådan.',
-  stuck:'Fastnat? Håll GAS och tryck på ↺ en kort stund – då lyfter framhjulet över stocken.',
-  rings:[{pts:[[-4,TOP],[-4,0],...sample(f,0,46),[46,TOP]]}, log(7,0,0.2), crate(27,0,0.55)],
-  apples:[[18,0.3],[27,1.3],[34,1.55]], killers:[], flower:[42,0], start:[2,0]}; });
-// 2 Lådorna — lådtrappa och nedfart
-LV.push(()=>({name:'Lådorna', theme:'meadow', hint:'Klättra lådtrappan steg för steg. Bromsa ner på andra sidan.',
-  rings:[{pts:[[-4,TOP],[-4,0],[36,0],[36,TOP]]},
-    rect(8,0,10.4,0.7,'crate'), rect(10.4,0,12.8,1.3,'crate'), rect(12.8,0,15.2,1.9,'crate'), rect(15.2,0,18.4,1.9,'crate'), rect(18.4,0,20.4,1.1,'crate'), crate(25,0,0.8)],
-  apples:[[16.8,2.65],[11.6,2.05],[25,1.55]], killers:[], flower:[31,0], start:[3,0]}));
-// 3 Vändplatsen — två återvändsgränder
-LV.push(()=>({name:'Vändplatsen', theme:'sunset', hint:'Varje hylla är en återvändsgränd. Vänd med pilknappen och kör tillbaka.',
-  rings:[{pts:[[-22,TOP],[-22,3],[-13,3],[-5,0],[6,0],[12,2.6],[19,2.6],[19,TOP]]}],
-  apples:[[17.5,3.35],[3,0.75],[-15,3.75]], killers:[], flower:[-19.5,3], start:[0,0]}));
-// 4 Trappan
-LV.push(()=>{ const pts=[[-4,TOP],[-4,0],[8,0]]; let x=8,y=0; const apples=[];
-  for(let i=0;i<5;i++){ x+=0.4; y+=0.55; pts.push([x,y]); x+=3.2; pts.push([x,y]); if(i===1||i===3) apples.push([x-1.6,y+0.75]); }
-  pts.push([x+4,y]); apples.push([x+3,y+0.75]); pts.push([x+14,0]); pts.push([x+24,0]); pts.push([x+24,TOP]);
-  return {name:'Trappan', theme:'sunset', hint:'Luta bakåt vid varje kant så framhjulet hakar i, sen fram.', rings:[{pts}], apples, killers:[], flower:[x+19,0], start:[3,0]}; });
-// 5 Hakarna
-LV.push(()=>({name:'Hakarna', theme:'meadow', hint:'Kör mot kanten och lyft framhjulet. Hjulen greppar och drar upp dig.',
-  rings:[{pts:[[-4,TOP],[-4,0],[8,0],[8,0.9],[16,0.9],[16,2.0],[24,2.0],[24,3.3],[34,3.3],[34,2.0],[44,2.0],[44,3.0],[46,3.0],[46,2.0],[56,2.0],[56,TOP]]}],
-  apples:[[12,1.65],[29,4.05],[45,3.75]], killers:[], flower:[52,2.0], start:[3,0]}));
-// 6 Svävande öar
-LV.push(()=>{ const v=x=>-3*Math.sin(Math.PI*(x-46)/20);
-  return {name:'Svävande öar', theme:'meadow', hint:'Ta sats i rampen och landa på öarna. Missar du finns marken under.',
-    rings:[{pts:[[-4,TOP],[-4,0],[10,0],[18,2.6],[19,2.9],[20.5,-1.5],[24,-1.5],[25.5,2.4],...sample(x=>2.4-2.4*(x-26)/10,26,36,1),[40,0],[45,2.2],[45.3,2.2],[45.8,0],...sample(v,46,66,0.5),[80,0],[80,TOP]]},
-      blob(51.5,3.4,5,1.4,3), blob(60,2.6,4,1.2,7)],
-    apples:[[22.5,4.3],[51.5,4.15],[60,3.35],[56,-2.25]], killers:[], flower:[74,0], start:[3,0]}; });
-// Volten — air time and rotation
-LV.push(()=>({name:'Volten', theme:'sunset', hint:'Full fart upp för rampen. Volta i luften så du landar på hjulen. Hamnar du i gropen – börja om.',
-  rings:[{pts:[[-4,TOP],[-4,0],[8,0],...arc(8,6,6,-90,-50,8).slice(1),[14.6,3.7],[14.8,3.7],[14.8,0],[21,0],[21,3.5],[24,3.4],[40,0],[52,0],[52,TOP]]}],
-  apples:[[18.5,5.6],[23,4.2],[31,2.66]], killers:[], flower:[46,0], start:[1,0]}));
-// 7 Bron
-LV.push(()=>({name:'Bron', theme:'meadow', hint:'Släpp dig ner genom hålet i bron. Kroppen glider genom tunna balkar – bara hjul och huvud krockar.',
-  rings:[{pts:[[-4,TOP],[-4,0],[14,0],[14.5,-1],[16,-6],[30,-6],[40,0],[52,0],[52,TOP]]},
-    {pts:[[14,0],[21,0],[21,-0.28],[14,-0.28]],style:'steel'}, {pts:[[25,0],[34,0],[34,-0.28],[25,-0.28]],style:'steel'}, rect(19.5,-3.2,24.5,-2.95,'wood')],
-  apples:[[23,0.75],[22,-2.2],[20,-5.25]], killers:[], flower:[46,0], start:[3,0]}));
-// 8 Grottan
-LV.push(()=>{ const f=x=>sm(4,10,x)*(1-sm(52,58,x))*(1.1*Math.sin((x-4)/5)+0.7*Math.sin((x-4)/2.3));
-  const cf=x=>f(x)+3.7+0.6*Math.sin(x/3.7+1);
-  return {name:'Grottan', theme:'cave', hint:'Lågt i tak. Ta det lugnt – huvudet får inte nudda något.',
-    rings:[{pts:[...sample(f,-4,64),...sample(cf,-4,64).reverse()]}], apples:[[18,f(18)+0.75],[33,f(33)+0.75],[47,f(47)+0.75]],
-    killers:[], flower:[60,f(60)], start:[0,0]}; });
-// 9 Pelarna
-LV.push(()=>({name:'Pelarna', theme:'sunset', hint:'Små hopp från pelare till pelare. Bromsa och balansera innan varje hopp.',
-  rings:[{pts:[[-4,TOP],[-4,0],[4,0],[10,2.2],[10,0],[40,0],[40,TOP]]},
-    pillar(10,11.6,2.2), pillar(12.6,14.2,2.2), pillar(15.6,17.2,2.2), pillar(19,20.6,2.2), pillar(21.8,23.4,2.2)],
-  apples:[[16.4,2.95],[22.6,2.95],[30,0.75]], killers:[], flower:[35,0], start:[1,0]}));
-// 10 Skålen
-LV.push(()=>{ const R=6.2, cx=14, cy=6.2;
-  return {name:'Skålen', theme:'sunset', hint:'Pumpa fram och tillbaka. Vänd med pilknappen högt upp på kanten.',
-    rings:[{pts:[[-4,TOP],[-4,cy],...arc(cx,cy,R,180,360,48),[36,cy],[36,TOP]]}],
-    apples:[[cx-R*0.9*Math.cos(Math.PI/4),cy-R*0.9*Math.sin(Math.PI/4)],[cx+R*0.9*Math.cos(Math.PI/4),cy-R*0.9*Math.sin(Math.PI/4)],[2,cy+0.75]],
-    killers:[], flower:[31,cy], start:[cx,0]}; });
-// 11 Hinderbanan
-LV.push(()=>({name:'Hinderbanan', theme:'sunset', hint:'Stockar, ramper och en plankö. Hoppa eller klättra – ta det i din egen takt.',
-  rings:[{pts:[[-4,TOP],[-4,0],[9,0],[15,1.8],[15.4,1.8],[16,0],[28,0],[34,2.2],[34.4,2.2],[35,0],[41,0],[45,2.4],[45.3,2.4],[45.8,0],[62,0],[70,0],[70,TOP]]},
-         {pts:[[47.5,3.2],[54,3.2],[54,3.8],[47.5,3.8]],style:'wood'}, log(19,0,0.36), log(38.2,0,0.42), log(58.5,0,0.34)],
-  apples:[[18.5,3.4],[51,4.55],[60.5,0.75]], killers:[], flower:[65,0], start:[3,0]}));
-// 12 Vinterberget
-LV.push(()=>{ const f=x=> x<6?0 : x<70 ? 7*sm(6,40,x)-7*sm(42,70,x)+0.9*Math.sin(x/2.2)*sm(6,12,x)*(1-sm(64,70,x)) : 0;
-  return {name:'Vinterberget', theme:'winter', hint:'Uppför i snön. Lagom gas och vikten framåt, annars välter du bakåt.',
-    rings:[{pts:[[-4,TOP],[-4,0],...sample(f,0,86,0.5),[86,TOP]]}],
-    apples:[[24,f(24)+0.75],[41,f(41)+0.75],[58,f(58)+0.75]], killers:[], flower:[80,0], start:[2,0]}; });
-// 13 Klippan
-LV.push(()=>({name:'Klippan', theme:'winter', hint:'Sista stjärnan ligger i gropen. Vänd och kör tillbaka till blomman.',
-  rings:[{pts:[[-4,TOP],[-4,0],[6,0],[14,3],[18,3],[24,6.5],[27,6.5],[30,9],[40,9],[49.6,4.5],[54,4.5],[54,TOP]]}],
-  apples:[[16,3.75],[35,9.75],[52.5,5.25]], killers:[], flower:[25.5,6.5], start:[2,0]}));
-// Upp och ner — roomy gravity oval
-LV.push(()=>{ const R=7, L0=-12, L1=30;
-  return {name:'Upp och ner', theme:'cave', hint:'Blå stjärnor vänder tyngdkraften. Kör upp i kurvan, kör i taket och kom ner på andra sidan.',
-    rings:[{pts:[[L0,0],[8,0],[8,0.6],[9.5,0.6],[9.5,0],[L1,0],...arc(L1,R,R,-90,90,36).slice(1,-1),[L1,2*R],[20,2*R],[20,2*R-0.7],[18.5,2*R-0.7],[18.5,2*R],[4,2*R],[4,2*R-0.6],[2,2*R-0.6],[2,2*R],[L0,2*R],...arc(L0,R,R,90,270,36).slice(1,-1)]}],
-    apples:[[L1+R*Math.cos(-Math.PI/4)*0.88,R+R*Math.sin(-Math.PI/4)*0.88,'up'],[24,2*R-0.75],[11,2*R-0.75],[-5,2*R-0.75],[L0-R*Math.cos(Math.PI/4)*0.88,R+R*Math.sin(Math.PI/4)*0.88,'down']],
-    killers:[], flower:[-6,0], start:[0,0]}; });
-// Stockarna — bunny hop
-LV.splice(2,0,()=>({name:'Stockarna', theme:'meadow', hint:'Bunny hop: luta bakåt en kort stund och kasta sen vikten framåt. Hoppa över gropar och stockar.',
-  rings:[{pts:[[-4,TOP],[-4,0],[9,0],[9,-1.2],[10.4,-1.2],[10.4,0],[17,0],[17,-1.2],[18.5,-1.2],[18.5,0],[27,0],[27,-1.2],[28.7,-1.2],[28.7,0],[40,0],[40,TOP]]},
-    log(13.5,0,0.42), log(23,0,0.38), log(32.5,0,0.45)],
-  apples:[[13.5,1.75],[23,1.6],[32.5,1.85]], killers:[], flower:[37,0], start:[3,0]}));
-// Hänget — hang from the rear wheel
-LV.push(()=>({name:'Hänget', theme:'meadow', hint:'Kör sakta ut på balken. Bromsa när bakhjulet är vid kanten – då greppar det och du hänger. Släpp bromsen för att falla.',
-  rings:[{pts:[[-4,TOP],[-4,0],[12,0],[12,-3.6],[34,-3.6],[44,0],[56,0],[56,TOP]]},
-    {pts:[[12,0],[18,0],[18,-0.26],[12,-0.26]],style:'steel'}],
-  apples:[[17.0,-1.6],[26,-2.85],[48,0.75]], killers:[], flower:[52,0], start:[3,0]}));
-// Svävaren — fall up onto the underside of a long floating island and ride it upside down
-LV.push(()=>{ const u=x=>7.2-0.35*Math.sin((x-12)/2.6)*(x>16&&x<52?1:0);
-  const under=sample(u,10,58,0.5); const top=[[58.5,8.3],[57,9.6],[50,10.4],[30,10.6],[16,10.3],[11,9.5],[9.5,8.3]];
-  return {name:'Svävaren', theme:'sunset', hint:'Kör in i den blå stjärnan under ön – du faller uppåt och vänds automatiskt. Kör upp och ner längs öns undersida.',
-  rings:[{pts:[[-4,TOP],[-4,0],[70,0],[70,TOP]]}, {pts:[...under,...top]}],
-  apples:[[15,0.75,'up'],[24,u(24)-0.75],[33,u(33)-0.75],[42,u(42)-0.75],[53,u(53)-0.75,'down']], killers:[], flower:[64,0], start:[2,0]}; });
-// Balkarna — hop between thin beams over spikes
-LV.push(()=>({name:'Balkarna', theme:'winter', hint:'Tunna balkar över en grop. Bunny hoppa från balk till balk – bromsa och ladda innan varje hopp.',
-  rings:[{pts:[[-4,TOP],[-4,0],[8,0],[8,-3],[38,-3],[46,0],[56,0],[56,TOP]]},
-    {pts:[[8,0],[12,0],[12,-0.26],[8,-0.26]],style:'steel'},
-    {pts:[[13.3,0],[17.5,0],[17.5,-0.26],[13.3,-0.26]],style:'steel'},
-    {pts:[[19.1,0],[23,0],[23,-0.26],[19.1,-0.26]],style:'steel'},
-    {pts:[[24.9,0],[29,0],[29,-0.26],[24.9,-0.26]],style:'steel'},
-    {pts:[[30.8,0],[38,0],[38,-0.26],[30.8,-0.26]],style:'steel'}],
-  apples:[[12.65,1.0],[18.3,1.1],[24,1.1],[29.9,1.1]], killers:[], flower:[51,0], start:[2,0]}));
-// Pumpbanan — pump the rollers for speed
-LV.push(()=>{ const f=x=> x<6?0 : x<46? -0.55*Math.cos((x-6)*Math.PI*2/5)+0.55 : x<50? 0 : 0;
-  return {name:'Pumpbanan', theme:'meadow', hint:'Pumpa: luta bakåt upp för varje puckel och kasta vikten fram på väg ner. Bygg fart utan gas!',
-    rings:[{pts:[[-4,TOP],[-4,0],...sample(f,0,50,0.25),[56,0],[56,2.6],[56.4,2.6],[57,0],[64,0],[64,-2.5],[69,-2.5],[74,0],[86,0],[86,TOP]]}],
-    apples:[[18.5,2.35],[33.5,2.45],[43.5,2.5],[60.5,2.9]], killers:[], flower:[80,0], start:[2,0]}; });
-// Studsen — drop, squeeze the spring and brake to bounce
-LV.push(()=>({name:'Studsen', theme:'sunset', hint:'Hoppa ner från klippan och tryck BROMS precis när fjädrarna är i botten – studsen tar dig upp på hyllan.',
-  rings:[{pts:[[-4,TOP],[-4,4],[6,4],[6,0],[14,0],[14,2.1],[22,2.1],[22,0.8],[30,0.8],[30,TOP]]}],
-  apples:[[10,0.75],[18,2.85],[26,1.55]], killers:[], flower:[28,0.8], start:[2,4]}));
-// Schaktet — zig-zag down a deep shaft
-LV.push(()=>{ const W=13, D=3.4, N=5; const rings=[{pts:[[-6,TOP],[-6,0],[0,0],[0,-D*N-3],[W+10,-D*N-3],[W+10,-D*N],[W,-D*N],[W,TOP]]}];
-  const apples=[];
-  for(let k=1;k<N;k++){ const y=-D*k; if(k%2){ rings.push({pts:[[W-8.5,y],[W,y],[W,y-0.45],[W-8.5,y-0.45]]}); apples.push([W-0.9,y+0.75]); }
-    else { rings.push({pts:[[0,y],[8.5,y],[8.5,y-0.45],[0,y-0.45]]}); apples.push([0.9,y+0.75]); } }
-  return {name:'Schaktet', theme:'cave', hint:'Kör ner för schaktet hylla för hylla. Vänd på varje hylla – stjärnorna ligger inne vid väggen.',
-    rings, apples, killers:[], flower:[W+7,-D*N-3], start:[-3,0]}; });
-// Klätterväggen — hops and wheel hooks up a big wall
-LV.push(()=>({name:'Klätterväggen', theme:'winter', hint:'Hoppa och haka i kanterna med hjulen. Är kanten för hög: bunny hop först, sen volt bakåt.',
-  rings:[{pts:[[-4,TOP],[-4,0],[8,0],[8,1.0],[13,1.0],[13,2.2],[17,2.2],[17,0.8],[20,0.8],[20,2.4],[25,2.4],[25,3.7],[30,3.7],[30,5.0],[37,5.0],[37,3.4],[40,3.4],[40,TOP]]},
-    log(15,2.2,0.32)],
-  apples:[[10.5,1.75],[18.5,1.55],[27.5,4.45],[33,5.75]], killers:[], flower:[38.6,3.4], start:[3,0]}));
-// Finalen — everything at once, lots of room
-LV.push(()=>({name:'Finalen', theme:'sunset', hint:'Allt du lärt dig: studs, bunny hop, balk och volter. Ta det lugnt – det finns gott om plats.',
-  rings:[{pts:[[-4,TOP],[-4,0],[10,0],[16,2.4],[16.4,2.4],[17,0],[24,0],[24,-3.5],[41,-3.5],[48,0.8],[52,0.8],[52,2.0],[60,2.0],[66,0],[90,0],[90,TOP]]},
-    {pts:[[30,0.6],[38,0.6],[38,0.34],[30,0.34]],style:'steel'}, log(56,2.0,0.36)],
-  apples:[[20,0.75],[37.2,-1.0],[41,-2.75],[49,1.55],[56,3.55],[75,0.75]], killers:[], flower:[85,0], start:[2,0]}));
-// Spegeln — flip gravity mid-air, ride the ceiling, flip back
-LV.push(()=>({name:'Spegeln', theme:'cave', hint:'Blå stjärna = tyngdkraften vänder. Volta i luften så du landar på hjulen i taket – och tillbaka igen.',
-  rings:[{pts:[[-6,0],[70,0],[70,9],[-6,9]]}],
-  apples:[[12,0.75,'up'],[24,8.25],[36,8.25],[48,8.25,'down'],[58,0.75]], killers:[], flower:[66,0], start:[2,0]}));
-// Trapphoppet — bunny hop up a staircase of thin beams
-LV.push(()=>({name:'Trapphoppet', theme:'winter', hint:'Hoppa uppåt från balk till balk. Ramlar du ner kör du bara tillbaka uppför backen och försöker igen.',
-  rings:[{pts:[[-4,TOP],[-4,0],[4,0],[10,-3],[34,-3],[35.5,3.5],[50,3.5],[50,TOP]]},
-    {pts:[[8.5,0],[12,0],[12,-0.26],[8.5,-0.26]],style:'steel'}, {pts:[[13.5,0.7],[17.5,0.7],[17.5,0.44],[13.5,0.44]],style:'steel'},
-    {pts:[[19,1.4],[23,1.4],[23,1.14],[19,1.14]],style:'steel'}, {pts:[[24.5,2.1],[28.5,2.1],[28.5,1.84],[24.5,1.84]],style:'steel'},
-    {pts:[[30,2.8],[34.2,2.8],[34.2,2.54],[30,2.54]],style:'steel'}],
-  apples:[[12.75,1.6],[18.25,2.3],[23.75,3.0],[29.25,3.7],[40,4.25]], killers:[], flower:[46,3.5], start:[1,0]}));
-// Flowbanan — rollers, a double and a tabletop: pump and float
-LV.push(()=>{ const r=x=>0.7*(0.5-0.5*Math.cos((x-6)*Math.PI*2/6));
-  return {name:'Flowbanan', theme:'meadow', hint:'Pumpa över vågorna, flyg över dubbelhoppet och landa mjukt på bordet. Lugnt och flytande.',
-  rings:[{pts:[[-4,TOP],[-4,0],[6,0],...sample(r,6.25,30,0.25),[34,0],[38,1.8],[38.3,0.8],[43.7,0.8],[44,2.0],[50,0],[54,0],[60,2.4],[66,2.4],[72,0],[90,0],[90,TOP]]}],
-  apples:[[21,2.0],[41,3.6],[63,3.4],[80,0.75]], killers:[], flower:[86,0], start:[2,0]}; });
-
-// ================= BANPAKET 2 =================
-const LV2=[];
-// 01 Dalens rytm — three soft valleys, tighter and tighter, then a wide climb
-LV2.push(()=>{ const s=cr([[-4,3],[3,3],[5,2.8],[11,0],[17,2.2],[22.5,0.2],[27,2.0],[31,0.4],[35,1.2],[40,3.6],[44,5.4],[50,5.5]],0.4);
-  return {id:'fjadra-pack2-01', name:'Dalens rytm', theme:'meadow', hint:'Känn hur fjädringen trycks ihop i dalarna och lättar på krönen. Pumpa i takt om du vill ha fart.',
-    rings:[{pts:[[-4,TOP],...s,[50,TOP]]}], apples:[[11,0.85],[27,2.8],[40,4.4]], killers:[], flower:[47,5.5], start:[1,3]}; });
-// 08 Gruvans andra våning — two tunnels on top of each other, joined by a wide ramp and a turning chamber
-LV2.push(()=>({id:'fjadra-pack2-08', name:'Gruvans andra våning', theme:'cave', hint:'Övre tunneln ut åt höger, bred nedfart, vänd i kammaren och ta nedre tunneln tillbaka till blomman.',
-  rings:[{pts:[[-2,6],[33,6],[35,5.92],[37,5.5],[39,4.82],[50,0],[50,-0.6],[37,5.0],[36,5.0],[36,-0.8],[-6,-0.8],[-6,1.6],[-12,1.6],[-12,-4],[58,-4],[58,9.4],[-2,9.4]]}],
-  apples:[[12,6.8],[28,6.8],[30,-3.2],[10,-3.2]], killers:[], flower:[-9.5,-4], start:[1,6]}));
-// 11 Stenhyllan — an overhanging rock shelf: hang from the lip by the rear wheel to reach the star underneath
-LV2.push(()=>({id:'fjadra-pack2-11', name:'Stenhyllan', theme:'sunset', hint:'Kör sakta mot kanten. BROMSA så fort framhjulet är ute över kanten (den gula zonen) och håll inne – bakhjulet hakar i kanten och du hänger. Ta stjärnan, släpp sen.',
-  rings:[{pts:[[-14,TOP],[-14,4.5],[9.3,4.5],[9.55,4.62],[9.95,4.64],[10.05,4.55],[10.05,4.08],[8.5,3.98],[6.5,3.9],[5.2,3.6],[5,3.1],[5,2.3],[8,1.6],[11,0.75],[14,0.1],[15,0],[22,0],[29,4.5],[38,4.5],[38,TOP]]}],
-  apples:[[4,5.25],[8.2,2.85],[25.5,2.95]], killers:[], flower:[34,4.5], start:[-10,4.5], marks:[[7.6,9.6]]}));
 var P28={cx:92,h:22};
 var P30={c1:76,c2:134,f2:-15,h:24,k2:2.5};
 var P23={cx:76,cy:6.5,h:19,s:12.6};
@@ -870,22 +713,54 @@ LV3.push(()=>{ const pts=[[-4,TOP],[-4,0],[30,0],...cr([[30,0],[34,1.2],[38,3.4]
   return {id:'fjadra-p3-29', name:'Gatloppet', theme:'winter', hint:'Gatloppet: låg tunnel, brant topp, schaktet (blå stjärna – fall uppåt), stort gap och stjärnor gömda i fickor.',
     stuck:'Schaktet: ta den blå stjärnan nere på botten, kör i taket åt höger och släpp vid nästa blå.',
     rings:[{pts}, roof, cap], apples:[[17,2.1],[44.6,7.05],[49.6,-5.25,'up'],[51,11.4-0.75],[55.2,10.6,'down'],[76,5.2],[103.4,0.75],[123.4,0.75]], killers:[], flower:[136,0], start:[2,0]}; });
-// 30 Fjädertoppen — finalen: halfpipe, dubbelloop, tak-körning, svingvägg och en skorsten upp till blomman på toppen
-LV3.push(()=>{ const F=-7, A=loopParts(48,8+6.5,4.6,45.5,3.5,60,8), B=loopParts(94,F+6.5,4.6,91.5,3.5,60,F);
-  const s=cr([[-4,22],[2,22],[5,21.6],[10,18.6],[17,13.2],[23,9.6],[28,8.2],[32,8],[A.k0-2,8]],0.3);
-  const m=cr([[A.end,8],[A.end+5,8],[A.end+10,6.4],[A.end+18,F+(8-F)*0.45],[A.end+26,F+0.8],[A.end+31,F],[B.k0-2,F]],0.3);
-  const hp=cr([[B.end,F],[B.end+8,F],[B.end+11,F-0.8],[B.end+14,F-2.8],[B.end+17,F-3.6],[B.end+20,F-2.8],[B.end+23,F-0.8],[B.end+26,F],[B.end+30,F]],0.3);
-  const X=B.end+30, R=ceilingRide(X,F,30,1.0), Q=X+40;
-  const wall=cr([[Q,F],[Q+12,F],[Q+15,F+0.25],[Q+17.5,F+1.0],[Q+19.3,F+2.0],[Q+20.4,F+3.0],[Q+20.9,F+3.5],[Q+21.05,F+3.8]],0.25);
-  const T=Q+21.35, H=F+4.0, W=7, top=H+16;
-  const pts=[[-4,TOP],...s,...A.ground,...m.slice(1),...B.ground,...hp.slice(1),...R.ground,[Q,F],...wall.slice(1),[Q+21.07,F+3.94],[Q+21.17,H],[T,H],[T+6,H],[T+6,H-0.01],[T+6+W,H],[T+6+W,top-3.6],[T+6+W+0.2,top-3.8],
-    ...cr([[T+6+W+0.2,top-3.8],[T+6+W+4,top-3.2],[T+6+W+8,top-1.2],[T+6+W+11,top],[T+6+W+13,top+0.4],[T+6+W+16,top+0.4]],0.3).slice(1),[T+6+W+16,TOP]];
-  const ch=[]; for(let k=1;k<=3;k++){ const left=k%2===1, y=H+3.4*k; ch.push({pts:[[left?T+6:T+6+2.6,y],[left?T+6+W-2.6:T+6+W,y],[left?T+6+W-2.4:T+6+W,y-0.5],[left?T+6:T+6+2.6,y-0.5]]}); }
-  ch.push({pts:[[T+5.4,top+1.0],[T+6+W+12,top+1.0],[T+6+W+12,top+1.8],[T+5.4,top+1.8]]}, {pts:[[T,H],[T+6,H],[T+6,top+1.8],[T,top+1.8]]});
-  return {id:'fjadra-p3-30', name:'Fjädertoppen', theme:'winter', hint:'Finalen! Två loopar, ett rör, tak-körning, svingväggen – och skorstenen upp till blomman på toppen.',
-    stuck:'Ta det i etapper: loopen behöver full fart, väggen behöver ansats, skorstenen: blå stjärnan nere i botten.',
-    rings:[{pts}, ...A.rings, ...B.rings, R.roof, ...ch],
-    apples:[A.top,B.top,[B.end+17,F-2.85],...R.apples,[T+3,H+0.8],[T+6+W/2,H+0.75,'up'],[T+6+W-0.8,H+3.4*2-0.5-0.75],[T+6+W+3,top-1.6,'down']], killers:[], flower:[T+6+W+14,top+0.4], start:[1,22]}; });
+// 30 Maraton — extremt lång bana: fem klättringsdelar upp till toppen, toppen, och fyra delar downhill hela vägen ner till blomman.
+// Höjderna är halverade mot skissen (topp 120 m i stället för 240 m): fysiken har inget luftmotstånd, så 240 m nerför ger orimliga farter.
+// Varje del slutar på en viloplatå; l.parts = [x,y] för varje gräns (används av tools/fjadra/test/run_marathon.js).
+LV3.push(()=>{ const LID=170, P=[[-8,LID],[-8,0],[0,0]], R=[], A=[], parts=[[0,0]]; let X=0, Y=0;
+  const add=pts=>{ for(const p of pts) P.push([+p[0].toFixed(3),+p[1].toFixed(3)]); const q=pts[pts.length-1]; X=q[0]; Y=q[1]; };
+  const curve=(rel,st)=>{ const abs=[[X,Y],...rel.map(([dx,dy])=>[X+dx,Y+dy])]; add(cr(abs,st||0.45).slice(1)); };
+  const fn=(L,f,st)=>{ st=st||0.6; const x0=X,y0=Y,pts=[]; for(let x=st;x<=L+1e-9;x+=st) pts.push([x0+x,y0+f(x)]); add(pts); };
+  const ease=(L,dy)=>fn(L,x=>dy*(0.5-0.5*Math.cos(Math.PI*x/L)));
+  const flat=L=>add([[X+L,Y]]);
+  const star=(dx,dy)=>A.push([X+(dx||0),Y+(dy==null?0.75:dy)]);
+  const rest=L=>{ flat(L/2); star(); flat(L/2); parts.push([X,Y]); };
+  const hills=(n,w,h,rise)=>fn(n*w,x=>h*0.5*(1-Math.cos(2*Math.PI*x/w))+(rise||0)*x/(n*w),0.4);
+  const dips=(n,w,h,drop)=>fn(n*w,x=>-h*0.5*(1-Math.cos(2*Math.PI*x/w))-(drop||0)*(x/(n*w)),0.4);           // pumpgropar (downhill)
+  const gap=(w,d)=>{ curve([[3,0.15],[5,0.6],[6,0.95]],0.25); curve([[1.0,-0.5],[w*0.3,-d],[w*0.7,-d],[w-1.0,-0.5],[w,-0.95]],0.3); };   // ramp + grop man också kan köra igenom
+  const canyon=(w,drop)=>{ curve([[3,0.2],[5,0.7],[6,1.0]],0.25); curve([[0.6,-0.4],[w*0.35,-drop*0.45],[w*0.7,-drop*0.9],[w,-drop-1.0],[w+6,-drop-1.0]],0.3); };   // ramp, landningsbacke långt ner
+  const pipe=(w,d)=>curve([[w*0.15,-d*0.3],[w*0.3,-d*0.85],[w*0.5,-d],[w*0.7,-d*0.85],[w*0.85,-d*0.3],[w,0]],0.3);
+  const loop=()=>{ const t=loopRide(0,4.6,Y), cx=X+0.3-t.lip, lr=loopRide(cx,4.6,Y); add(lr.ground.slice(2)); R.push(...lr.rings); flat(4); };
+  const wall=H=>{ const x0=X,y0=Y; add(cr([[x0,y0],[x0+3,y0+0.25],[x0+5.5,y0+H*0.25],[x0+7.3,y0+H*0.5],[x0+8.4,y0+H*0.75],[x0+8.9,y0+H-0.5],[x0+9.05,y0+H-0.2]],0.25).slice(1)); add([[x0+9.07,y0+H-0.06],[x0+9.17,y0+H],[x0+9.35,y0+H+0.04]]); };
+  const tunnel=(L,h,n)=>{ const x0=X,y0=Y; flat(L); R.push({pts:[[x0,y0+h+0.35],[x0+0.6,y0+h],[x0+L-0.6,y0+h],[x0+L,y0+h+0.35],[x0+L-0.4,y0+h+1.6],[x0+0.4,y0+h+1.6]]}); for(let k=1;k<=n;k++) A.push([x0+L*k/(n+1),y0+0.75]); };
+  const pocket=()=>{ // mesa: uppför, över, ner – vänd och kör in i fickan under kanten (stjärna), vänd igen
+    curve([[2,0.3],[4,1.5],[5.5,2.6],[6.6,3.0],[7.5,3.0]],0.25); flat(6.5); const x0=X,y0=Y;
+    add([[x0+0.05,y0-0.1],[x0+0.05,y0-0.35],[x0-3.4,y0-0.35],[x0-3.6,y0-0.5],[x0-3.6,y0-2.9],[x0-3.5,y0-3.0]]); A.push([x0-2.7,y0-2.25]); X=x0-3.5; Y=y0-3.0; add([[x0+10,Y]]); };
+  const shaft=H=>{ const x0=X,y0=Y,W=6; flat(W); A.push([x0+3,y0+0.75,'up']); add([[X,y0+H-3.2]]); R.push({pts:[[x0-4,y0+H],[x0+W+6,y0+H],[x0+W+6,y0+H+0.8],[x0-4,y0+H+0.8]]}); A.push([x0+W+1.8,y0+H-0.85,'down']); flat(14); };
+  const ceiling=len=>{ const c=ceilingRide(X,Y,len,1.0); flat(8); add(c.ground.slice(1)); R.push(c.roof); A.push(...c.apples); add([[X+len+12,Y]]); };
+  const overhang=()=>{ const x0=X,y0=Y; flat(14); R.push({pts:[[x0+4,y0+2.65],[x0+10,y0+2.65],[x0+11,y0+3.2],[x0+10,y0+4.2],[x0+4,y0+4.2],[x0+3,y0+3.2]]}); A.push([x0+7,y0+2.05]); };
+
+  // Del 1 – klättring (0 → 20)
+  flat(10); hills(3,7,0.9,2); flat(4); gap(10,2.2); flat(6); pipe(16,3.5); flat(4); ease(60,12); flat(6); star(); ease(30,-10); flat(12); loop(); ease(65,13); rest(10);
+  // Del 2 – klättring (→ 45)
+  pocket(); flat(6); tunnel(26,2.9,2); flat(14); wall(4.5); ease(50,10); overhang(); ease(36,7); rest(10);
+  // Del 3 – klättring (→ 70)
+  ceiling(30); shaft(14); gap(10,2); ease(30,-10); flat(12); loop(); flat(4); ease(30,-15); flat(10); loop();
+  { const need=70-Y; ease(Math.max(60,need*5),need); } rest(10);
+  // Del 4 – klättring (→ 95)
+  flat(14); wall(4); flat(14); wall(4); tunnel(30,2.75,2); pocket(); flat(4); pipe(18,4.5); { const need=95-Y; ease(Math.max(40,need*5),need); } rest(10);
+  // Del 5 – klättring (→ 120)
+  shaft(16); ceiling(26); gap(14,3); { const need=110-Y; if(need>0) ease(need*5,need); } flat(6); star(); ease(30,-11); flat(12); loop(); flat(4); { const need=114-Y; ease(need*5,need); } flat(14); wall(5); { const need=120-Y; ease(Math.max(20,need*5),need); } rest(12);
+  // Del 6 – toppen
+  flat(14); star(0,0.75); flat(16); ease(40,-5); rest(8);
+  // Del 7–10 – downhill hela vägen ner (pumpa groparna för fart, bromsa före hoppen)
+  const down=(end,big)=>{ canyon(12,big?9:6); dips(4,10,1.4,4); flat(4); star(); pipe(18,4); dips(5,6,0.7,3); flat(4); { const need=end-Y; fn(Math.max(30,-need*4.2),x=>need*x/Math.max(30,-need*4.2)+0.6*Math.sin(x/2.2)*(x>4?1:0)*(1-x/Math.max(30,-need*4.2)),0.4); } rest(10); };
+  down(85); down(55,1); down(25,1);
+  dips(3,10,1.2,4); canyon(12,6); { const need=0-Y; fn(Math.max(30,-need*4.2),x=>need*x/Math.max(30,-need*4.2)); } flat(30); star(); flat(10);
+  const fx=X+6; flat(14); P.push([X,LID]);
+  return {id:'fjadra-p3-30', name:'Maraton', theme:'meadow', parts, top:LID,
+    hint:'Maraton: klättra hela vägen upp till toppen och susa ner igen. Ta det lugnt – varje del slutar på en viloplatå.',
+    stuck:'Fastnat? Uppför: ta sats och luta framåt. Väggar: full fart och luta fram vid krönet. Blå stjärna = tyngden vänder.',
+    rings:[{pts:P}, ...R], apples:A, killers:[], flower:[fx,Y], start:[2,0]}; });
 // loop man kör rakt in i: loopens botten ligger i marknivå (som en bro över ett dike). Man kör in, runt, och efter varvet
 // faller man ut genom öppningen nere till vänster ner i diket, som leder ut under loopen. Ger: markpunkter från kanten t.o.m. diket, plankorna.
 function loopRide(cx,R,fy,o){ o=Object.assign({dy:-0.5,gap:2.3,o0:255,o1:215},LOOPRIDE,o||{}); const cy=fy+R+o.dy, Ro=R+o.gap;
@@ -896,22 +771,18 @@ var LOOPRIDE={};
 const MEDALS3={'fjadra-p3-01':[16,26],'fjadra-p3-02':[14,24],'fjadra-p3-03':[24,38],'fjadra-p3-04':[12,20],'fjadra-p3-05':[13,22],
   'fjadra-p3-06':[11,18],'fjadra-p3-07':[14,24],'fjadra-p3-08':[16,26],'fjadra-p3-09':[11,18],'fjadra-p3-10':[14,22],'fjadra-p3-11':[30,45],'fjadra-p3-12':[15,24],'fjadra-p3-13':[30,45],'fjadra-p3-14':[14,24],'fjadra-p3-15':[11,18],
   'fjadra-p3-16':[30,45],'fjadra-p3-17':[16,26],'fjadra-p3-18':[26,40],'fjadra-p3-19':[30,45],'fjadra-p3-20':[34,50],'fjadra-p3-21':[24,36],'fjadra-p3-22':[24,36],'fjadra-p3-23':[26,40],'fjadra-p3-24':[34,50],'fjadra-p3-25':[40,60],
-  'fjadra-p3-26':[50,75],'fjadra-p3-27':[30,45],'fjadra-p3-28':[50,75],'fjadra-p3-29':[50,75],'fjadra-p3-30':[80,120]};
-const MEDALS={'Första stegen':[10,16],'Lådorna':[16,26],'Vändplatsen':[12,20],'Trappan':[11,17],'Hakarna':[16,26],'Svävande öar':[16,25],'Bron':[14,22],'Grottan':[10,16],'Pelarna':[14,24],'Skålen':[25,45],'Hinderbanan':[13,20],'Vinterberget':[12,19],'Klippan':[16,26],'Upp och ner':[14,24],'Hänget':[16,28],'Svävaren':[14,24],'Balkarna':[14,24],'Pumpbanan':[14,22],'Studsen':[12,20],'Schaktet':[22,34],'Klätterväggen':[18,30],'Finalen':[28,45],'Spegeln':[16,26],'Trapphoppet':[16,26],'Flowbanan':[14,22],'Stockarna':[9,15],'Volten':[9,15]};
-const MEDALS2={'fjadra-pack2-01':[12,20],'fjadra-pack2-08':[26,40],'fjadra-pack2-11':[14,24]};
+  'fjadra-p3-26':[50,75],'fjadra-p3-27':[30,45],'fjadra-p3-28':[50,75],'fjadra-p3-29':[50,75],'fjadra-p3-30':[300,450]};
 const slug=n=>n.toLowerCase().replace(/å/g,'a').replace(/ä/g,'a').replace(/ö/g,'o').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 function makeLevels(){
-  const L1=LV.map(f=>f()), L2=LV2.map(f=>f()), L3=LV3.map(f=>f());
-  for(const l of L1){ l.pack=1; l.id='p1-'+slug(l.name); l.medal=MEDALS[l.name]||[15,25]; }
-  for(const l of L2){ l.pack=2; l.medal=MEDALS2[l.id]||[20,35]; }
+  const L3=LV3.map(f=>f());
   for(const l of L3){ l.pack=3; l.medal=MEDALS3[l.id]||[20,35]; }
-  const L=L1.concat(L2,L3);
+  const L=L3;
   for(const l of L){ l.segs=buildSegs(l.rings);
     let mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9; for(const r of l.rings) for(const p of r.pts){ mnx=Math.min(mnx,p[0]);mxx=Math.max(mxx,p[0]);mny=Math.min(mny,p[1]);mxy=Math.max(mxy,p[1]); }
     l.bounds=[mnx,mny,mxx,mxy];
     // "view" bounds for the overview map: ignore the invisible sky lid at TOP
     let vx0=1e9,vx1=-1e9,vy0=1e9,vy1=-1e9; const add=(x,y)=>{ vx0=Math.min(vx0,x); vx1=Math.max(vx1,x); vy0=Math.min(vy0,y); vy1=Math.max(vy1,y); };
-    for(const r of l.rings) for(const p of r.pts) if(p[1]<TOP-1) add(p[0],p[1]); for(const a of l.apples) add(a[0],a[1]+1); add(l.flower[0],l.flower[1]+2); add(l.start[0],l.start[1]+2.5);
+    for(const r of l.rings) for(const p of r.pts) if(p[1]<(l.top||TOP)-1) add(p[0],p[1]); for(const a of l.apples) add(a[0],a[1]+1); add(l.flower[0],l.flower[1]+2); add(l.start[0],l.start[1]+2.5);
     l.vbounds=[vx0,vy0,vx1,vy1]; }
   return L;
 }
@@ -925,7 +796,7 @@ const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
 const $=id=>document.getElementById(id);
 let W=0,Hh=0,DPR=1,SC=40,SC0=40,zoom=0.86;
 let li=0, lvl=null, bike=null, got=[], state='menu', T=0, acc=0, endTimer=0, flagWarn=0, parts=[], rag=null, pops=[], shake=0, bloom=0, rec=[], recT=0, ghost=null, BASE_A=1;
-const NEWLV=new Set(['fjadra-pack2-01','fjadra-pack2-08','fjadra-pack2-11','fjadra-p3-01','fjadra-p3-02','fjadra-p3-03','fjadra-p3-04','fjadra-p3-05','fjadra-p3-06','fjadra-p3-07','fjadra-p3-08','fjadra-p3-09','fjadra-p3-10','fjadra-p3-11','fjadra-p3-12','fjadra-p3-13','fjadra-p3-14','fjadra-p3-15','fjadra-p3-16','fjadra-p3-17','fjadra-p3-18','fjadra-p3-19','fjadra-p3-20','fjadra-p3-21','fjadra-p3-22','fjadra-p3-23','fjadra-p3-24','fjadra-p3-25','fjadra-p3-26','fjadra-p3-27','fjadra-p3-28','fjadra-p3-29','fjadra-p3-30']); let curPack=1;
+const NEWLV=new Set(['fjadra-pack2-01','fjadra-pack2-08','fjadra-pack2-11','fjadra-p3-01','fjadra-p3-02','fjadra-p3-03','fjadra-p3-04','fjadra-p3-05','fjadra-p3-06','fjadra-p3-07','fjadra-p3-08','fjadra-p3-09','fjadra-p3-10','fjadra-p3-11','fjadra-p3-12','fjadra-p3-13','fjadra-p3-14','fjadra-p3-15','fjadra-p3-16','fjadra-p3-17','fjadra-p3-18','fjadra-p3-19','fjadra-p3-20','fjadra-p3-21','fjadra-p3-22','fjadra-p3-23','fjadra-p3-24','fjadra-p3-25','fjadra-p3-26','fjadra-p3-27','fjadra-p3-28','fjadra-p3-29','fjadra-p3-30']); let curPack=3;
 let STYLE='cartoon'; try{ STYLE=localStorage.getItem('fjadra.style')==='neon'?'neon':'cartoon'; }catch(e){}
 let stuckT=0, stuckCD=0;
 // ghosts are stored per stable level id; old name-keyed ghosts are moved over the first time
@@ -958,7 +829,7 @@ function medalSVG(k){ if(!k) return '<svg viewBox="-13 -13 26 26" aria-hidden="t
 
 function loadLevel(i){ li=i; lvl=LEVELS[i]; setTheme(lvl.theme); bike=newBike(lvl.start[0],lvl.start[1]); got=lvl.apples.map(()=>false);
   T=0; acc=0; stuckT=0; stuckCD=0; parts=[]; rag=null; pops=[]; shake=0; bloom=0; rec=[]; recT=0; loadGhost(lvl); lvl.steelSegs=lvl.segs.filter(s=>s.style==='steel'); cam.x=bike.b.x+2; cam.y=bike.b.y+0.8; camBaseY=cam.y; state='play';
-  $('lvlname').textContent=(lvl.pack>1?'Paket '+lvl.pack+' · ':'')+(LEVELS.filter(x=>x.pack===lvl.pack).indexOf(lvl)+1)+'. '+lvl.name; updApples(); updGrav(); hideOv(); toast(lvl.hint,3400); }
+  $('lvlname').textContent=(LEVELS.filter(x=>x.pack===lvl.pack).indexOf(lvl)+1)+'. '+lvl.name; updApples(); updGrav(); hideOv(); toast(lvl.hint,3400); }
 function updApples(){ $('applesTxt').textContent=got.filter(Boolean).length+'/'+got.length; }
 function updGrav(){ const g=bike?(bike.gy<0&&bike.gx===0?null:(bike.gy>0?'up':bike.gx<0?'left':'right')):null; $('gravTile').style.display=g?'flex':'none'; if(g) $('gravArrow').textContent=GARROW[g]; }
 function hideOv(){ $('menu').classList.remove('show'); $('endov').classList.remove('show'); }
@@ -1738,10 +1609,9 @@ $('bMusic').onclick=()=>setMusic(!musicOn);
 function setStyle(s){ STYLE=s; try{ localStorage.setItem('fjadra.style',s); }catch(e){} document.body.classList.toggle('neon',s==='neon'); $('bStyle').textContent='Stil: '+(s==='neon'?'Neon':'Tecknad'); curTheme=''; if(lvl) setTheme(lvl.theme); buildMenu(); }
 $('bStyle').onclick=()=>setStyle(STYLE==='neon'?'cartoon':'neon');
 $('bNextUnplayed').onclick=()=>{ audioInit(); pausedState=null; let i=LEVELS.findIndex(l=>l.pack===curPack&&best[l.id]==null); if(i<0) i=LEVELS.findIndex((l,k)=>l.pack===curPack&&medalOf(k,best[l.id])<3); if(i<0) i=LEVELS.findIndex(l=>l.pack===curPack); loadLevel(i); };
-for(const p of [1,2,3]) $('tab'+p).onclick=()=>{ curPack=p; buildMenu(); };
+
 $('bFull').onclick=()=>{ const d=document.documentElement; try{ if(document.fullscreenElement) document.exitFullscreen(); else { (d.requestFullscreen||d.webkitRequestFullscreen).call(d); if(screen.orientation&&screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{}); } }catch(e){} };
 function buildMenu(){ const box=$('lvls'); box.innerHTML=''; const shown=[];
-  for(const p of [1,2,3]){ const t=$('tab'+p); t.classList.toggle('on',p===curPack); t.setAttribute('aria-selected',p===curPack?'true':'false'); }
   LEVELS.forEach((l,i)=>{ if(l.pack!==curPack) return; const n=shown.length+1; shown.push(l); const b=document.createElement('button'); b.className='lv'; const t=best[l.id];
     b.innerHTML='<canvas></canvas>'+(NEWLV.has(l.id)?'<span class="newb">NY</span>':'')+'<div class="meta"><div class="nm"><b>'+n+'. '+l.name+'</b><i>'+(t!=null?fmt(t):'Ej klarad')+' · guld '+l.medal[0]+' s</i></div>'+medalSVG(medalOf(i,t))+'</div>';
     b.onclick=()=>{ audioInit(); pausedState=null; loadLevel(i); }; box.appendChild(b); });

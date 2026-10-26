@@ -21,11 +21,11 @@ function simSeg(l,node,act,dur){
 function score(l,nd){ const g=nd.got.reduce((a,b)=>a+b,0); let tx,ty;
   if(g===nd.got.length){ tx=l.flower[0]; ty=l.flower[1]+0.6; }
   else if(l._ordered){ const k=nd.got.indexOf(0); tx=l.apples[k][0]; ty=l.apples[k][1]; } else { let best=1e9; l.apples.forEach((a,k)=>{ if(nd.got[k]) return; const d=Math.hypot(a[0]-nd.bk.b.x,a[1]-nd.bk.b.y); if(d<best){best=d;tx=a[0];ty=a[1];} }); }
-  const d=Math.hypot(tx-nd.bk.b.x,ty-nd.bk.b.y);
+  const d0=Math.hypot(tx-nd.bk.b.x,ty-nd.bk.b.y), d=d0<50?d0:Math.min(50+(d0-50)*0.2,99);   // långt bort: svagare lutning, så en stjärna alltid väger mer än avståndet till nästa (Maraton)
   const sp=Math.hypot(nd.bk.b.vx,nd.bk.b.vy);
   return g*1000 - d*10 + Math.min(sp,8)*0.5 + Math.random()*4; }
-function plan(li,{K=40,dur=0.25,maxT=45,seed=1,ordered=false}={}){
-  const L=makeLevels(); const l=L[li]; l._ordered=ordered;
+function plan(li,{K=40,dur=0.25,maxT=45,seed=1,ordered=false,level=null}={}){
+  const l=level||makeLevels()[li]; l._ordered=ordered;
   let beam=[{bk:C.newBike(l.start[0],l.start[1]),got:l.apples.map(()=>0),t:0,hist:[]}];
   let bestG=0;
   for(let d=0; d*dur<maxT; d++){
