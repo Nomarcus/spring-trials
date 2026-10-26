@@ -38,3 +38,17 @@ Fast steg `P.H = 1/600 s`. `physics(dt)` i `logic.js` kör en ackumulator med h�
 - Ett perfekt lodrätt ragdoll-torso är en inverterad pendel och faller aldrig; därför en liten slumpad sidokraft (`rd.bias`).
 - Bromsgreppet måste bortses från en stund efter en studs (`noPin`), annars sugs hjulet fast.
 - Vassa kanter på ramper kastar iväg cykeln; runda av toppar.
+
+
+## Fjädringsval (menyn → Fjädring)
+`SUSP` i `core.js` skriver över fjäder `KY`, dämpning `CY`, fjäderväg `TRAVEL` (och för de studsigaste `BOUNCE_MAX`). `setSusp(namn)` sätter värdena; `normal` = `P` som allt är testat med (`BASELINE.txt`).
+
+| Val | KY | CY | TRAVEL | BOUNCE_MAX | sjunker i vila | studs (broms+bak→fram, bakhjul) |
+|---|---|---|---|---|---|---|
+| Hård (`hard`) | 240 | 9 | 0,22 | 3,8 | 0,09 m | 0,09 m |
+| Normal | 118 | 4,6 | 0,30 | 3,8 | 0,19 m | 0,24 m |
+| Mjuk (`soft`) | 85 | 2,4 | 0,45 | 3,8 | 0,22 m | 0,34 m |
+| Elma (`elma`) | 70 | 1,2 | 0,60 | 4,6 | 0,38 m | 0,48 m |
+| Studsboll (`bouncy`) | 62 | 0,5 | 0,70 | 5,4 | 0,56 m | 1,00 m |
+
+Inget val ger huvudkrasch vid fall från 6 m. Testboten klarar bana 1–10 med alla fem valen. Kör boten med ett annat val: `SUSP=elma node tools/fjadra/test/run.js 0 1 2`.

@@ -180,6 +180,11 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
 .newb.edb{ background:#f2b81f; color:#18324f; }
 @media (max-height:420px){ .eb{ height:40px; min-width:40px; font-size:14px; } .tl{ height:50px; min-width:52px; font-size:10px; } #edOpt{ height:50px; } .edzoom .eb{ width:42px; height:42px; } .edzoom{ gap:6px; } }
 @media (max-width:700px){ .tl{ min-width:48px; padding:0 5px; } .eb .lbl{ display:none; } }
+.fjad{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:12px; }
+.fjad b{ font-weight:400; font-size:19px; color:var(--ink); }
+#suspBtns{ display:flex; gap:6px; flex-wrap:wrap; }
+#suspBtns .tab{ padding:6px 11px; font-size:15px; }
+#suspTxt{ margin:6px 0 0; font-size:13.5px; color:var(--muted); }
 @media (prefers-reduced-motion:reduce){ #toast{ transition:none; } .k{ transition:none; } #appleTile.pop{ animation:none; } }
 </style>
 </head>
@@ -267,6 +272,8 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
     <div class="tabs"><button class="tab on" id="tabMain">Banor</button><button class="tab" id="tabMine">Mina banor</button></div>
     <div class="row" id="resumeRow" style="margin:0 0 10px;display:none"><button class="btn" id="bResume">Fortsätt köra</button><button class="btn alt" id="bEditCur">✎ Redigera banan</button></div>
     <div class="row" style="margin:0 0 10px;align-items:center"><button class="btn" id="bNextUnplayed">Spela nästa</button><button class="btn" id="bNewLevel" style="display:none">＋ Ny bana</button><span id="progress" style="color:var(--muted);font-size:14px;font-weight:800"></span></div>
+    <div class="fjad" style="margin:0 0 2px"><b class="disp">Fjädring</b><div id="suspBtns"></div></div>
+    <p id="suspTxt" style="margin:0 0 10px"></p>
     <div class="lvls" id="lvls"></div>
     <p class="help"><b>Mobil:</b> GAS och BROMS till höger, pilen vänder cykeln. ↺ ↻ flyttar förarens vikt och voltar cykeln – båda samtidigt ger en extra kraftig volt. <b>Pumpa:</b> luta bak och fram i takt för att ta fart med armarna. <b>Bunny hop:</b> luta bakåt en kort stund och kasta sedan vikten framåt. <b>Studs:</b> tryck ner ett hjul (landning eller volt) och tryck BROMS precis i botten. <b>Broms</b> får också hjulen att greppa – häng i kanter och balkar.<br>
     <b>Tangentbord:</b> ↑ gas, ↓ broms, ← → volta, mellanslag vänd, Enter börja om, Esc meny.</p>
@@ -296,6 +303,12 @@ const P = {G:10, WR:0.4, WM:1, WI:0.13, BM:2.3, BI:2.3, AX:0.96, AY:-0.55,
   HOLD:6.5, LEANMAX:3.6, VOLT_A:46, VOLT_T:0.11, VOLT_LOCK:0.3, ALO:1.5,
   MR:2.0, KR:500, CR:12, RBX:-0.1, RBY:0.52, RLX:0.3, RCROUCH:0.24, REXT:0.08, RMAX:0.5,
   THR_RATE:3.5, FLIP_T:0.38, BOUNCE:13, BOUNCE_MAX:3.8, BOUNCE_MIN:0.07, PUMP:1.1, PUMP_VMAX:8.5, PUMP_CD:0.3, VOLT_BRAKE:1.35, HOP:3.6, HOP_MIN:0.09, HOP_WIN:0.22, STRETCH:1.3, HOX:0.2, HOY:0.43, HR:0.23, TRAVEL:0.3, HEAD_SAFE:3.2, SAVE:9, ASSIST_K:30, ASSIST_D:8, ASSIST_T:1.6, KBUMP:2400, CBUMP:60, RDOWN:0.2, KRBUMP:2600, BRK_SHIFT:0.16, ANTI_LOOP:14, GAS_LOW:0.45, GAS_LOW_V:4.0, KPIN:2600, CPIN:45, PIN_MAX:170, PIN_REL:0.24, PIN_V:3.8, HANG_DAMP:1.8, HANG_LEAN:1.6, H:1/600};
+
+// Fjädringsval (menyn → Fjädring). 'normal' = värdena i P ovan; fysiktesterna och BASELINE.txt gäller den.
+// Mjukare = större fjäderväg, mjukare fjäder och mindre dämpning: cykeln sjunker ihop mer, gungar längre och studsar högre (Elasto Mania-känsla).
+const SUSP={hard:{KY:240,CY:9,TRAVEL:0.22}, normal:{}, soft:{KY:85,CY:2.4,TRAVEL:0.45}, elma:{KY:70,CY:1.2,TRAVEL:0.6,BOUNCE_MAX:4.6}, bouncy:{KY:62,CY:0.5,TRAVEL:0.7,BOUNCE_MAX:5.4}};
+const SUSP_BASE={KY:P.KY,CY:P.CY,TRAVEL:P.TRAVEL,BOUNCE_MAX:P.BOUNCE_MAX};
+function setSusp(name){ Object.assign(P,SUSP_BASE,SUSP[name]||{}); }
 
 function buildSegs(rings){
   const segs=[];
@@ -1943,6 +1956,14 @@ $('bNext').onclick=next; $('bEditCur').onclick=()=>{ if(lvl&&li>=0) edOpen(li); 
 $('tabMain').onclick=()=>{ curPack=3; buildMenu(); }; $('tabMine').onclick=()=>{ curPack='mine'; buildMenu(); }; $('bAgain').onclick=restart; $('bLevels').onclick=()=>{ pausedState=null; showMenu(); };
 const fsOK=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen; if(!fsOK) $('bFull').style.display='none';
 $('bMusic').onclick=()=>setMusic(!musicOn);
+// fjädringsval: ändrar bara fjäder, dämpning och fjäderväg (setSusp i core.js); gäller direkt, även mitt i en åkning
+const SUSP_UI=[['hard','Hård','Stum och stabil. Nästan inget gung.'],['normal','Normal','Som banorna är byggda och testade.'],['soft','Mjuk','Mer fjädring och lite gung efter landningar.'],
+  ['elma','Elma','Elasto Mania-känsla: djup fjädring som gungar länge och studsar högt.'],['bouncy','Studsboll','Extremt studsig. Gungar och studsar mest av allt.']];
+let suspK='normal'; try{ const v=localStorage.getItem('fjadra.susp'); if(SUSP_UI.some(o=>o[0]===v)) suspK=v; }catch(e){}
+function setSuspension(k){ suspK=k; setSusp(k); try{ localStorage.setItem('fjadra.susp',k); }catch(e){}
+  const box=$('suspBtns'); box.innerHTML=''; for(const [id,name] of SUSP_UI){ const b=document.createElement('button'); b.className='tab'+(id===k?' on':''); b.textContent=name; b.onclick=()=>setSuspension(id); box.appendChild(b); }
+  $('suspTxt').textContent=SUSP_UI.find(o=>o[0]===k)[2]; }
+setSuspension(suspK);
 function setStyle(s){ STYLE=s; try{ localStorage.setItem('fjadra.style',s); }catch(e){} document.body.classList.toggle('neon',s==='neon'); $('bStyle').textContent='Stil: '+(s==='neon'?'Neon':'Tecknad'); curTheme=''; if(lvl) setTheme(lvl.theme); buildMenu(); }
 $('bStyle').onclick=()=>setStyle(STYLE==='neon'?'cartoon':'neon');
 $('bNextUnplayed').onclick=()=>{ audioInit(); pausedState=null; let i=LEVELS.findIndex(l=>l.pack===curPack&&best[l.id]==null); if(i<0) i=LEVELS.findIndex((l,k)=>l.pack===curPack&&medalOf(k,best[l.id])<3); if(i<0) i=LEVELS.findIndex(l=>l.pack===curPack); loadLevel(i); };
