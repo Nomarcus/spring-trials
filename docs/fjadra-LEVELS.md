@@ -32,6 +32,8 @@ Menyn → pennan på en bana (eller *Mina banor* → **＋ Ny bana**). Koden lig
 - **Verktyg:** Flytta (dra marken med *Mjuk*-radie 0–8 m, dra stjärnor/start/blomma/block, dra i luften = panorera), Punkt (tryck på en linje), Radera, Stjärna, Blå stjärna (tryck igen = byt riktning), Block (trä, stål, sten, låda, stock, mark). Två fingrar panorerar och zoomar. Ångra/gör om (40 steg).
 - **Testa** kör banan direkt (inga rekord sparas); pennan uppe till höger tar en tillbaka.
 - **Spara:** egna banor → `localStorage['fjadra.mine']` (fliken *Mina banor*). Ändrade inbyggda banor → `localStorage['fjadra.edits']`; de ersätter originalet på den enheten och får märket ÄNDRAD tills man trycker *Återställ original*.
+- **Spara för alla (claude.ai-länken):** artifacten har capability `db` (regler: alla läser, bara ägaren/Editors skriver). Spara på en inbyggd bana skriver också `levels/<banID>` = `{doc, at}`. Alla som öppnar länken får ändringen vid start (`edPull`). Claude läser samlingen med `ArtifactData` (`list`, collection `levels`), lägger in varje `doc` med `import_level.py` och tar sedan bort dokumenten, så att databasen inte skuggar senare ändringar i koden. En lokal ändring som är identisk med den inbakade banan rensas automatiskt vid start.
+- **Utanför länken** (GitHub Pages): ⋯ → *Ladda ner alla ändringar* ger `fjadra-andringar.json` (`{v:1,edits:[…]}`), som `import_level.py` tar direkt.
 - **Baka in i spelet:** editorn → ⋯ → *Kopiera bankod*. Spara koden i en fil och kör `python3 tools/fjadra/import_level.py bana.json` (ID för en inbyggd bana ersätter den, `mine-…` blir en ny bana `fjadra-p3-NN` sist). Koden hamnar i `EDITS` i `src/levels.js`. Bygg och kör testboten innan det släpps.
 
 ## Banlista

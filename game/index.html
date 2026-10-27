@@ -257,7 +257,7 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
     <div class="fld">Tema<div id="edThemes"></div></div>
     <label class="fld">Tips när banan startar<input id="edHintIn" maxlength="200" autocomplete="off" placeholder="T.ex. Ta sats före hoppet!"></label>
     <div class="row" style="margin-top:4px"><button class="btn alt" id="edExtendB">Förläng 20 m →</button><button class="btn alt" id="edSplitB">Dela långa linjer</button></div>
-    <div class="row"><button class="btn alt" id="edCopyB">Kopiera bankod</button><button class="btn alt" id="edPasteB">Klistra in bankod</button><button class="btn" id="edCodeGo" style="display:none">Läs in</button></div>
+    <div class="row"><button class="btn alt" id="edCopyB">Kopiera bankod</button><button class="btn alt" id="edPasteB">Klistra in bankod</button><button class="btn alt" id="edDlAll">Ladda ner alla ändringar</button><button class="btn" id="edCodeGo" style="display:none">Läs in</button></div>
     <textarea id="edCode" spellcheck="false" aria-label="Bankod"></textarea>
     <p id="edInfo"></p>
     <div class="row"><button class="btn" id="edMoreOk">Klar</button><button class="btn warn" id="edReset">Återställ original</button><button class="btn warn" id="edDelete">Ta bort banan</button></div>
@@ -1730,9 +1730,37 @@ function edNewDoc(name){ const g=[]; for(let x=0;x<=80;x++) g.push([x,0]);
   return {v:1,id:'mine-'+Date.now().toString(36),name,theme:'meadow',hint:'',stuck:'',top:TOP,start:[2,0],flower:[74,0],apples:[[30,0.75]],rings:[{pts:[[-6,TOP],[-6,0],...g,[86,0],[86,TOP]]}]}; }
 function edMineLevel(d){ return levelFromDoc(d,{pack:'mine',medal:null}); }
 // körs en gång vid start: lägg in sparade ändringar och egna banor i LEVELS
-function edBoot(){ const edits=edGet('fjadra.edits',{});
-  LEVELS.forEach((l,i)=>{ const d=edits[l.id]; if(!d) return; try{ ORIG[l.id]=l; LEVELS[i]=levelFromDoc(d,{pack:l.pack,medal:l.medal,edited:true}); }catch(e){ LEVELS[i]=l; } });
+// en lokal ändring som redan är inbakad i spelet (EDITS) tas bort, så att banan inte längre märks ÄNDRAD
+const edKey=d=>JSON.stringify([d.name,d.theme,d.start,d.flower,d.apples,d.rings.map(r=>[r.style||null,r.pts])]);
+function edBoot(){ const edits=edGet('fjadra.edits',{}); let cleaned=false;
+  LEVELS.forEach((l,i)=>{ const d=edits[l.id]; if(!d) return; if(edKey(d)===edKey(edDocOf(l))){ delete edits[l.id]; cleaned=true; return; }
+    try{ ORIG[l.id]=l; LEVELS[i]=levelFromDoc(d,{pack:l.pack,medal:l.medal,edited:true}); }catch(e){ LEVELS[i]=l; } });
+  if(cleaned) edPut('fjadra.edits',edits);
   for(const d of edGet('fjadra.mine',[])){ try{ LEVELS.push(edMineLevel(d)); }catch(e){} } }
+
+// ---------- delning via länken ----------
+// I claude.ai-länken har spelet en databas (artifact-capability db, bara ägaren skriver). När en inbyggd bana sparas
+// skrivs den till levels/<banID>, och alla som öppnar länken får den vid start. Claude läser samma databas och bakar in
+// banorna i spelet (EDITS i levels.js). Utanför länken (GitHub Pages, sparad fil) finns ingen databas: då gäller ändringen
+// bara på den här enheten, och "Ladda ner alla ändringar" ger en fil att skicka till Claude.
+const EDB_COL='levels';
+const edDb=(async()=>{ try{ return (window.claude&&window.claude.use)?await window.claude.use('db'):null; }catch(e){ return null; } })();
+edDb.then(db=>db&&edPull(db));
+async function edPull(db){ let snap; try{ snap=await db.collection(EDB_COL).get(); }catch(e){ return; }
+  const local=edGet('fjadra.edits',{}); let n=0;
+  for(const sd of snap.docs){ const b=sd.data(), d=b&&b.doc, i=LEVELS.findIndex(l=>l.id===sd.id&&l.pack!=='mine'); if(!d||i<0||local[sd.id]) continue;
+    const base=ORIG[sd.id]||LEVELS[i]; if(edKey(d)===edKey(edDocOf(base))) continue;
+    try{ ORIG[sd.id]=base; LEVELS[i]=levelFromDoc(d,{pack:base.pack,medal:base.medal}); n++; }catch(e){} }
+  if(n&&state==='menu') buildMenu(); }
+// resolves true (sparad för alla), null (ingen databas här) eller en felkod
+async function edShare(c){ const db=await edDb; if(!db) return null;
+  try{ await db.collection(EDB_COL).doc(c.id).set({doc:c,at:Date.now()}); return true; }catch(e){ return (e&&e.code)||'fel'; } }
+async function edDownloadAll(){ const edits=edGet('fjadra.edits',{}), list=Object.values(edits);
+  if(!list.length) return toast('Du har inga ändrade banor än',2200);
+  const data=JSON.stringify({v:1,edits:list}), name='fjadra-andringar.json';
+  let dl=null; try{ dl=(window.claude&&window.claude.use)?await window.claude.use('downloads'):null; }catch(e){}
+  try{ if(dl) await dl.save({filename:name,data}); else { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([data],{type:'application/json'})); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000); }
+    toast(list.length+' ändrade banor – skicka filen till Claude så bakas de in i spelet',4200); }catch(e){ if(!(e&&e.code==='declined')) toast('Kunde inte spara filen',2400); } }
 
 // ---------- öppna / stänga ----------
 function edOpen(i){ let doc, src;
@@ -1890,7 +1918,9 @@ function edSave(){ const c=JSON.parse(JSON.stringify(edClean(ed.doc))), id=c.id,
     const L=edMineLevel(c); if(i<0) LEVELS.push(L); else LEVELS[i]=L; }
   else { const m=edGet('fjadra.edits',{}); m[id]=c; if(!edPut('fjadra.edits',m)) return toast('Kunde inte spara – lagringen är full',2600);
     if(!ORIG[id]) ORIG[id]=LEVELS[i]; LEVELS[i]=levelFromDoc(c,{pack:LEVELS[i].pack,medal:LEVELS[i].medal,edited:true}); try{ localStorage.removeItem('fjadra.g4.'+id); }catch(e){} }
-  ed.dirty=false; ed.isNew=false; edUI(); toast(ed.src==='mine'?'Sparad under Mina banor':'Sparad – banan i spelet är nu din version',2200); }
+  ed.dirty=false; ed.isNew=false; edUI();
+  if(ed.src==='mine') return toast('Sparad under Mina banor',2200);
+  toast('Sparar …',1500); edShare(c).then(r=>toast(r===true?'Sparad för alla som spelar via länken ✓':r===null?'Sparad på den här enheten. Öppna spelet via claude.ai-länken för att spara för alla.':r==='quota_exceeded'?'Sparad här, men databasen är full':'Sparad på den här enheten (bara ägaren kan spara för alla)',3600)); }
 function edTest(){ const L=levelFromDoc(edClean(ed.doc),{pack:'test',medal:null,stuck:ed.doc.stuck});
   ed.cam={x:cam.x,y:cam.y,sc:SC}; ed.ptrs.clear(); ed.pinch=null; ed.drag=null; edTesting=true; zoom=0.86; SC=SC0*zoom;
   document.body.classList.remove('editing'); document.body.classList.add('testing'); loadLevel(-1,L); }
@@ -1924,6 +1954,7 @@ function edPasteGo(){ let d; try{ d=JSON.parse($('edCode').value.trim()); }catch
   $('edMore').classList.remove('show'); edStart(doc,built?'edit':'mine',true); toast('Banan är inläst – tryck Spara för att behålla den',2600); }
 function edReset(){ const id=ed.doc.id; if(!ORIG[id]||!confirm('Återställa originalbanan? Dina ändringar av den tas bort.')) return;
   const m=edGet('fjadra.edits',{}); delete m[id]; edPut('fjadra.edits',m); const i=LEVELS.findIndex(l=>l.id===id); LEVELS[i]=ORIG[id]; delete ORIG[id];
+  edDb.then(db=>db&&db.collection(EDB_COL).doc(id).delete()).catch(()=>{});
   $('edMore').classList.remove('show'); edStart(edDocOf(LEVELS[i]),'edit',false); toast('Originalbanan är tillbaka',1800); }
 function edDelete(){ const id=ed.doc.id; if(!confirm('Ta bort banan "'+ed.doc.name+'" för alltid?')) return;
   edPut('fjadra.mine',edGet('fjadra.mine',[]).filter(x=>x.id!==id)); const i=LEVELS.findIndex(l=>l.id===id); if(i>=0) LEVELS.splice(i,1);
@@ -1935,7 +1966,7 @@ $('edTest').onclick=()=>edTest(); $('edSave').onclick=()=>edSave(); $('edMoreB')
 $('edZin').onclick=()=>edZoom(1.4); $('edZout').onclick=()=>edZoom(1/1.4); $('edOpt').onclick=()=>edOpt();
 document.querySelectorAll('#ed [data-tool]').forEach(b=>b.onclick=()=>edTool(b.dataset.tool));
 $('edMoreOk').onclick=edMoreDone; $('edSplitB').onclick=()=>{ edMoreDone(); edSplit(); }; $('edExtendB').onclick=()=>{ edMoreDone(); edExtend(); };
-$('edCopyB').onclick=edCopy; $('edPasteB').onclick=edPasteOpen; $('edCodeGo').onclick=edPasteGo; $('edReset').onclick=edReset; $('edDelete').onclick=edDelete;
+$('edCopyB').onclick=edCopy; $('edDlAll').onclick=edDownloadAll; $('edPasteB').onclick=edPasteOpen; $('edCodeGo').onclick=edPasteGo; $('edReset').onclick=edReset; $('edDelete').onclick=edDelete;
 $('bEdBack').onclick=()=>edBack(); $('bToEd').onclick=()=>edBack();
 
 // ---------- audio ----------
