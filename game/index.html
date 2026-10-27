@@ -582,8 +582,8 @@ function mkTrack(lid){ const T={P:[[-6,lid],[-6,0],[0,0]],R:[],A:[],parts:[[0,0]
   T.waves=(n,w,h)=>T.fn(n*w,x=>h*0.5*(1-Math.cos(2*Math.PI*x/w)));
   T.loop=()=>{ const t=loopRide(0,4.6,T.Y), cx=T.X+0.3-t.lip, lr=loopRide(cx,4.6,T.Y); T.add(lr.ground.slice(2)); T.R.push(...lr.rings); T.A.push(lr.top); T.flat(4); };
   // planka med ovansidan från (x0,y0) till (x1,y1), tjockleken under
-  T.plank=(x0,y0,x1,y1,th)=>{ th=th||0.3; const dx=x1-x0, dy=y1-y0, L=Math.hypot(dx,dy), nx=-dy/L*th, ny=dx/L*th;
-    T.R.push({style:'wood',pts:[[x0,y0],[x1,y1],[x1-nx,y1-ny],[x0-nx,y0-ny]].map(p=>[+p[0].toFixed(3),+p[1].toFixed(3)])}); };
+  T.plank=(x0,y0,x1,y1,th,st)=>{ th=th||0.3; const dx=x1-x0, dy=y1-y0, L=Math.hypot(dx,dy), nx=-dy/L*th, ny=dx/L*th;
+    T.R.push({style:st||'wood',pts:[[x0,y0],[x1,y1],[x1-nx,y1-ny],[x0-nx,y0-ny]].map(p=>[+p[0].toFixed(3),+p[1].toFixed(3)])}); };
   T.log=(dx,r)=>T.R.push(log(T.X+dx,T.Y-0.04,r||0.28));
   T.end=(flowerDx,tail)=>{ const fx=T.X+flowerDx; T.flat(tail); T.P.push([T.X,lid]); return [fx,T.Y]; };
   return T; }
@@ -959,9 +959,80 @@ function finishLevel(l){ l.segs=buildSegs(l.rings);
 // banfil från editorn → bana (egen kopia; fält som banfilen saknar tas från base)
 function levelFromDoc(d,base){ const c=JSON.parse(JSON.stringify(d)); const l=Object.assign({killers:[],hint:'',stuck:''},base||{},c);
   delete l.v; delete l.segs; delete l.vis; for(const r of l.rings) if(!r.style) delete r.style; return finishLevel(l); }
+
+// ================= SKILL-DELAR =================
+// Marcus: "längre, mycket mer varierat, mycket skill – man ska behöva hänga, trials". Varje bana han inte själv ändrat får en
+// ny skill-del FÖRE originalet (startar längre till vänster och kör in i den gamla banan), eller EFTER när banans början
+// är ett vertikalt pussel. Byggstenarna nedan är trials/Elma-hinder; varje bana får sin egen mix (SKILL nedan).
+function skillKit(T){
+  const r=v=>+v.toFixed(3);
+  T.ledge=(h,run)=>{ T.flat(run||4.5); T.add([[T.X+0.06,T.Y+h*0.55],[T.X+0.12,T.Y+h-0.08],[T.X+0.26,T.Y+h],[T.X+0.5,T.Y+h]]); };   // kant att wheelie/hoppa upp på
+  T.hang=(n,h,run)=>{ for(let k=0;k<n;k++) T.ledge(h,run); T.star(-0.4); T.flat(4); };       // trials-trappa: kort ansats, hopp + häng i kanten med bromsen
+  T.drop=h=>{ T.flat(1.5); T.add([[T.X+0.2,T.Y-0.25],[T.X+0.32,T.Y-h*0.55]]); T.curve([[2.2,-h*0.3],[5,-h*0.42],[8,-h*0.45]],0.35); };   // stup ner på en landningsbacke
+  T.notch=(w,h)=>{ T.flat(4); T.add([[T.X+0.05,T.Y-1.6],[T.X+w-0.05,T.Y-1.6],[T.X+w,T.Y+h-0.1],[T.X+w+0.15,T.Y+h],[T.X+w+0.5,T.Y+h]]); T.flat(3); };   // springa: framhjulet ner, lyft ut
+  T.pit=(w,d)=>{ const x0=T.X; T.curve([[w*0.2,-d*0.4],[w*0.38,-d*0.92],[w*0.5,-d],[w*0.62,-d*0.92],[w*0.8,-d*0.4],[w,0]],0.3); T.A.push([r(x0+w*0.5),r(T.Y-d+0.75)]); };   // grop: pumpa dig upp
+  T.hill=h=>{ T.ease(h*3.4,h); T.flat(1.5); T.star(-0.75); T.ease(h*2.6,-h); };   // brant kulle upp och ner
+  T.kicker=(w,d)=>{ T.curve([[3,0.15],[5,0.6],[6,0.95]],0.25); const gx=T.X; T.curve([[1,-0.6],[w*0.3,-d],[w*0.7,-d],[w-1,-0.6],[w,-0.95]],0.3); T.A.push([r(gx+w*0.5),r(T.Y+2.7)]); };   // hopp, stjärna i luften
+  T.speedLoop=()=>{ T.ease(16,-5); T.flat(4); T.loop(); };
+  T.logs=(n,gap,rr)=>{ for(let k=0;k<n;k++) T.log(3+k*gap,rr); T.star(3+gap*(n-1)/2,1.6); T.flat(4+n*gap); };
+  T.stoneSteps=(n,h,w)=>{ const x0=T.X+3, y0=T.Y; for(let k=1;k<=n;k++) T.R.push(rect(r(x0+(k-1)*w),r(y0-0.1),r(x0+k*w),r(y0+k*h),'stone')); T.A.push([r(x0+(n-0.5)*w),r(y0+n*h+0.75)]); T.flat(3+n*w+6); };
+  T.crates=(n,h,w)=>{ h=h||0.75; w=w||1.7; const x0=T.X+3, y0=T.Y-0.02; for(let k=1;k<=n;k++) for(let j=0;j<k;j++) T.R.push(rect(r(x0+(k-1)*w),r(y0+j*h),r(x0+k*w),r(y0+(j+1)*h),'crate')); T.A.push([r(x0+(n-0.5)*w),r(y0+n*h+0.75)]); T.flat(3+n*w+6); };
+  T.lowRoof=(L,clear,bump)=>{ const x0=T.X, y0=T.Y; T.fn(L,x=>bump*Math.sin(Math.PI*x/L)); const u=y0+clear+bump*0.6;
+    T.R.push({pts:[[x0+1,u],[x0+L-1,u],[x0+L,u+1.2],[x0+L-1,u+2.4],[x0+1,u+2.4],[x0,u+1.2]].map(q=>[r(q[0]),r(q[1])])}); T.A.push([r(x0+L/2),r(y0+bump+0.75)]); };   // lågt tak över en puckel
+  T.stairs=(n,L,g,rs,st,d)=>{ const xr=T.X, y0=T.Y, span=n*L+(n-1)*g, Rr=n*rs+(n-1)*st;   // plankstege uppför över en ravin
+    T.curve([[span*0.15,-d*0.12],[span*0.38,-d*0.55],[span*0.6,-d*0.92],[span*0.75,-d],[span*0.88,-d]],0.35);
+    T.add([[xr+span*0.88+0.3,y0-d],[xr+span-0.4,y0+Rr-0.4],[xr+span-0.1,y0+Rr-0.05],[xr+span+0.3,y0+Rr]]);
+    let px=xr-0.5, py=y0+0.02; for(let k=0;k<n;k++){ T.plank(px,py,px+L,py+rs); if(k===(n>>1)||k===n-1) T.A.push([r(px+L/2),r(py+rs/2+0.75)]); px+=L+g; py+=rs+st; } T.flat(6); };
+  T.beams=(n,L,g,rs,d)=>{ const xr=T.X, y0=T.Y, span=n*L+(n-1)*g, Rr=n*rs;   // stålbalkar över en ravin, mjuk utväg till höger
+    let px=xr-0.4, py=y0+0.02; for(let k=0;k<n;k++){ T.plank(px,py,px+L,py+rs,0.28,'steel'); if(k===n-2) T.A.push([r(px+L/2),r(py+rs/2+0.75)]); px+=L+g; py+=rs; }
+    T.curve([[1.2,-d*0.5],[2.6,-d],[span*0.5,-d],[span+6,Rr-0.2],[span+9,Rr]],0.35); T.flat(4); };
+  T.stepsDown=(n,L,g,dr,st)=>{ const x0=T.X, y0=T.Y; let px=x0-0.4, py=y0+0.02;   // plankor som trappsteg nerför, marken under följer med
+    for(let k=0;k<n;k++){ T.plank(px,py,px+L,py-dr); if(k===n-2) T.A.push([r(px+L/2),r(py-dr/2+0.75)]); px+=L+g; py-=dr+st; }
+    const span=px-x0+1, drop=y0-py+0.3; T.curve([[1.2,-0.4],[3,-2.2],[span*0.45,-drop-0.6],[span*0.8,-drop-0.4],[span+4,-drop]],0.35); T.flat(4); };
+  return T; }
+// skill-del före banan: pennan bygger från x=0, sedan flyttas allt så att delen slutar precis där banans vänstra vägg började
+function addIntro(l,recipe,hint){ const T=skillKit(mkTrack(TOP)); T.flat(6); recipe(T); T.flat(6);
+  const p0=l.rings[0].pts, xw=p0[1][0], yw=p0[1][1], dx=xw-T.X, dy=yw-T.Y, sh=q=>[+(q[0]+dx).toFixed(3),+(q[1]+dy).toFixed(3)];
+  const sec=T.P.map(sh); let hi=-1e9; for(const q of sec.slice(1)) hi=Math.max(hi,q[1]); sec[0]=[sec[0][0],Math.max(p0[0][1],hi+12)];
+  l.rings[0]={...l.rings[0],pts:[...sec,...p0.slice(2)]}; l.rings.push(...T.R.map(rg=>({...rg,pts:rg.pts.map(sh)})));
+  l.apples=[...T.A.map(a=>[...sh(a),...a.slice(2)]),...l.apples]; l.start=sh([2,0]); l.hint=hint+' '+(l.hint||''); return T.X; }
+// skill-del efter banan (vertikala pussel): gamla blomman blir en stjärna, ny blomma sist
+function addOutro(l,recipe,hint){ const T=skillKit(mkTrack(TOP)); T.flat(4); recipe(T); T.flat(4); const fx=T.X+5; T.flat(12);
+  const p0=l.rings[0].pts, n=p0.length, xe=p0[n-2][0], ye=p0[n-2][1], sh=q=>[+(q[0]+xe).toFixed(3),+(q[1]+ye).toFixed(3)];
+  const sec=T.P.slice(3).map(sh); let hi=-1e9; for(const q of sec) hi=Math.max(hi,q[1]);
+  l.rings[0]={...l.rings[0],pts:[...p0.slice(0,n-1),...sec,[sec[sec.length-1][0],Math.max(p0[n-1][1],hi+12)]]}; l.rings.push(...T.R.map(rg=>({...rg,pts:rg.pts.map(sh)})));
+  l.apples=[...l.apples,[l.flower[0],l.flower[1]+0.75],...T.A.map(a=>[...sh(a),...a.slice(2)])]; l.flower=sh([fx,0]); l.hint=(l.hint||'')+' '+hint; return T.X; }
+const SKILL={
+  'fjadra-p3-01':['Ny början: gupp, stockar, en kant, en brant kulle och ett hopp.',T=>{ T.waves(2,7,0.8); T.logs(3,4,0.25); T.ledge(0.5); T.flat(5); T.hill(2.5); T.flat(6); T.kicker(9,1.6); }],
+  'fjadra-p3-02':['Ny början: brant kulle, stentrappa, stup, en springa och en grop att pumpa sig ur.',T=>{ T.hill(3); T.stoneSteps(3,0.55,2.2); T.drop(2.2); T.notch(1.4,0.3); T.flat(4); T.pit(14,2.8); }],
+  'fjadra-p3-03':['Ny början: två kanter, plankstege över en ravin, stup och stockar.',T=>{ T.ledge(0.6); T.ledge(0.7); T.flat(3); T.stairs(5,3.6,0.6,0.5,0.12,5); T.drop(2.6); T.logs(2,5,0.32); }],
+  'fjadra-p3-04':['Ny början: trials-trappa (hoppa och häng i kanten med bromsen), lådtrappa, springa och en brant kulle.',T=>{ T.hang(3,0.7,3.2); T.crates(3,0.7,1.8); T.notch(1.4,0.4); T.flat(4); T.hill(3); }],
+  'fjadra-p3-10':['Ny början: lågt tak över en puckel, stålbalkar över en ravin, stup och en djup grop.',T=>{ T.lowRoof(16,3.1,0.8); T.flat(4); T.beams(4,3.4,0.7,0.35,4); T.drop(2.5); T.flat(3); T.pit(14,3); }],
+  'fjadra-p3-12':['Ny början: vågor, hopp, stentrappa, stup in i en loop och en springa.',T=>{ T.waves(3,8,1.2); T.flat(4); T.kicker(10,2); T.stoneSteps(3,0.65,2.0); T.drop(2.4); T.speedLoop(); T.notch(1.4,0.5); }],
+  'fjadra-p3-13':['Ny början: loop, brant kulle, plankstege, trials-trappa, stup och vågor.',T=>{ T.speedLoop(); T.hill(3.5); T.flat(4); T.stairs(5,3.5,0.6,0.55,0.12,6); T.hang(2,0.8,3); T.drop(3); T.waves(2,10,1.5); }],
+  'fjadra-p3-14':['Ny början: två branta kullar, lådtrappa, stup, lågt tak och ett hopp.',T=>{ T.hill(4); T.flat(3); T.hill(3); T.crates(4,0.7,1.8); T.drop(3); T.flat(3); T.lowRoof(14,3.0,1); T.flat(4); T.kicker(10,2); }],
+  'fjadra-p3-15':['Ny början: två stup, plankor nerför, en djup grop och en trials-trappa.',T=>{ T.drop(3); T.flat(3); T.drop(2.5); T.flat(3); T.stepsDown(4,3.4,0.7,0.4,0.4); T.pit(16,3.2); T.hang(3,0.75,3); }],
+  'fjadra-p3-16':['Ny början: lågt tak, springa, stålbalkar, stup och lådtrappa.',T=>{ T.lowRoof(18,3.1,0.9); T.notch(1.4,0.4); T.beams(3,3.6,0.6,0.3,4); T.drop(2.5); T.crates(3,0.7,1.8); }],
+  'fjadra-p3-17':['Ny början: lång plankstege, vågor, hopp, trials-trappa och en loop.',T=>{ T.stairs(6,3.6,0.6,0.55,0.12,6); T.waves(2,9,1.2); T.flat(3); T.kicker(11,2.2); T.hang(3,0.8,3); T.speedLoop(); }],
+  'fjadra-p3-18':['Ny början: stentrappa, stup, djup grop, springa, stockar och en brant kulle.',T=>{ T.stoneSteps(4,0.7,2); T.drop(2.8); T.flat(3); T.pit(15,3.2); T.notch(1.5,0.5); T.logs(3,4,0.35); T.hill(3.5); }],
+  'fjadra-p3-21':['Ny början: lågt tak, lång trials-trappa, stålbalkar, stup och ett hopp.',T=>{ T.lowRoof(20,3.0,1.1); T.hang(4,0.8,2.8); T.beams(5,3.2,0.7,0.4,5); T.drop(3); T.flat(3); T.kicker(11,2.2); }],
+  'fjadra-p3-22':['Ny början: lådtrappa, stup, hög plankstege, trials-trappa och en djup grop.',T=>{ T.crates(4,0.72,1.7); T.drop(3); T.flat(3); T.stairs(6,3.4,0.6,0.6,0.15,6); T.hang(3,0.85,2.8); T.pit(16,3.4); }],
+  'fjadra-p3-24':['Ny början: lågt tak, springa, lång trials-trappa, stålbalkar och stup.',T=>{ T.lowRoof(16,3.0,1); T.notch(1.5,0.5); T.hang(4,0.8,2.8); T.beams(4,3.4,0.7,0.35,5); T.drop(3); }],
+  'fjadra-p3-26':['Ny början: loop, plankstege, stort stup, lådtrappa, hopp och stockar.',T=>{ T.speedLoop(); T.stairs(6,3.6,0.6,0.5,0.12,6); T.drop(3.5); T.flat(3); T.crates(4,0.72,1.7); T.kicker(12,2.4); T.logs(3,4.5,0.35); }],
+  'fjadra-p3-28':['Ny början: vågor, loop, brant kulle, plankstege, trials-trappa, stup och hopp.',T=>{ T.waves(3,9,1.5); T.speedLoop(); T.hill(4); T.flat(3); T.stairs(6,3.5,0.6,0.55,0.12,6); T.hang(4,0.85,2.8); T.drop(3.5); T.flat(3); T.kicker(12,2.4); }],
+  'fjadra-p3-29':['Ny början: lång trials-trappa, springa, stålbalkar, stup, lådtrappa, grop och loop.',T=>{ T.hang(5,0.85,2.7); T.notch(1.5,0.5); T.beams(5,3.2,0.7,0.4,5); T.drop(3.5); T.flat(3); T.crates(5,0.7,1.7); T.pit(16,3.5); T.speedLoop(); }],
+};
+const SKILL_END={
+  'fjadra-p3-20':['Sen vidare: trials-trappa, lågt tak, stålbalkar, stup och lådtrappa fram till blomman.',T=>{ T.hang(3,0.8,2.8); T.lowRoof(16,3,1); T.flat(4); T.beams(4,3.4,0.7,0.35,4); T.drop(3); T.crates(3,0.7,1.8); }],
+  'fjadra-p3-24':null,
+  'fjadra-p3-25':['Sen vidare: grop, trials-trappa, plankstege, stup och hopp fram till blomman.',T=>{ T.pit(15,3); T.hang(4,0.8,2.8); T.stairs(5,3.5,0.6,0.55,0.12,6); T.drop(3); T.flat(3); T.kicker(11,2.2); }],
+};
+function addSkill(l){ const a=SKILL[l.id], b=SKILL_END[l.id]; let len=0;
+  if(a) len+=addIntro(l,a[1],a[0]); if(b) len+=addOutro(l,b[1],b[0]); if(!len) return;
+  l.medal=[l.medal[0]+Math.round(len/4.5),l.medal[1]+Math.round(len/3)]; l.skill=true; }
 function makeLevels(){
   let L=LV3.map(f=>f());
-  for(const l of L){ l.pack=3; l.medal=MEDALS3[l.id]||[20,35]; }
+  for(const l of L){ l.pack=3; l.medal=MEDALS3[l.id]||[20,35]; if(!EDITS[l.id]) addSkill(l); }
   L=L.map(l=>EDITS[l.id]?levelFromDoc(EDITS[l.id],{pack:l.pack,medal:l.medal,stuck:l.stuck}):l);
   for(const id in EDITS) if(!L.some(l=>l.id===id)) L.push(levelFromDoc(EDITS[id],{pack:3,medal:EDITS[id].medal||[30,50]}));
   for(const l of L) if(!l.segs) finishLevel(l);
