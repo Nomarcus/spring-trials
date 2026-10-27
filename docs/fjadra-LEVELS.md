@@ -35,7 +35,7 @@ Menyn → pennan på en bana (eller *Mina banor* → **＋ Ny bana**). Koden lig
 - **Baka in i spelet:** editorn → ⋯ → *Kopiera bankod*. Spara koden i en fil och kör `python3 tools/fjadra/import_level.py bana.json` (ID för en inbyggd bana ersätter den, `mine-…` blir en ny bana `fjadra-p3-NN` sist). Koden hamnar i `EDITS` i `src/levels.js`. Bygg och kör testboten innan det släpps.
 
 ## Banlista
-Banpaket 1 och 2 är borttagna (Marcus beslut). Spelet har bara banpaket 3 (30 banor). Index nedan är ordningen i `makeLevels()`; i tabellen står de gamla indexen 30–59, dra av 30.
+Banpaket 1 och 2 är borttagna (Marcus beslut). Spelet har bara banpaket 3 (32 banor). I tabellen står de gamla indexen 30–59: dra av 30 för bana 1–3 och dra av 28 från bana 4 (Bakhjulstrappan) och framåt, eftersom de två Elma-banorna (ID 31 och 32) ligger på plats 4 och 5.
 Stenhyllans geometri finns kvar i `tools/fjadra/test/hang.js` som testbana för hänget.
 
 ### Banpaket 3 (30 banor efter skisserna i `fjadra_30_banor.zip`, lätt → svår)
@@ -46,6 +46,8 @@ Index fortsätter efter paket 2. Varje bana lär ut en teknik. Kolumnen *Bara ga
 | 30 | fjadra-p3-01 | Första turen (gas) | meadow | 3 | 16/26 | ✅ 11,4 s | klarar (meningen) |
 | 31 | fjadra-p3-02 | Mjuka backen (broms + luta bak) | meadow | 1 | 14/24 | ✅ 9,4 s | klarar |
 | 32 | fjadra-p3-03 | Lutbacken (luta fram) | sunset | 2 | 24/38 | ✅ 17,5 s | kraschar |
+| (3) | fjadra-p3-31 | Plankstegen (Elma: plankstege över ravin, loop, stockar, vågor, ö) | meadow | 8 | 75/105 | ✅ del för del, 64 s | 366 m, `parts` |
+| (4) | fjadra-p3-32 | Elmadalen (Elma: gungdal, plankor nerför, dubbelloop, grotta, hopp) | sunset | 8 | 85/120 | ✅ del för del, 82 s | 365 m, `parts` |
 | 33 | fjadra-p3-04 | Bakhjulstrappan (wheelie) | meadow | 2 | 12/20 | ✅ 7,9 s | fastnar/kraschar |
 | 34 | fjadra-p3-05 | Pumpdalen (pumpa) | sunset | 2 | 13/22 | ✅ 8,3 s | kraschar |
 | 35 | fjadra-p3-06 | Lilla gapet (hopp) | meadow | 1 | 11/18 | ✅ 7,8 s | klarar |
@@ -105,3 +107,9 @@ Byggd efter `docs/reference/marathon/` (10 delar, 48 punkter): fem klättringsde
 - Stjärnorna ligger där man inte kan missa dem (platåer, tunnlar, fickor, tak-körning) – inga stjärnor i looparna, så en misslyckad loop tvingar inte fram omstart av hela banan.
 - `l.parts` = viloplatåerna mellan delarna. `node tools/fjadra/test/run_marathon.js [del…]` kör testboten på en del i taget (startar stilla på platån, ska nå nästa med alla stjärnor däremellan; bara segmenten runt delen används så att det går fort).
 - Prestanda: ca 5 200 segment, ~35 ms fysik per spelsekund på en dator (övriga banor 7–13 ms).
+
+## Elma-banorna (bana 4 och 5)
+Marcus ville ha "mycket mer Elasto": längre banor med mycket upp och ner, plankor, loopar och hinder (som hans egna editorbanor). Båda byggs med `mkTrack()` i `levels.js`, en penna som ritar marken framåt och lägger till plankor (`T.plank`), stockar (`T.log`), loopar (`T.loop`) och stjärnor.
+- **Plankstegen:** sex lutande plankor med 0,6 m glipor går som en trappa upp över en 7 m djup ravin. Ravinens vänstersida är mjuk så att man kan köra upp igen efter ett fall. Sedan kommer en 10 m nerförsbacke in i en loop, en 8 m klättring, stockar, tre stora vågor (3,2 m) och ett hopp upp på en ö.
+- **Elmadalen:** först en 7 m djup gungdal. Sedan fem plankor som trappsteg nerför (marken under följer med), dubbelloop, 8 m klättring, en grotta under en sned stenhylla, hopp över en svacka, stockar och vågor.
+- Verifiering: `LEVEL=fjadra-p3-31 node tools/fjadra/test/run_marathon.js` kör banan del för del (`parts`).

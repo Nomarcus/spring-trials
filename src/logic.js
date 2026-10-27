@@ -4,7 +4,7 @@ const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
 const $=id=>document.getElementById(id);
 let W=0,Hh=0,DPR=1,SC=40,SC0=40,zoom=0.86;
 let li=0, lvl=null, bike=null, got=[], state='menu', T=0, acc=0, endTimer=0, flagWarn=0, parts=[], rag=null, pops=[], shake=0, bloom=0, rec=[], recT=0, ghost=null, BASE_A=1;
-const NEWLV=new Set(['fjadra-pack2-01','fjadra-pack2-08','fjadra-pack2-11','fjadra-p3-01','fjadra-p3-02','fjadra-p3-03','fjadra-p3-04','fjadra-p3-05','fjadra-p3-06','fjadra-p3-07','fjadra-p3-08','fjadra-p3-09','fjadra-p3-10','fjadra-p3-11','fjadra-p3-12','fjadra-p3-13','fjadra-p3-14','fjadra-p3-15','fjadra-p3-16','fjadra-p3-17','fjadra-p3-18','fjadra-p3-19','fjadra-p3-20','fjadra-p3-21','fjadra-p3-22','fjadra-p3-23','fjadra-p3-24','fjadra-p3-25','fjadra-p3-26','fjadra-p3-27','fjadra-p3-28','fjadra-p3-29','fjadra-p3-30']); let curPack=3;
+const NEWLV=new Set(['fjadra-pack2-01','fjadra-pack2-08','fjadra-pack2-11','fjadra-p3-01','fjadra-p3-02','fjadra-p3-03','fjadra-p3-04','fjadra-p3-05','fjadra-p3-06','fjadra-p3-07','fjadra-p3-08','fjadra-p3-09','fjadra-p3-10','fjadra-p3-11','fjadra-p3-12','fjadra-p3-13','fjadra-p3-14','fjadra-p3-15','fjadra-p3-16','fjadra-p3-17','fjadra-p3-18','fjadra-p3-19','fjadra-p3-20','fjadra-p3-21','fjadra-p3-22','fjadra-p3-23','fjadra-p3-24','fjadra-p3-25','fjadra-p3-26','fjadra-p3-27','fjadra-p3-28','fjadra-p3-29','fjadra-p3-30','fjadra-p3-31','fjadra-p3-32']); let curPack=3;
 let STYLE='cartoon'; try{ STYLE=localStorage.getItem('fjadra.style')==='neon'?'neon':'cartoon'; }catch(e){}
 let stuckT=0, stuckCD=0;
 // ghosts are stored per stable level id; old name-keyed ghosts are moved over the first time
