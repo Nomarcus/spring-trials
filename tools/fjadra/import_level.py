@@ -5,7 +5,9 @@
     pbpaste | python3 tools/fjadra/import_level.py -          # eller kommer på stdin
     python3 tools/fjadra/import_level.py bana.json --id fjadra-p3-12   # tvinga ett ID
 
-Bankoden får man i spelet: editorn → ⋯ → Kopiera bankod.
+Bankoden får man i spelet: editorn → ⋯ → Kopiera bankod, eller alla på en gång med "Ladda ner alla ändringar"
+(fil med {"v":1,"edits":[...]}). I claude.ai-länken sparas ändrade banor också i länkens databas (samling "levels",
+dokument {doc, at}); Claude läser den med ArtifactData och lägger in dokumentens doc-fält med det här verktyget.
 - ID för en inbyggd bana (t.ex. fjadra-p3-07): banan byts ut mot den ändrade versionen.
 - Egen bana (ID mine-…): blir en ny bana sist i paketet med nästa lediga ID fjadra-p3-NN.
 Kör sedan python3 tools/fjadra/build.py och testboten på banan.
@@ -21,6 +23,12 @@ def main():
     if '--id' in args: k = args.index('--id'); force = args[k + 1]; del args[k:k + 2]
     raw = sys.stdin.read() if args[0] == '-' else open(args[0], encoding='utf8').read()
     d = json.loads(raw.strip())
+    # en bankod, en fil från "Ladda ner alla ändringar" ({edits:[...]}), eller en lista bankoder
+    docs = d['edits'] if isinstance(d, dict) and 'edits' in d else (d if isinstance(d, list) else [d])
+    if force and len(docs) > 1: sys.exit('--id går bara med en bana')
+    for doc in docs: put(doc, force)
+
+def put(d, force):
     for k in ('rings', 'start', 'flower', 'apples'):
         if k not in d: sys.exit('bankoden saknar ' + k)
     src = open(LV, encoding='utf8').read()
