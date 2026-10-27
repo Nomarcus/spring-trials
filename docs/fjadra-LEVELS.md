@@ -115,3 +115,9 @@ Marcus ville ha "mycket mer Elasto": längre banor med mycket upp och ner, plank
 - **Plankstegen:** sex lutande plankor med 0,6 m glipor går som en trappa upp över en 7 m djup ravin. Ravinens vänstersida är mjuk så att man kan köra upp igen efter ett fall. Sedan kommer en 10 m nerförsbacke in i en loop, en 8 m klättring, stockar, tre stora vågor (3,2 m) och ett hopp upp på en ö.
 - **Elmadalen:** först en 7 m djup gungdal. Sedan fem plankor som trappsteg nerför (marken under följer med), dubbelloop, 8 m klättring, en grotta under en sned stenhylla, hopp över en svacka, stockar och vågor.
 - Verifiering: `LEVEL=fjadra-p3-31 node tools/fjadra/test/run_marathon.js` kör banan del för del (`parts`).
+
+## Marcus egna versioner (inbakade i EDITS)
+Marcus spelade och ändrade 11 banor i editorn och sparade dem via länkens databas. De är inbakade i `EDITS` i `levels.js` precis som han gjorde dem: Pumpdalen, Lilla gapet, Halfpipe-gungan, Första loopen, Grytet, Fram och tillbaka, Dubbelloopen, Rördrömmen, Maraton, Plankstegen och Elmadalen.
+- Medaljtiderna är skalade efter den nya banlängden. De är inte testade med boten, eftersom Marcus testar själv.
+- Pumpdalen avslutas avsiktligt på ett snett tak: en blå stjärna vänder tyngden, och stjärnan och blomman sitter under taket.
+- `parts` för Maraton, Plankstegen och Elmadalen följer inte med i EDITS, så `run_marathon.js` fungerar inte på de versionerna.
