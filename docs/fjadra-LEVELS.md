@@ -121,3 +121,14 @@ Marcus spelade och ändrade 11 banor i editorn och sparade dem via länkens data
 - Medaljtiderna är skalade efter den nya banlängden. De är inte testade med boten, eftersom Marcus testar själv.
 - Pumpdalen avslutas avsiktligt på ett snett tak: en blå stjärna vänder tyngden, och stjärnan och blomman sitter under taket.
 - `parts` för Maraton, Plankstegen och Elmadalen följer inte med i EDITS, så `run_marathon.js` fungerar inte på de versionerna.
+
+## Skill-delar (banor Marcus inte ändrat)
+Marcus ville ha längre, mer varierade banor med mycket skill. Varje inbyggd bana som inte finns i `EDITS` får en ny del före originalet (`SKILL` i `levels.js`, `addIntro`). Delen startar längre till vänster och kör in där banans vänstra vägg låg. Labyrinten och Fritt fall får i stället en del efter (`SKILL_END`, `addOutro`), där gamla blomman blir en stjärna. Spiralschaktet är orört, eftersom blomman sitter inne i spiralen.
+- Byggstenar (`skillKit`):
+  - `hang`: trials-trappa med kort ansats, hopp och häng i kanten med bromsen.
+  - `ledge`, `notch` (springa), `drop` (stup) och `pit` (grop att pumpa sig ur).
+  - `hill`, `kicker` (hopp med stjärna i luften) och `speedLoop`.
+  - `logs`, `stoneSteps`, `crates` (lådtrappa) och `lowRoof` (lågt tak över en puckel).
+  - `stairs` (plankstege över ravin), `beams` (stålbalkar över ravin) och `stepsDown`.
+- Medaljtiderna ökas med delens längd (guld +längd/4,5 s, silver +längd/3 s). Banorna är inte testade med boten; Marcus testar själv.
+- Ändrar Marcus en sådan bana i editorn sparas hela banan, inklusive skill-delen, i EDITS, och `addSkill` hoppar över den.
