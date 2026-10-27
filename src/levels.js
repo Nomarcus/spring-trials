@@ -18,6 +18,24 @@ var P23={cx:76,cy:6.5,h:19,s:12.6};
 var P19={c1:48,c2:112,f2:-7};   // c2: andra loopen måste ligga efter nerförsbacken (A.end+31) plus en platt sträcka
 var P13={cx:66,cy:6.5,R:4.6,kx:63.5,kr:3.5,ka:60};
 // ================= BANPAKET 3 (30 banor, lätt → svår) =================
+// Byggsats för långa Elma-banor: en "penna" (X,Y) ritar marken framåt; plankor, stockar, loopar och stjärnor läggs till på vägen.
+// parts = viloställen för testboten (tools/fjadra/test/run_marathon.js kör banan del för del).
+function mkTrack(lid){ const T={P:[[-6,lid],[-6,0],[0,0]],R:[],A:[],parts:[[0,0]],X:0,Y:0};
+  T.add=pts=>{ for(const p of pts) T.P.push([+p[0].toFixed(3),+p[1].toFixed(3)]); const q=pts[pts.length-1]; T.X=q[0]; T.Y=q[1]; };
+  T.curve=(rel,st)=>T.add(cr([[T.X,T.Y],...rel.map(([dx,dy])=>[T.X+dx,T.Y+dy])],st||0.35).slice(1));
+  T.fn=(L,f,st)=>{ st=st||0.4; const x0=T.X,y0=T.Y,pts=[]; let x=st; for(;x<L-1e-6;x+=st) pts.push([x0+x,y0+f(x)]); pts.push([x0+L,y0+f(L)]); T.add(pts); };
+  T.ease=(L,dy)=>T.fn(L,x=>dy*(0.5-0.5*Math.cos(Math.PI*x/L)));
+  T.flat=L=>T.add([[T.X+L,T.Y]]);
+  T.star=(dx,dy,g)=>{ const a=[T.X+(dx||0),T.Y+(dy==null?0.75:dy)]; if(g) a.push(g); T.A.push(a); };
+  T.part=()=>T.parts.push([T.X,T.Y]);
+  T.waves=(n,w,h)=>T.fn(n*w,x=>h*0.5*(1-Math.cos(2*Math.PI*x/w)));
+  T.loop=()=>{ const t=loopRide(0,4.6,T.Y), cx=T.X+0.3-t.lip, lr=loopRide(cx,4.6,T.Y); T.add(lr.ground.slice(2)); T.R.push(...lr.rings); T.A.push(lr.top); T.flat(4); };
+  // planka med ovansidan från (x0,y0) till (x1,y1), tjockleken under
+  T.plank=(x0,y0,x1,y1,th)=>{ th=th||0.3; const dx=x1-x0, dy=y1-y0, L=Math.hypot(dx,dy), nx=-dy/L*th, ny=dx/L*th;
+    T.R.push({style:'wood',pts:[[x0,y0],[x1,y1],[x1-nx,y1-ny],[x0-nx,y0-ny]].map(p=>[+p[0].toFixed(3),+p[1].toFixed(3)])}); };
+  T.log=(dx,r)=>T.R.push(log(T.X+dx,T.Y-0.04,r||0.28));
+  T.end=(flowerDx,tail)=>{ const fx=T.X+flowerDx; T.flat(tail); T.P.push([T.X,lid]); return [fx,T.Y]; };
+  return T; }
 const LV3=[];
 // 01 Första turen — gas: platt start, mjuka gupp, stjärnor på marken
 LV3.push(()=>{ const bump=(x,c,h,w)=>Math.abs(x-c)<w? h*0.5*(1+Math.cos(Math.PI*(x-c)/w)) : 0;
@@ -38,6 +56,50 @@ LV3.push(()=>{ const s=cr([[-4,0],[2,0],[5,0.35],[8,1.6],[10,3.0],[11.4,4.0],[12
     stuck:'Tippar du bakåt? Håll ↻ hela vägen upp och gasa lugnare.',
     rings:[{pts:[[-4,TOP],...s,[74,TOP]]}],
     apples:[[13.2,5.2],[38.6,7.2]], killers:[], flower:[69,0.3], start:[1,0]}; });
+// 04 Plankstegen — Elma: pumpgupp, plankstege upp över en ravin, nerför in i en loop, stockar, stora vågor och ett hopp upp på en ö
+LV3.push(()=>{ const T=mkTrack(150);
+  T.flat(8); T.waves(3,6,0.7); T.flat(3); T.star(); T.flat(10); T.part();
+  // ravinen: mjuk vänstersida (man kan rulla tillbaka), brant högersida upp till platån; plankstegen går över alltihop
+  const xr=T.X; T.curve([[4,-0.8],[10,-3.2],[16,-5.8],[20,-7],[24,-7]],0.35); T.add([[xr+24.3,-7],[xr+26.3,3.6],[xr+26.6,3.95],[xr+27,4]]);
+  { let px=xr-0.5, py=0.02; const L=4.07, g=0.6, rs=0.563, st=0.12;
+    for(let k=0;k<6;k++){ T.plank(px,py,px+L,py+rs); if(k===2||k===5) T.A.push([+(px+L/2).toFixed(2),+(py+rs/2+0.75).toFixed(2)]); px+=L+g; py+=rs+st; } }
+  T.flat(10); T.part();
+  T.ease(30,-10); T.flat(8); T.loop(); T.flat(6); T.part();
+  T.ease(40,8); T.flat(4); for(let k=0;k<3;k++) T.log(5+7*k); T.star(8.5); T.flat(24); T.part();
+  { const w0=T.X, y0=T.Y; T.waves(3,20,3.2); T.A.push([w0+30,y0+3.2+0.75]); } T.flat(10); T.part();
+  T.ease(20,-6); T.flat(8);
+  // hopp: ramp, ö med stjärna, ner i en svacka (man kan köra igenom den om man missar ön)
+  T.curve([[3,0.15],[5,0.6],[6,0.95]],0.25); const kx=T.X, ky=T.Y;
+  T.R.push(blob(kx+7,ky+0.05,6.5,1.2,7)); T.A.push([kx+7,ky+0.3+0.75]);
+  T.curve([[1,-0.6],[2.5,-1.9],[11,-2.0],[15,-1.2],[18,-0.95]],0.35); T.flat(6); T.star(); T.flat(4);
+  const fl=T.end(10,16);
+  return {id:'fjadra-p3-31', name:'Plankstegen', theme:'meadow', parts:T.parts, top:150,
+    hint:'Elma-bana! Ta fart och kör uppför plankstegen över ravinen. Sen nerför, in i loopen, över stockarna och hoppa upp på ön.',
+    stuck:'Ramlade du ner i ravinen? Vänd (pilknappen), kör upp för den mjuka sidan, vänd igen och ta mer fart mot plankorna.',
+    rings:[{pts:T.P}, ...T.R], apples:T.A, killers:[], flower:fl, start:[2,0]}; });
+// 05 Elmadalen — Elma: djup gungdal, plankor nerför som trappsteg, dubbelloop, grotta med lutande tak, hopp över en svacka, stockar
+LV3.push(()=>{ const T=mkTrack(150);
+  T.flat(10); const d0=T.X; T.curve([[4,-0.6],[8,-3.2],[11,-6],[14,-7],[17,-7]],0.35); T.A.push([d0+15.5,-7+0.75]);
+  T.curve([[3,0.8],[6,3.2],[9,5.4],[12,6.1],[14,6.1]],0.35); T.flat(8); T.part();
+  // plankor nerför: varje planka lutar nedåt och nästa ligger ett trappsteg lägre; marken under följer med (ofarligt att ramla)
+  { const x0=T.X, y0=T.Y; const L=3.6, g=0.7, dr=0.45, st=0.4, n=5; let px=x0-0.4, py=y0+0.02;
+    for(let k=0;k<n;k++){ T.plank(px,py,px+L,py-dr); if(k===1||k===3) T.A.push([+(px+L/2).toFixed(2),+(py-dr/2+0.75).toFixed(2)]); px+=L+g; py-=dr+st; }
+    const span=px-x0+1, drop=y0-py+0.3; T.curve([[1.2,-0.4],[3,-2.2],[span*0.45,-drop-0.6],[span*0.8,-drop-0.4],[span+4,-drop]],0.35); }
+  T.flat(10);   // ingen viloplats här: loopen behöver farten från plankorna
+  T.loop(); T.flat(6); T.loop(); T.flat(8); T.part();
+  T.ease(40,8); T.flat(8); T.part();
+  // grotta: en ö ovanför vägen med snett tak (som en stenhylla), stjärna där taket är lägst
+  { const x0=T.X, y0=T.Y; T.R.push({pts:[[x0+2,y0+5.6],[x0+22,y0+3.3],[x0+23,y0+3.9],[x0+22,y0+6.2],[x0+2,y0+7.2],[x0+1.2,y0+6.4]]}); T.A.push([x0+19,y0+0.75]); }
+  T.flat(28); T.part();
+  // hopp över en svacka: ramp, landning nerför på andra sidan
+  T.curve([[3,0.15],[5,0.6],[6,0.95]],0.25); { const gx=T.X; T.curve([[1,-0.6],[3,-2.4],[6,-2.6],[8,-1.2],[9.5,-0.4],[11,0.1],[14,-0.3],[20,-0.95]],0.35); T.A.push([gx+10.5,T.Y+1.8]); }
+  T.flat(8); T.part();
+  T.ease(24,-7); T.flat(4); T.log(4,0.3); T.log(11,0.3); T.flat(16); T.waves(2,16,2.6); T.star(-8,3.35); T.flat(6);
+  const fl=T.end(8,14);
+  return {id:'fjadra-p3-32', name:'Elmadalen', theme:'sunset', parts:T.parts, top:150,
+    hint:'Elma-bana! Gunga ner i dalen, hoppa ner för plankorna, susa genom dubbelloopen och in under stenhyllan.',
+    stuck:'Kommer du inte upp ur dalen? Ta full fart nerför och luta framåt på vägen upp.',
+    rings:[{pts:T.P}, ...T.R], apples:T.A, killers:[], flower:fl, start:[2,0]}; });
 // 04 Bakhjulstrappan — wheelie: tre kanter, varje lite högre
 LV3.push(()=>{ const pts=[[-4,TOP],[-4,0]]; let y=0; const steps=[[10,0.6],[19,0.8],[28,1.0]];
   for(const [x,h] of steps){ pts.push([x-0.12,y]); const y1=y+h; pts.push([x,y+0.06],[x,y1-0.1],[x+0.04,y1-0.03],[x+0.12,y1]); y=y1; }
@@ -317,7 +379,7 @@ var LOOPRIDE={};
 const MEDALS3={'fjadra-p3-01':[16,26],'fjadra-p3-02':[14,24],'fjadra-p3-03':[24,38],'fjadra-p3-04':[12,20],'fjadra-p3-05':[13,22],
   'fjadra-p3-06':[11,18],'fjadra-p3-07':[14,24],'fjadra-p3-08':[16,26],'fjadra-p3-09':[11,18],'fjadra-p3-10':[14,22],'fjadra-p3-11':[30,45],'fjadra-p3-12':[15,24],'fjadra-p3-13':[30,45],'fjadra-p3-14':[14,24],'fjadra-p3-15':[11,18],
   'fjadra-p3-16':[30,45],'fjadra-p3-17':[16,26],'fjadra-p3-18':[26,40],'fjadra-p3-19':[36,52],'fjadra-p3-20':[34,50],'fjadra-p3-21':[24,36],'fjadra-p3-22':[24,36],'fjadra-p3-23':[26,40],'fjadra-p3-24':[34,50],'fjadra-p3-25':[40,60],
-  'fjadra-p3-26':[50,75],'fjadra-p3-27':[30,45],'fjadra-p3-28':[50,75],'fjadra-p3-29':[50,75],'fjadra-p3-30':[300,450]};
+  'fjadra-p3-26':[50,75],'fjadra-p3-27':[30,45],'fjadra-p3-28':[50,75],'fjadra-p3-29':[50,75],'fjadra-p3-30':[300,450],'fjadra-p3-31':[75,105],'fjadra-p3-32':[85,120]};
 const slug=n=>n.toLowerCase().replace(/å/g,'a').replace(/ä/g,'a').replace(/ö/g,'o').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 // Ändringar och nya banor från baneditorn som är inbakade i spelet (läggs in med tools/fjadra/import_level.py).
 // Nyckel = ban-ID. En inbyggd bana byts ut mot sin ändrade version, ett okänt ID blir en ny bana sist i paketet.
