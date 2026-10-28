@@ -23,7 +23,8 @@ function lbRender(list,hiT){ const box=$('lbList'); box.innerHTML='';
   list.slice(0,5).forEach((e,i)=>{ const row=document.createElement('div'); row.className='lbr'+(hiT!=null&&Math.abs(e.time-hiT)<0.006?' me':'');
     const a=document.createElement('span'), b=document.createElement('span'); a.textContent=(i+1)+'. '+String(e.name).slice(0,16); b.textContent=fmt(+e.time); row.append(a,b); box.appendChild(row); }); }
 // visas i slutrutan efter mål; är tiden bland de 10 bästa kan man skriva in sitt namn
-async function lbShow(l,t){ if(!l){ lbCtx=null; $('lbBox').style.display='none'; return; }
+// topplistan är avstängd tills ONLINE fylls i (Marcus: "vi skipar topplistan nu")
+async function lbShow(l,t){ if(!l||!onl()){ lbCtx=null; $('lbBox').style.display='none'; return; }
   lbCtx={id:l.id,t,saved:false}; $('lbBox').style.display=''; $('lbForm').style.display='none';
   $('lbTitle').textContent=lbOnline(l.id)?'Leaderboard':'Leaderboard (this device)'; $('lbList').textContent='Loading …';
   const list=await lbGet(l.id); if(!lbCtx||lbCtx.id!==l.id) return; lbRender(list);
