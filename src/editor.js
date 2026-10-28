@@ -32,6 +32,13 @@ function edBoot(){ const edits=edGet('fjadra.edits',{}); let cleaned=false;
   if(cleaned) edPut('fjadra.edits',edits);
   for(const d of edGet('fjadra.mine',[])){ try{ LEVELS.push(edMineLevel(d)); }catch(e){} } }
 
+// ---------- vem får ändra huvudbanorna ----------
+// Bara ägaren (claude.ai-länken: user.isOwner()/canEdit()) ser pennan på huvudbanorna. Alla kan skapa och ändra egna banor.
+// Utanför länken finns ingen inloggning; där kan ägaren slå på det med #admin i adressen (det ändrar ändå bara den enheten).
+let EDIT_MAIN=/[#&?]admin\b/.test(location.hash+location.search);
+const edCanEdit=l=>l.pack==='mine'||EDIT_MAIN;
+(async()=>{ try{ const u=(window.claude&&window.claude.use)?await window.claude.use('user'):null; if(u&&((u.isOwner&&await u.isOwner())||(u.canEdit&&await u.canEdit()))){ EDIT_MAIN=true; if(state==='menu') buildMenu(); } }catch(e){} })();
+
 // ---------- delning via länken ----------
 // I claude.ai-länken har spelet en databas (artifact-capability db, bara ägaren skriver). När en inbyggd bana sparas
 // skrivs den till levels/<banID>, och alla som öppnar länken får den vid start. Claude läser samma databas och bakar in
@@ -57,7 +64,7 @@ async function edDownloadAll(){ const edits=edGet('fjadra.edits',{}), list=Objec
     toast(list.length+' edited levels – send the file to Claude to build them into the game',4200); }catch(e){ if(!(e&&e.code==='declined')) toast('Could not save the file',2400); } }
 
 // ---------- öppna / stänga ----------
-function edOpen(i){ let doc, src;
+function edOpen(i){ let doc, src; if(i!=null&&i>=0&&!edCanEdit(LEVELS[i])) return toast('Only the game owner can edit the main levels. Build your own under My levels!',3200);
   if(i==null||i<0){ const n=LEVELS.filter(l=>l.pack==='mine').length+1; doc=edNewDoc('My level '+n); src='mine'; }
   else { const l=LEVELS[i]; doc=edDocOf(l); src=l.pack==='mine'?'mine':'edit'; }
   edStart(doc,src,i==null||i<0); }
@@ -241,7 +248,7 @@ function edPasteGo(){ let d; try{ d=JSON.parse($('edCode').value.trim()); }catch
   if(!d||!Array.isArray(d.rings)||!d.rings.length||!d.rings.every(r=>r&&Array.isArray(r.pts)&&r.pts.length>=3&&r.pts.every(okPt))||!okPt(d.start)||!okPt(d.flower)||!Array.isArray(d.apples)||!d.apples.every(okPt))
     return toast('That does not look like a level code',2400);
   if(ed.dirty&&!confirm('Replace the level you are working on? Unsaved changes will be lost.')) return;
-  const built=LEVELS.find(l=>l.id===d.id&&l.pack!=='mine');
+  const built=EDIT_MAIN&&LEVELS.find(l=>l.id===d.id&&l.pack!=='mine');   // andra än ägaren: en inklistrad huvudbana blir en egen bana
   const doc={v:1,id:built?d.id:(String(d.id||'').startsWith('mine-')?d.id:'mine-'+Date.now().toString(36)),name:String(d.name||'Loaded level').slice(0,40),theme:ED_THEMES.some(t=>t[0]===d.theme)?d.theme:'meadow',
     hint:String(d.hint||''),stuck:String(d.stuck||''),top:isFinite(d.top)?+d.top:TOP,start:d.start.slice(0,2),flower:d.flower.slice(0,2),
     apples:d.apples.map(a=>ED_DIRS.includes(a[2])?[+a[0],+a[1],a[2]]:[+a[0],+a[1]]),rings:d.rings.map(r=>{ const pts=r.pts.map(p=>[+p[0],+p[1]]); return ED_MATS.some(m=>m[0]&&m[0]===r.style)?{style:r.style,pts}:{pts}; })};
