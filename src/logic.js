@@ -4,9 +4,9 @@ const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
 const $=id=>document.getElementById(id);
 let W=0,Hh=0,DPR=1,SC=40,SC0=40,zoom=0.86;
 let li=0, lvl=null, bike=null, got=[], state='menu', T=0, acc=0, endTimer=0, flagWarn=0, parts=[], rag=null, pops=[], shake=0, bloom=0, rec=[], recT=0, ghost=null, BASE_A=1;
-const NEWLV=new Set(['fjadra-pack2-01','fjadra-pack2-08','fjadra-pack2-11','fjadra-p3-01','fjadra-p3-02','fjadra-p3-03','fjadra-p3-04','fjadra-p3-05','fjadra-p3-06','fjadra-p3-07','fjadra-p3-08','fjadra-p3-09','fjadra-p3-10','fjadra-p3-11','fjadra-p3-12','fjadra-p3-13','fjadra-p3-14','fjadra-p3-15','fjadra-p3-16','fjadra-p3-17','fjadra-p3-18','fjadra-p3-19','fjadra-p3-20','fjadra-p3-21','fjadra-p3-22','fjadra-p3-23','fjadra-p3-24','fjadra-p3-25','fjadra-p3-26','fjadra-p3-27','fjadra-p3-28','fjadra-p3-29','fjadra-p3-30','fjadra-p3-31','fjadra-p3-32']); let curPack=3;
+const NEWLV=new Set(['fjadra-tutorial','fjadra-pack2-01','fjadra-pack2-08','fjadra-pack2-11','fjadra-p3-01','fjadra-p3-02','fjadra-p3-03','fjadra-p3-04','fjadra-p3-05','fjadra-p3-06','fjadra-p3-07','fjadra-p3-08','fjadra-p3-09','fjadra-p3-10','fjadra-p3-11','fjadra-p3-12','fjadra-p3-13','fjadra-p3-14','fjadra-p3-15','fjadra-p3-16','fjadra-p3-17','fjadra-p3-18','fjadra-p3-19','fjadra-p3-20','fjadra-p3-21','fjadra-p3-22','fjadra-p3-23','fjadra-p3-24','fjadra-p3-25','fjadra-p3-26','fjadra-p3-27','fjadra-p3-28','fjadra-p3-29','fjadra-p3-30','fjadra-p3-31','fjadra-p3-32']); let curPack=3;
 let STYLE='cartoon'; try{ STYLE=localStorage.getItem('fjadra.style')==='neon'?'neon':'cartoon'; }catch(e){}
-let stuckT=0, stuckCD=0;
+let stuckT=0, stuckCD=0, tipsSeen=new Set();
 // ghosts are stored per stable level id; old name-keyed ghosts are moved over the first time
 function loadGhost(lv){ ghost=null; try{ let s=localStorage.getItem('fjadra.g4.'+lv.id); if(!s){ s=localStorage.getItem('fjadra.ghost.'+lv.name); if(s) localStorage.setItem('fjadra.g4.'+lv.id,s); } ghost=s?JSON.parse(s):null; }catch(e){ ghost=null; } }
 function saveGhost(lv){ try{ localStorage.setItem('fjadra.g4.'+lv.id,JSON.stringify(rec)); }catch(e){} }
@@ -37,7 +37,7 @@ function medalSVG(k){ if(!k) return '<svg viewBox="-13 -13 26 26" aria-hidden="t
 
 // i = index i LEVELS; L = en bana utanför listan (testkörning från editorn, i = -1)
 function loadLevel(i,L){ li=i; lvl=L||LEVELS[i]; setTheme(lvl.theme); if(!lvl.vis) analyze(lvl); bike=newBike(lvl.start[0],lvl.start[1]); got=lvl.apples.map(()=>false);
-  T=0; acc=0; stuckT=0; stuckCD=0; parts=[]; rag=null; pops=[]; shake=0; bloom=0; rec=[]; recT=0; if(i>=0) loadGhost(lvl); else ghost=null; lvl.steelSegs=lvl.segs.filter(s=>s.style==='steel'); cam.x=bike.b.x+2; cam.y=bike.b.y+0.8; camBaseY=cam.y; state='play';
+  T=0; acc=0; stuckT=0; stuckCD=0; tipsSeen=new Set(); parts=[]; rag=null; pops=[]; shake=0; bloom=0; rec=[]; recT=0; if(i>=0) loadGhost(lvl); else ghost=null; lvl.steelSegs=lvl.segs.filter(s=>s.style==='steel'); cam.x=bike.b.x+2; cam.y=bike.b.y+0.8; camBaseY=cam.y; state='play';
   const nr=LEVELS.filter(x=>x.pack===lvl.pack).indexOf(lvl)+1; $('lvlname').textContent=(i<0?'Test: ':nr+'. ')+lvl.name; updApples(); updGrav(); hideOv(); if(lvl.hint) toast(lvl.hint,3400); }
 function updApples(){ $('applesTxt').textContent=got.filter(Boolean).length+'/'+got.length; }
 function updGrav(){ const g=bike?(bike.gy<0&&bike.gx===0?null:(bike.gy>0?'up':bike.gx<0?'left':'right')):null; $('gravTile').style.display=g?'flex':'none'; if(g) $('gravArrow').textContent=GARROW[g]; }
@@ -69,7 +69,7 @@ function musicTick(){ if(!MUS||!AC) return; const on=musicOn&&!muted; MUS.out.ga
     if(beat===0){ const ch=CHORDS[Math.floor(MUS.step/8)%CHORDS.length]; for(const n of ch) voice(mtof(n),t,4.4,'triangle',0.14,1.4,1.8); voice(mtof(ch[0]-12),t,4.4,'sine',0.18,0.8,1.6); }
     if(Math.random()<0.38){ const n=PENTA[Math.floor(Math.random()*PENTA.length)]; voice(mtof(n),t,1.6,'sine',0.09,0.02,1.4); }
     MUS.next+=0.5; MUS.step++; } }
-function setMusic(on){ musicOn=on; try{ localStorage.setItem('fjadra.music',on?'1':'0'); }catch(e){} $('bMusic').textContent='Musik: '+(on?'på':'av'); audioInit(); }
+function setMusic(on){ musicOn=on; try{ localStorage.setItem('fjadra.music',on?'1':'0'); }catch(e){} $('bMusic').textContent='Music: '+(on?'on':'off'); audioInit(); }
 
 function beep(freq,dur,type,vol,slide){ if(!AC||muted) return; const o=AC.createOscillator(), g=AC.createGain(), t=AC.currentTime;
   o.type=type||'triangle'; o.frequency.setValueAtTime(freq,t); if(slide) o.frequency.exponentialRampToValueAtTime(Math.max(30,freq*slide),t+dur);
@@ -110,7 +110,7 @@ addEventListener('blur',()=>{ for(const k in inp) inp[k]=0; document.querySelect
 document.addEventListener('contextmenu',e=>e.preventDefault());
 
 function restart(){ loadLevel(li,li<0?lvl:null); }
-function enterOverview(){ if(state!=='play') return; state='overview'; for(const k in inp) inp[k]=0; document.querySelectorAll('.k.on').forEach(b=>b.classList.remove('on')); toast('Översikt – tryck på valfri knapp för att fortsätta',2200); }
+function enterOverview(){ if(state!=='play') return; state='overview'; for(const k in inp) inp[k]=0; document.querySelectorAll('.k.on').forEach(b=>b.classList.remove('on')); toast('Overview – press any button to continue',2200); }
 function leaveOverview(){ if(state!=='overview') return; state='play'; acc=0; }
 // soft edge pointers toward stars and the flower when they are off-screen
 function drawPointers(){ const tg=[]; lvl.apples.forEach((a,i)=>{ if(!got[i]) tg.push({x:a[0],y:a[1],k:a[2]?'g':'s'}); }); const ready=got.every(Boolean); tg.push({x:lvl.flower[0],y:lvl.flower[1]+1,k:'f'});
@@ -124,6 +124,12 @@ function drawPointers(){ const tg=[]; lvl.apples.forEach((a,i)=>{ if(!got[i]) tg
     ctx.beginPath(); ctx.arc(px,py,11,0,6.28); ctx.fillStyle='rgba(20,42,68,.88)'; ctx.fill(); ctx.strokeStyle='rgba(160,195,230,.7)'; ctx.lineWidth=1.5; ctx.stroke();
     if(isF){ for(let i=0;i<6;i++){ const a=i*Math.PI/3; ctx.beginPath(); ctx.ellipse(px+Math.cos(a)*4,py+Math.sin(a)*4,3,1.8,a,0,6.28); ctx.fillStyle='#fff'; ctx.fill(); } ctx.beginPath(); ctx.arc(px,py,2.4,0,6.28); ctx.fillStyle='#f7c51e'; ctx.fill(); }
     else { ctx.beginPath(); for(let i=0;i<10;i++){ const a=-Math.PI/2+i*Math.PI/5, r=i%2?3:7; ctx.lineTo(px+Math.cos(a)*r,py+Math.sin(a)*r); } ctx.closePath(); ctx.fillStyle=t.k==='g'?'#8fd0ff':'#ffd23f'; ctx.fill(); } }
+  ctx.globalAlpha=1; }
+// en liten träskylt med ett "i" vid varje tips; lästa skyltar bleknar
+function drawSigns(l){ const v=view(); worldT();
+  l.tips.forEach((t,k)=>{ const x=t[0], y=t[1]; if(x<v[0]-2||x>v[2]+2) return; ctx.globalAlpha=(state==='play'&&tipsSeen.has(k))?0.45:1;
+    ctx.fillStyle='#7a5230'; ctx.fillRect(x-0.05,y,0.1,1.25); ctx.beginPath(); ctx.rect(x-0.42,y+1.05,0.84,0.62); ctx.fillStyle='#f3e3bf'; ctx.fill(); ctx.strokeStyle=OUT; ctx.lineWidth=0.06; ctx.stroke();
+    ctx.save(); ctx.translate(x,y+1.36); ctx.scale(1,-1); ctx.fillStyle='#18324f'; ctx.font='bold 0.46px "Lilita One",Arial,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('i',0,0.02); ctx.restore(); });
   ctx.globalAlpha=1; }
 function next(){ const pk=LEVELS.filter(l=>l.pack===lvl.pack); loadLevel(LEVELS.indexOf(pk[(pk.indexOf(lvl)+1)%pk.length])); }
 // knapparna i slutrutan: under testkörning från editorn finns bara Kör igen och Till editorn
@@ -139,14 +145,14 @@ $('tabMain').onclick=()=>{ curPack=3; buildMenu(); }; $('tabMine').onclick=()=>{
 const fsOK=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen; if(!fsOK) $('bFull').style.display='none';
 $('bMusic').onclick=()=>setMusic(!musicOn);
 // fjädringsval: ändrar bara fjäder, dämpning och fjäderväg (setSusp i core.js); gäller direkt, även mitt i en åkning
-const SUSP_UI=[['hard','Hård','Stum och stabil. Nästan inget gung.'],['normal','Normal','Som banorna är byggda och testade.'],['soft','Mjuk','Mer fjädring och lite gung efter landningar.'],
-  ['elma','Elma','Elasto Mania-känsla: djup fjädring som gungar länge och studsar högt.'],['bouncy','Studsboll','Extremt studsig. Gungar och studsar mest av allt.']];
+const SUSP_UI=[['hard','Hard','Stiff and stable. Hardly any bobbing.'],['normal','Normal','The way the levels were built and tested.'],['soft','Soft','More travel and a little bobbing after landings.'],
+  ['elma','Elma','Elasto Mania feel: deep suspension that bobs for long and bounces high.'],['bouncy','Bouncy','Extremely springy. Bobs and bounces the most of all.']];
 let suspK='normal'; try{ const v=localStorage.getItem('fjadra.susp'); if(SUSP_UI.some(o=>o[0]===v)) suspK=v; }catch(e){}
 function setSuspension(k){ suspK=k; setSusp(k); try{ localStorage.setItem('fjadra.susp',k); }catch(e){}
   const box=$('suspBtns'); box.innerHTML=''; for(const [id,name] of SUSP_UI){ const b=document.createElement('button'); b.className='tab'+(id===k?' on':''); b.textContent=name; b.onclick=()=>setSuspension(id); box.appendChild(b); }
   $('suspTxt').textContent=SUSP_UI.find(o=>o[0]===k)[2]; }
 setSuspension(suspK);
-function setStyle(s){ STYLE=s; try{ localStorage.setItem('fjadra.style',s); }catch(e){} document.body.classList.toggle('neon',s==='neon'); $('bStyle').textContent='Stil: '+(s==='neon'?'Neon':'Tecknad'); curTheme=''; if(lvl) setTheme(lvl.theme); buildMenu(); }
+function setStyle(s){ STYLE=s; try{ localStorage.setItem('fjadra.style',s); }catch(e){} document.body.classList.toggle('neon',s==='neon'); $('bStyle').textContent='Style: '+(s==='neon'?'Neon':'Cartoon'); curTheme=''; if(lvl) setTheme(lvl.theme); buildMenu(); }
 $('bStyle').onclick=()=>setStyle(STYLE==='neon'?'cartoon':'neon');
 $('bNextUnplayed').onclick=()=>{ audioInit(); pausedState=null; let i=LEVELS.findIndex(l=>l.pack===curPack&&best[l.id]==null); if(i<0) i=LEVELS.findIndex((l,k)=>l.pack===curPack&&medalOf(k,best[l.id])<3); if(i<0) i=LEVELS.findIndex(l=>l.pack===curPack); loadLevel(i); };
 
@@ -155,16 +161,16 @@ const PENCIL='<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-7 7l1.2
 function buildMenu(){ const box=$('lvls'); box.innerHTML=''; const shown=[], mine=curPack==='mine';
   $('tabMain').classList.toggle('on',!mine); $('tabMine').classList.toggle('on',mine); $('bNewLevel').style.display=mine?'':'none'; $('bNextUnplayed').style.display=mine?'none':'';
   LEVELS.forEach((l,i)=>{ if(l.pack!==curPack) return; const n=shown.length+1; shown.push(l); const wr=document.createElement('div'); wr.className='lvw'; const b=document.createElement('button'); b.className='lv'; const t=best[l.id];
-    const badge=l.edited?'<span class="newb edb">ÄNDRAD</span>':(NEWLV.has(l.id)?'<span class="newb">NY</span>':'');
-    b.innerHTML='<canvas></canvas>'+badge+'<div class="meta"><div class="nm"><b>'+n+'. '+l.name.replace(/[<>&]/g,'')+'</b><i>'+(t!=null?fmt(t):'Ej klarad')+(l.medal?' · guld '+l.medal[0]+' s':'')+'</i></div>'+(l.medal?medalSVG(medalOf(i,t)):'')+'</div>';
+    const badge=l.edited?'<span class="newb edb">EDITED</span>':(NEWLV.has(l.id)?'<span class="newb">NEW</span>':'');
+    b.innerHTML='<canvas></canvas>'+badge+'<div class="meta"><div class="nm"><b>'+n+'. '+l.name.replace(/[<>&]/g,'')+'</b><i>'+(t!=null?fmt(t):'Not cleared')+(l.medal?' · gold '+l.medal[0]+' s':'')+'</i></div>'+(l.medal?medalSVG(medalOf(i,t)):'')+'</div>';
     b.onclick=()=>{ audioInit(); pausedState=null; loadLevel(i); };
-    const e=document.createElement('button'); e.className='edp'; e.setAttribute('aria-label','Redigera '+l.name); e.innerHTML=PENCIL; e.onclick=ev=>{ ev.stopPropagation(); edOpen(i); };
+    const e=document.createElement('button'); e.className='edp'; e.setAttribute('aria-label','Edit '+l.name); e.innerHTML=PENCIL; e.onclick=ev=>{ ev.stopPropagation(); edOpen(i); };
     wr.appendChild(b); wr.appendChild(e); box.appendChild(wr); });
-  if(mine&&!shown.length) box.innerHTML='<p class="help" style="grid-column:1/-1;margin:4px 0 8px">Inga egna banor än. Tryck <b>＋ Ny bana</b> och bygg din första! Du kan också trycka på pennan på en inbyggd bana för att justera den.</p>';
+  if(mine&&!shown.length) box.innerHTML='<p class="help" style="grid-column:1/-1;margin:4px 0 8px">No levels of your own yet. Tap <b>＋ New level</b> and build your first! You can also tap the pencil on a built-in level to adjust it.</p>';
   $('resumeRow').style.display=pausedState==='play'?'flex':'none'; $('bEditCur').style.display=pausedState==='play'&&li>=0?'':'none';
   const inPack=LEVELS.filter(l=>l.pack===curPack), done=inPack.filter(l=>best[l.id]!=null).length, golds=inPack.filter(l=>medalOf(LEVELS.indexOf(l),best[l.id])===3).length;
-  $('progress').textContent=mine?(inPack.length?inPack.length+(inPack.length===1?' egen bana':' egna banor'):''):'Klarade '+done+' av '+inPack.length+' · '+golds+' guld';
-  $('bMusic').textContent='Musik: '+(musicOn?'på':'av');
+  $('progress').textContent=mine?(inPack.length?inPack.length+(inPack.length===1?' own level':' own levels'):''):'Cleared '+done+' of '+inPack.length+' · '+golds+' gold';
+  $('bMusic').textContent='Music: '+(musicOn?'on':'off');
   requestAnimationFrame(()=>{ box.querySelectorAll('canvas').forEach((c,i)=>drawPreview(c,shown[i])); }); }
 
 // ---------- rules ----------
@@ -172,25 +178,25 @@ function crash(){ if(state!=='play') return; state='crash'; endTimer=0; const [h
   rag=makeRagdoll(bike); bike.rider=false; for(const k in rag.pts){ const q=rag.pts[k]; q.px+=(Math.random()-0.5)*0.01; q.py-= 0.004; }
   for(let i=0;i<14;i++){ const a=Math.random()*6.283, v=1.5+Math.random()*3; parts.push({k:'star',x:hx,y:hy,vx:Math.cos(a)*v,vy:Math.sin(a)*v,r:.07+Math.random()*.06,l:.5,L:.5,c:i%2?'#ffe36b':'#ffffff'}); }
   beep(130,.35,'sawtooth',.13,.3); try{ navigator.vibrate&&navigator.vibrate(60); }catch(e){}
-  $('endTitle').textContent='Krasch!'; $('endTime').innerHTML=''; $('endNote').textContent='Tryck GAS eller Enter för att köra igen'; endButtons(false);
+  $('endTitle').textContent='Crash!'; $('endTime').innerHTML=''; $('endNote').textContent='Press GAS or Enter to ride again'; endButtons(false);
   setTimeout(()=>{ if(state==='crash') $('endov').classList.add('show'); },1100); }
 function win(){ state='win'; endTimer=0; const test=li<0, prev=best[lvl.id]; const isRec=!test&&(prev==null||T<prev); if(isRec){ best[lvl.id]=T; saveBest(); saveGhost(lvl); } const rec_=isRec;
   const cols=['#ffe08a','#9bd37f','#8fb7ee','#f2a7a0','#ffffff','#b9e3ff']; for(let i=0;i<50;i++){ const an=Math.PI/2+(Math.random()-0.5)*2.0, v=3.5+Math.random()*4.5; parts.push({k:'conf',x:lvl.flower[0],y:lvl.flower[1]+1.1,vx:Math.cos(an)*v,vy:Math.sin(an)*v,rot:Math.random()*6,vr:(Math.random()-0.5)*14,l:2.2+Math.random(),L:3,c:cols[i%cols.length]}); }
   spark(lvl.flower[0],lvl.flower[1]+1); spark(lvl.flower[0],lvl.flower[1]+1);
   beep(660,.12,'triangle',.11); setTimeout(()=>beep(880,.12,'triangle',.11),110); setTimeout(()=>beep(1320,.28,'triangle',.11),220);
-  const md=lvl.medal, m=md?medalOf(li,T):0; $('endTitle').textContent='I mål!'; $('endTime').innerHTML=(m?medalSVG(m):'')+'<span>'+fmt(T)+'</span>';
-  const nxt=!md?'':m===3?'Guld!':(m===2?'Guld under '+fmt(md[0]):'Silver under '+fmt(md[1])+', guld under '+fmt(md[0]));
-  $('endNote').textContent=test?'Testkörning – banan går att klara!':((rec_&&prev!=null?'Nytt rekord! ':'')+nxt+(rec_?(nxt?' · ':'')+'Spöket sparat':''));
-  endButtons(true); const pk=LEVELS.filter(l=>l.pack===lvl.pack); $('bNext').textContent=pk.indexOf(lvl)===pk.length-1?'Första banan':'Nästa bana'; setTimeout(()=>{ if(state==='win') $('endov').classList.add('show'); },1000); }
+  const md=lvl.medal, m=md?medalOf(li,T):0; $('endTitle').textContent='Finished!'; $('endTime').innerHTML=(m?medalSVG(m):'')+'<span>'+fmt(T)+'</span>';
+  const nxt=!md?'':m===3?'Gold!':(m===2?'Gold under '+fmt(md[0]):'Silver under '+fmt(md[1])+', gold under '+fmt(md[0]));
+  $('endNote').textContent=test?'Test ride – the level can be finished!':((rec_&&prev!=null?'New record! ':'')+nxt+(rec_?(nxt?' · ':'')+'Ghost saved':''));
+  endButtons(true); const pk=LEVELS.filter(l=>l.pack===lvl.pack); $('bNext').textContent=pk.indexOf(lvl)===pk.length-1?'First level':'Next level'; setTimeout(()=>{ if(state==='win') $('endov').classList.add('show'); },1000); }
 function contactPts(){ const [hx,hy]=headPos(bike); return [[bike.wh[0].x,bike.wh[0].y,0.8],[bike.wh[1].x,bike.wh[1].y,0.8],[hx,hy,0.65]]; }
 function checkItems(){ const pts=contactPts();
   for(let k=0;k<lvl.apples.length;k++){ if(got[k]) continue; const a=lvl.apples[k];
     for(const [x,y,r] of pts) if(Math.hypot(x-a[0],y-a[1])<r){ got[k]=true; updApples(); spark(a[0],a[1]); parts.push({k:'ring',x:a[0],y:a[1],r:0.3,l:0.45,L:0.45,c:a[2]?'#8fd0ff':'#ffe36b'}); pops.push({x:a[0],y:a[1]+0.4,t:0,txt:a[2]?'⟳':'+1'}); const tl=$('appleTile'); tl.classList.remove('pop'); void tl.offsetWidth; tl.classList.add('pop'); beep(988,.08,'square',.06); setTimeout(()=>beep(1480,.12,'square',.05),70);
-      if(a[2]){ setGravity(bike,GV[a[2]][0],GV[a[2]][1]); updGrav(); toast('Tyngdkraften pekar nu '+({up:'uppåt',down:'nedåt',left:'åt vänster',right:'åt höger'})[a[2]],1500); beep(330,.3,'sine',.08,a[2]==='up'?2:.5); }
+      if(a[2]){ setGravity(bike,GV[a[2]][0],GV[a[2]][1]); updGrav(); toast('Gravity now points '+({up:'up',down:'down',left:'left',right:'right'})[a[2]],1500); beep(330,.3,'sine',.08,a[2]==='up'?2:.5); }
       try{ navigator.vibrate&&navigator.vibrate(15); }catch(e){} break; } }
   for(const s of lvl.killers) for(const [x,y,r] of pts) if(Math.hypot(x-s[0],y-s[1])<r-0.05) return crash();
   const fx=lvl.flower[0], fy=lvl.flower[1]+0.6;
-  if(pts.some(([x,y])=>Math.hypot(x-fx,y-fy)<0.95)){ if(got.every(Boolean)) return win(); if(flagWarn<=0){ toast('Samla alla stjärnor först ('+got.filter(Boolean).length+'/'+got.length+')',1600); flagWarn=2; } }
+  if(pts.some(([x,y])=>Math.hypot(x-fx,y-fy)<0.95)){ if(got.every(Boolean)) return win(); if(flagWarn<=0){ toast('Collect all the stars first ('+got.filter(Boolean).length+'/'+got.length+')',1600); flagWarn=2; } }
 }
 let dustT=0, bumpCD=0;
 function physics(dt){ acc+=dt; const h=P.H; let n=0; const lean=(inp.left?1:0)-(inp.right?1:0); const I={gas:inp.gas,brake:inp.brake,lean};
@@ -200,8 +206,10 @@ function physics(dt){ acc+=dt; const h=P.H; let n=0; const lean=(inp.left?1:0)-(
     if(bike.b.y<lvl.bounds[1]-25||bike.b.y>lvl.bounds[3]+25||bike.b.x<lvl.bounds[0]-25||bike.b.x>lvl.bounds[2]+25) crash();
     if(!isFinite(bike.b.x)){ restart(); return; } }
   if(n>=40) acc=0;
+  // skyltar (lvl.tips = [x, y, text]): texten visas en gång när cykeln passerar skylten
+  if(state==='play'&&lvl.tips) lvl.tips.forEach((t,k)=>{ if(!tipsSeen.has(k)&&Math.abs(bike.b.x-t[0])<1.5&&Math.abs(bike.b.y-t[1])<4){ tipsSeen.add(k); toast(t[2],Math.max(4500,t[2].length*55)); } });
   if(state==='play'){ const spd=Math.hypot(bike.b.vx,bike.b.vy); stuckT=spd<0.35?stuckT+dt:0; stuckCD-=dt;
-    if(stuckT>4.5&&stuckCD<=0&&T>3){ stuckT=0; stuckCD=25; toast(lvl.stuck||'Fastnat? Pumpa (luta bakåt och kasta vikten framåt), prova en bunny hop – eller tryck OMSTART.',4600); } }
+    if(stuckT>4.5&&stuckCD<=0&&T>3){ stuckT=0; stuckCD=25; toast(lvl.stuck||'Stuck? Pump (lean back, then throw your weight forward), try a bunny hop – or press RESTART.',4600); } }
   // landing dust
   if(state==='play'&&bike.impact>4.5){ const s=Math.min(1,(bike.impact-4)/8); for(const w of bike.wh){ for(let i=0;i<2+s*3;i++) puff(w.x+(Math.random()-0.5)*0.4,w.y-0.32,(Math.random()-0.5)*4*(0.5+s),Math.random()*1.2,0.13+s*0.12,TH.kind==='snow'?'#ffffff':TH.dirtLight,0.5+s*0.4); } beep(90,.12,'sine',.08*s+.02); }
   if(state==='play') bike.impact=0;
@@ -232,7 +240,7 @@ function frame(now){
     shake*=Math.exp(-dt*7); const shx=(Math.random()-0.5)*shake, shy=(Math.random()-0.5)*shake; cam.x+=shx; cam.y+=shy;
     drawBackground(tt); drawLife(tt);
     for(const d of lvl.vis.deco) blit(SPR[d.kind],d.x,d.y,0,d.s);
-    drawGround(lvl,tt); drawMarks(lvl); drawLanterns(lvl,tt);
+    drawGround(lvl,tt); drawMarks(lvl); drawLanterns(lvl,tt); if(lvl.tips) drawSigns(lvl);
     for(const hng of lvl.vis.hang) blit(SPR.stalac,hng.x,hng.y,0,hng.s);
     // flower: bud until all stars are collected, then it blooms with a light beam
     const ready=got.every(Boolean); const fx=lvl.flower[0], fy=lvl.flower[1]; bloom+=((ready?1:0)-bloom)*Math.min(1,dt*3);
@@ -269,6 +277,6 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 resize();
-document.body.classList.toggle('neon',STYLE==='neon'); $('bStyle').textContent='Stil: '+(STYLE==='neon'?'Neon':'Tecknad');
+document.body.classList.toggle('neon',STYLE==='neon'); $('bStyle').textContent='Style: '+(STYLE==='neon'?'Neon':'Cartoon');
 (function(){ edBoot(); lvl=LEVELS[0]; setTheme(lvl.theme); bike=newBike(lvl.start[0],lvl.start[1]); got=lvl.apples.map(()=>false); cam.x=bike.b.x+5; cam.y=bike.b.y+1.2; camBaseY=cam.y; state='menu'; $('lvlname').textContent=''; updApples(); buildMenu(); })();
 requestAnimationFrame(frame);

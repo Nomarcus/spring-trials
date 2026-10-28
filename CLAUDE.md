@@ -46,6 +46,7 @@ Spelet öppnas direkt som fil i webbläsaren, ingen server behövs.
 
 ## Nuläge och kända luckor (läs innan du börjar)
 - **Testboten har inte körts om på alla banor med nuvarande fysik (v11).** Verifierade: se tabellen i `docs/fjadra-LEVELS.md` (✅). Kör hela sviten först: `node tools/fjadra/test/run.js` (delas gärna upp i batcher, den är CPU-tung).
+- **Spelet är på engelska** (all text i gränssnittet, editorn och banornas namn/tips); kod, kommentarer och dokumentation är på svenska. Banornas ID är oförändrade. Bana 1 är en tutorial (`fjadra-tutorial`) med skyltar: `tips:[[x,y,text]]` på en bana visar texten när cykeln passerar.
 - Medaljtider är satta efter botens körningar, inte mänskliga rekord.
 - Musiken i spelet är genererad (Web Audio). Suno-spåren i `assets/music/` är **inte inkopplade**.
 - Neon är en palett + glödande kanter; HUD:en har bara färgvariabler, inga egna neon-detaljer.
