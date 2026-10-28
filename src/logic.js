@@ -92,6 +92,11 @@ function press(k,on){
   }
   if(on&&k==='gas'&&state==='crash'&&endTimer>.35) restart();
 }
+// vänd utan att släppa gasen: dra tummen uppåt från GAS eller BRAKE (en gång per tryckning)
+for(const id of ['kGas','kBrake']){ const b=$(id); let y0=null, done=false;
+  b.addEventListener('pointerdown',e=>{ y0=e.clientY; done=false; });
+  b.addEventListener('pointermove',e=>{ if(y0==null||done||y0-e.clientY<50) return; done=true; press('turn',true); const t=$('kTurn'); t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),180); });
+  const end=()=>{ y0=null; }; b.addEventListener('pointerup',end); b.addEventListener('pointercancel',end); }
 document.querySelectorAll('[data-k]').forEach(b=>{ const k=b.dataset.k;
   b.addEventListener('pointerdown',e=>{ e.preventDefault(); try{b.setPointerCapture(e.pointerId);}catch(_){} b.classList.add('on'); press(k,true); });
   const up=()=>{ if(!b.classList.contains('on')) return; b.classList.remove('on'); press(k,false); };
