@@ -10,7 +10,7 @@ const ED_MATS=[['wood','Wood'],['steel','Steel'],['stone','Stone'],['crate','Cra
 const ED_SOFT=[0,1,2,4,8];
 const ED_DIRS=['up','right','down','left'];
 const ED_DRAW=[['ground','Ground','#3fae37'],['solid','Rock','#8a7c6c'],['wood','Plank','#a0703f'],['steel','Steel','#8a8f96']];
-const ED_TIPS={draw:'Draw with your finger or pen. Ground: draw the whole track from left to right – start and flower move to the ends. Rock, Plank, Steel: draw pieces on top. Close a shape to make a rock.',move:'Drag the ground to shape it. Drag stars, start, flower and blocks. Two fingers pan and zoom.',
+const ED_TIPS={draw:'Draw with your finger or pen. Ground: draw the track from left to right – every new stroke adds to it (extend at the ends or redraw a part). Rock, Plank, Steel: draw pieces on top. Close a shape to make a rock.',move:'Drag the ground to shape it. Drag stars, start, flower and blocks. Two fingers pan and zoom.',
   add:'Tap a line to add a point and drag it where you want.', del:'Tap a point, star or block to delete it.',
   star:'Tap where the star should go.', gstar:'Tap where the blue star should go. Tap a star to change its direction.',
   block:'Tap where the block should go, drag to move it. Wood and steel: the head passes through, the wheels ride on them. Ground placed inside the ground makes a cave.'};
@@ -208,13 +208,28 @@ function edStroke(raw){ if(raw.length<2) return; let len=0; for(let i=1;i<raw.le
   if(len<1.5) return toast('Draw a longer line',1400);
   let p=edSmooth(edResample(raw,0.5),2); const d=ed.doc, a=p[0], z=p[p.length-1], closed=len>4&&Math.hypot(z[0]-a[0],z[1]-a[1])<Math.max(1.2,len*0.08);
   edPush();
-  if(ed.dmode==='ground'&&!closed){ if(z[0]<a[0]) p=p.reverse(); const f=p[0], l=p[p.length-1]; let hi=-1e9; for(const q of p) hi=Math.max(hi,q[1]);
-    const top=Math.max(d.top||TOP,hi+12); d.top=top;
-    d.rings[0]={pts:[[r3(f[0]-4),top],[r3(f[0]-4),r3(f[1])],...p.map(q=>[r3(q[0]),r3(q[1])]),[r3(l[0]+4),r3(l[1])],[r3(l[0]+4),top]]};
-    d.start=[r3(f[0]-2),r3(f[1])]; d.flower=[r3(l[0]+1.5),r3(l[1])];
-    for(const s of d.apples){ for(let i=1;i<p.length;i++){ const u=p[i-1], w=p[i]; if((s[0]-u[0])*(s[0]-w[0])>0||u[0]===w[0]) continue;   // stjärnor under den nya marken lyfts upp till ytan
-      const gy=u[1]+(w[1]-u[1])*(s[0]-u[0])/(w[0]-u[0]); if(s[1]<gy+0.5) s[1]=r3(gy+0.75); break; } }
-    edSync(true); return toast('Track drawn! Add stars, then tap Test.',2400); }
+  if(ed.dmode==='ground'&&!closed){ if(z[0]<a[0]) p=p.reverse(); const S=p.map(q=>[r3(q[0]),r3(q[1])]), f=S[0], l=S[S.length-1];
+    const gyAt=x=>{ for(let k=1;k<S.length;k++){ const u=S[k-1], w=S[k]; if((x-u[0])*(x-w[0])>0||u[0]===w[0]) continue; return u[1]+(w[1]-u[1])*(x-u[0])/(w[0]-u[0]); } return null; };
+    const r0=d.rings[0].pts, top0=d.top||TOP, std=r0.length>=4&&r0[0][1]>=top0-1&&r0[r0.length-1][1]>=top0-1;
+    let out, pre=false, ext=false, msg;
+    if(!ed.groundDone&&ed.isNew||!std){   // första strecket på en ny bana (eller en bana utan vanlig mark) = hela marken
+      out=[[r3(f[0]-4),f[1]],...S,[r3(l[0]+4),l[1]]]; pre=ext=true; msg='Track drawn! Keep drawing to add more, then add stars and tap Test.'; }
+    else {   // annars läggs strecket till: förlänger åt höger/vänster eller byter bara ut biten det ritas över
+      const G=r0.slice(1,-1).map(q=>q.slice()), g0=G[0][0], g1=G[G.length-1][0];
+      // skarvarna: strecket glider mjukt (2,5 m) ner/upp till den befintliga marken så att det inte blir ett trappsteg
+      const gAt=x=>{ for(let k=1;k<G.length;k++){ const u=G[k-1], w=G[k]; if((x-u[0])*(x-w[0])>0||u[0]===w[0]) continue; return u[1]+(w[1]-u[1])*(x-u[0])/(w[0]-u[0]); } return null; };
+      const blend=(idx,dir,gy)=>{ if(gy==null) return; const dy=gy-S[idx][1], o=S.map(q=>q.slice()); let dist=0; for(let k=idx;k>=0&&k<S.length;k+=dir){ if(k!==idx) dist+=Math.hypot(o[k][0]-o[k-dir][0],o[k][1]-o[k-dir][1]); if(dist>2.5) break; S[k][1]=r3(o[k][1]+dy*(1-dist/2.5)); } };
+      blend(0,1,f[0]>=g1-0.5?G[G.length-1][1]:gAt(f[0])); blend(S.length-1,-1,l[0]<=g0+0.5?G[0][1]:gAt(l[0]));
+      if(f[0]>=g1-0.5){ out=[...G,...S,[r3(l[0]+4),l[1]]]; ext=true; msg='Track extended →'; }
+      else if(l[0]<=g0+0.5){ out=[[r3(f[0]-4),f[1]],...S,...G]; pre=true; msg='Track extended ←'; }
+      else { let i0=0; while(i0<G.length&&G[i0][0]<f[0]) i0++; let j0=G.length-1; while(j0>=0&&G[j0][0]>l[0]) j0--;
+        out=[...G.slice(0,i0),...S,...G.slice(j0+1)]; if(i0===0){ out.unshift([r3(f[0]-4),f[1]]); pre=true; } if(j0===G.length-1){ out.push([r3(l[0]+4),l[1]]); ext=true; } msg='Ground updated'; } }
+    let hi=-1e9; for(const q of out) hi=Math.max(hi,q[1]); const top=Math.max(top0,hi+12); d.top=top;
+    d.rings[0]={...d.rings[0],pts:[[out[0][0],top],...out,[out[out.length-1][0],top]]}; ed.groundDone=true;
+    if(pre) d.start=[r3(out[0][0]+2),r3(out[0][1])]; else { const gy=gyAt(d.start[0]); if(gy!=null) d.start[1]=r3(gy); }
+    if(ext){ const e=out[out.length-1]; d.flower=[r3(e[0]-2.5),r3(e[1])]; } else { const gy=gyAt(d.flower[0]); if(gy!=null) d.flower[1]=r3(gy); }
+    for(const st of d.apples){ const gy=gyAt(st[0]); if(gy!=null&&st[1]<gy+0.5) st[1]=r3(gy+0.75); }   // stjärnor under den nya marken lyfts upp
+    edSync(true); return toast(msg,2200); }
   if(closed) d.rings.push({pts:p.slice(0,-1).map(q=>[r3(q[0]),r3(q[1])])});
   else if(ed.dmode==='solid'||ed.dmode==='ground') d.rings.push({pts:edStrip(p,0.9)});
   else d.rings.push({style:ed.dmode,pts:edStrip(p,ed.dmode==='steel'?0.28:0.3)});
@@ -234,7 +249,7 @@ function edOpt(){ const t=ed.tool;
   if(t==='move'||t==='add'){ ed.soft=ED_SOFT[(ED_SOFT.indexOf(ed.soft)+1)%ED_SOFT.length]; toast(ed.soft?'Soft: points within '+ed.soft+' m follow along':'Sharp: only the point you drag moves',1800); }
   else if(t==='gstar'){ ed.gdir=ED_DIRS[(ED_DIRS.indexOf(ed.gdir)+1)%4]; }
   else if(t==='block'){ const k=ED_MATS.findIndex(m=>m[0]===ed.mat); ed.mat=ED_MATS[(k+1)%ED_MATS.length][0]; }
-  else if(t==='draw'){ const k=ED_DRAW.findIndex(m=>m[0]===ed.dmode); ed.dmode=ED_DRAW[(k+1)%ED_DRAW.length][0]; toast(ed.dmode==='ground'?'Ground: your stroke becomes the whole track':'Draw a '+ED_DRAW.find(m=>m[0]===ed.dmode)[1].toLowerCase()+' – close the shape to make a rock',1800); }
+  else if(t==='draw'){ const k=ED_DRAW.findIndex(m=>m[0]===ed.dmode); ed.dmode=ED_DRAW[(k+1)%ED_DRAW.length][0]; toast(ed.dmode==='ground'?'Ground: each stroke adds to the track':'Draw a '+ED_DRAW.find(m=>m[0]===ed.dmode)[1].toLowerCase()+' – close the shape to make a rock',1800); }
   edUI(); }
 function edUI(){ if(!ed) return; const t=ed.tool;
   document.querySelectorAll('#ed [data-tool]').forEach(b=>b.classList.toggle('on',b.dataset.tool===t));
