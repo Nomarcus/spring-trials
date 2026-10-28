@@ -13,7 +13,7 @@ const ED_DRAW=[['ground','Ground','#3fae37'],['solid','Rock','#8a7c6c'],['wood',
 const ED_TIPS={draw:'Draw with your finger or pen. Ground: draw the track from left to right – every new stroke adds to it (extend at the ends or redraw a part). Rock, Plank, Steel: draw pieces on top. Close a shape to make a rock.',move:'Drag the ground to shape it. Drag stars, start, flower and blocks. Two fingers pan and zoom.',
   add:'Tap a line to add a point and drag it where you want.', del:'Tap a point, star or block to delete it.',
   star:'Tap where the star should go.', gstar:'Tap where the blue star should go. Tap a star to change its direction.',
-  block:'Tap where the block should go, drag to move it. Wood and steel: the head passes through, the wheels ride on them. Ground placed inside the ground makes a cave.'};
+  block:'Drag to draw a block as long as you want – planks and steel follow the direction you drag, stone, crates and ground become a box. Tap for a standard block, drag a block to move it. Wood and steel: the head passes through, the wheels ride on them. Ground placed inside the ground makes a cave.'};
 let ed=null, edTesting=false;
 const ORIG={};   // inbyggda banor innan de ändrades i editorn (för Återställ original)
 const r3=v=>Math.round(v*1000)/1000;
@@ -118,6 +118,14 @@ function edGrab(ri,i){ const p=ed.doc.rings[ri].pts, n=p.length, R=ed.soft, out=
   if(R>0&&!ed.doc.rings[ri].style) for(const dir of [1,-1]){ let d=0, k=i; for(let s=1;s<n/2;s++){ const k2=(k+dir+n)%n; d+=Math.hypot(p[k2][0]-p[k][0],p[k2][1]-p[k][1]); if(d>=R) break;
     out.push([k2,0.5*(1+Math.cos(Math.PI*d/R)),p[k2][0],p[k2][1]]); k=k2; } }
   return out; }
+// block som dras ut: plankor/stål längs dragningen (kan luta), stock = diameter, sten/låda/mark = ruta mellan punkterna (minsta höjd som standardblocket)
+function edBlockSpan(a,b,mat){ const R=(x0,y0,x1,y1)=>[[x0,y0],[x1,y0],[x1,y1],[x0,y1]].map(p=>[r3(p[0]),r3(p[1])]);
+  if(mat==='wood'||mat==='steel'){ let [p,q]=a[0]<=b[0]?[a,b]:[b,a]; const th=mat==='steel'?0.3:0.34, dx=q[0]-p[0], dy=q[1]-p[1], L=Math.hypot(dx,dy)||1, nx=-dy/L*th, ny=dx/L*th;
+    return {style:mat,pts:[[p[0],p[1]],[q[0],q[1]],[q[0]-nx,q[1]-ny],[p[0]-nx,p[1]-ny]].map(v=>[r3(v[0]),r3(v[1])])}; }
+  if(mat==='log'){ const cx=(a[0]+b[0])/2, cy=(a[1]+b[1])/2, rr=Math.max(0.2,Math.hypot(b[0]-a[0],b[1]-a[1])/2), p=[]; for(let i=0;i<12;i++){ const t=i/12*Math.PI*2; p.push([r3(cx+Math.cos(t)*rr),r3(cy+Math.sin(t)*rr)]); } return {style:'log',pts:p}; }
+  const h0=mat==='stone'?1.0:mat==='crate'?0.9:1.2; let x0=Math.min(a[0],b[0]), x1=Math.max(a[0],b[0]), y1=Math.max(a[1],b[1]), y0=Math.min(a[1],b[1]);
+  if(x1-x0<0.6){ const c=(x0+x1)/2; x0=c-0.3; x1=c+0.3; } if(y1-y0<h0) y0=y1-h0;
+  const rg={pts:R(x0,y0,x1,y1)}; if(mat) rg.style=mat; return rg; }
 function edBlock(x,y,mat){ const R=(x0,y0,x1,y1)=>[[x0,y0],[x1,y0],[x1,y1],[x0,y1]].map(p=>[r3(p[0]),r3(p[1])]);
   if(mat==='wood') return {style:'wood',pts:R(x-1.5,y-0.17,x+1.5,y+0.17)};
   if(mat==='steel') return {style:'steel',pts:R(x-1.5,y-0.15,x+1.5,y+0.15)};
@@ -150,10 +158,12 @@ function edAct(sx,sy){ const [x,y]=edW(sx,sy), d=ed.doc, t=ed.tool;
     edPush(); d.apples.push(t==='gstar'?[r3(x),r3(y),ed.gdir]:[r3(x),r3(y)]); edSync(); return dragObj({kind:'apple',i:d.apples.length-1},null); }
   if(t==='draw'){ ed.drag={type:'stroke',pts:[[x,y]],sx,sy}; return; }
   if(t==='block'){ const ri=edHitRing(x,y); if(ri>0) return dragRing(ri,edSnap());
-    edPush(); d.rings.push(edBlock(x,y,ed.mat)); edSync(true); return dragRing(d.rings.length-1,null); } }
+    edPush(); d.rings.push(edBlock(x,y,ed.mat)); edSync(true); ed.drag={type:'blockdraw',ri:d.rings.length-1,a:[x,y],sx,sy}; return; } }
 function edMove(sx,sy){ const pe=ed.pend; if(pe){ if(Math.hypot(sx-pe.sx,sy-pe.sy)<6) return; ed.pend=null; edAct(pe.sx,pe.sy); }
   const dr=ed.drag; if(!dr) return;
   if(dr.type==='pan'){ cam.x=dr.cx-(sx-dr.sx)/SC; cam.y=dr.cy+(sy-dr.sy)/SC; return; }
+  if(dr.type==='blockdraw'){ const b=edW(sx,sy), L=Math.hypot(b[0]-dr.a[0],b[1]-dr.a[1]); if(L<0.4) return; ed.doc.rings[dr.ri]=edBlockSpan(dr.a,b,ed.mat); edSync(false);
+    $('edRead').textContent=(ed.mat==='wood'||ed.mat==='steel'||ed.mat==='log'?L:Math.abs(b[0]-dr.a[0])).toFixed(1)+' m'; return; }
   if(dr.type==='stroke'){ const [x,y]=edW(sx,sy), q=dr.pts[dr.pts.length-1]; if(Math.hypot(x-q[0],y-q[1])>0.12) dr.pts.push([x,y]); return; }
   if(!dr.moved){ if(Math.hypot(sx-dr.sx,sy-dr.sy)<5) return; dr.moved=true; if(dr.snap) edPush(dr.snap); }
   const [x,y]=edW(sx,sy), dx=x-dr.x0, dy=y-dr.y0, d=ed.doc; let rx, ry;
@@ -162,7 +172,7 @@ function edMove(sx,sy){ const pe=ed.pend; if(pe){ if(Math.hypot(sx-pe.sx,sy-pe.s
   else if(dr.type==='ring'){ const p=d.rings[dr.ri].pts; dr.orig.forEach((q,k)=>{ p[k][0]=r3(q[0]+dx); p[k][1]=r3(q[1]+dy); }); rx=dx; ry=dy; }
   edSync(false); if(performance.now()-ed.anT>150&&edCount()<1500){ analyze(lvl); ed.anT=performance.now(); }
   $('edRead').textContent=dr.type==='ring'?'move '+rx.toFixed(1)+' · '+ry.toFixed(1):'x '+rx.toFixed(1)+' · y '+ry.toFixed(1); }
-function edUp(){ const pe=ed.pend; ed.pend=null; if(pe) edAct(pe.sx,pe.sy); const dr=ed.drag; ed.drag=null; $('edRead').textContent=''; if(dr&&dr.type==='stroke') return edStroke(dr.pts); if(dr&&dr.type!=='pan'&&(dr.moved||!dr.snap)) edSync(true); }
+function edUp(){ const pe=ed.pend; ed.pend=null; if(pe) edAct(pe.sx,pe.sy); const dr=ed.drag; ed.drag=null; $('edRead').textContent=''; if(dr&&dr.type==='stroke') return edStroke(dr.pts); if(dr&&dr.type==='blockdraw') return edSync(true); if(dr&&dr.type!=='pan'&&(dr.moved||!dr.snap)) edSync(true); }
 cv.addEventListener('pointerdown',e=>{ if(state!=='edit') return; e.preventDefault(); try{ cv.setPointerCapture(e.pointerId); }catch(_){}
   ed.ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(ed.ptrs.size===2){ ed.pend=null; if(ed.drag&&ed.drag.type==='stroke') ed.drag=null; edUp(); const [a,b]=[...ed.ptrs.values()], mx=(a.x+b.x)/2, my=(a.y+b.y)/2; ed.pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1,sc:SC,w:edW(mx,my)}; return; }
