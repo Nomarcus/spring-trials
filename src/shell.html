@@ -188,6 +188,14 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
 .k.turn.wide{ width:192px; height:64px; flex-direction:row; gap:10px; }   /* lika bred som BRAKE + GAS, precis ovanför dem */
 .k.turn.wide span{ font-size:16px; }
 @media (max-height:420px){ .k.turn.wide{ width:168px; height:54px; } .k.turn.wide span{ font-size:14px; } }
+#lbBox{ margin:8px auto 0; max-width:320px; text-align:left; }
+#lbTitle{ font-size:17px; color:var(--ink); margin-bottom:4px; text-align:center; }
+#lbList{ font-size:14px; color:var(--muted); font-variant-numeric:tabular-nums; }
+.lbr{ display:flex; justify-content:space-between; gap:12px; padding:2px 8px; border-radius:8px; color:var(--ink); }
+.lbr.me{ background:rgba(242,184,31,.35); font-weight:800; }
+.lbf{ display:flex; gap:6px; margin-top:6px; } .lbf input{ flex:1; min-width:0; font:inherit; font-size:16px; color:var(--ink); background:var(--panel); border:2.5px solid var(--navy); border-radius:12px; padding:6px 10px; -webkit-user-select:text; user-select:text; touch-action:auto; }
+.lbf .btn{ padding:6px 14px; }
+@media (max-height:480px){ #lbBox{ margin-top:4px; } #lbList{ font-size:12.5px; } .lbr{ padding:0 8px; } }
 @media (prefers-reduced-motion:reduce){ #toast{ transition:none; } .k{ transition:none; } #appleTile.pop{ animation:none; } }
 </style>
 </head>
@@ -262,7 +270,7 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
     <div class="fld">Theme<div id="edThemes"></div></div>
     <label class="fld">Tip when the level starts<input id="edHintIn" maxlength="200" autocomplete="off" placeholder="E.g. Build up speed before the jump!"></label>
     <div class="row" style="margin-top:4px"><button class="btn alt" id="edExtendB">Extend 20 m →</button><button class="btn alt" id="edSplitB">Split long lines</button></div>
-    <div class="row"><button class="btn alt" id="edCopyB">Copy level code</button><button class="btn alt" id="edPasteB">Paste level code</button><button class="btn alt" id="edDlAll">Download all changes</button><button class="btn" id="edCodeGo" style="display:none">Load</button></div>
+    <div class="row"><button class="btn alt" id="edCopyB">Copy level code</button><button class="btn alt" id="edPasteB">Paste level code</button><button class="btn alt" id="edDlAll">Download all changes</button><button class="btn" id="edShareB" style="display:none">Share with everyone</button><button class="btn" id="edCodeGo" style="display:none">Load</button></div>
     <textarea id="edCode" spellcheck="false" aria-label="Level code"></textarea>
     <p id="edInfo"></p>
     <div class="row"><button class="btn" id="edMoreOk">Done</button><button class="btn warn" id="edReset">Restore original</button><button class="btn warn" id="edDelete">Delete level</button></div>
@@ -274,7 +282,7 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
   <div class="card">
     <div class="head"><h1 class="title disp">Fjädra</h1></div>
     <p class="sub">Trials puzzles on springs. Collect all the stars and ride to the flower. Take it easy, read the level and find the way. Only the wheels and the head touch the ground – and the head can't take a hit.</p>
-    <div class="tabs"><button class="tab on" id="tabMain">Levels</button><button class="tab" id="tabMine">My levels</button></div>
+    <div class="tabs"><button class="tab on" id="tabMain">Levels</button><button class="tab" id="tabMine">My levels</button><button class="tab" id="tabComm" style="display:none">Community</button></div>
     <div class="row" id="resumeRow" style="margin:0 0 10px;display:none"><button class="btn" id="bResume">Keep riding</button><button class="btn alt" id="bEditCur">✎ Edit level</button></div>
     <div class="row" style="margin:0 0 10px;align-items:center"><button class="btn" id="bNextUnplayed">Play next</button><button class="btn" id="bNewLevel" style="display:none">＋ New level</button><span id="progress" style="color:var(--muted);font-size:14px;font-weight:800"></span></div>
     <div class="fjad" style="margin:0 0 2px"><b class="disp">Suspension</b><div id="suspBtns"></div></div>
@@ -292,6 +300,8 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
     <h2 class="disp" id="endTitle">Finished!</h2>
     <p class="disp" id="endTime"></p>
     <p id="endNote"></p>
+    <div id="lbBox" style="display:none"><div class="disp" id="lbTitle">Leaderboard</div><div id="lbList"></div>
+      <div class="lbf" id="lbForm" style="display:none"><input id="lbName" maxlength="16" autocomplete="nickname" placeholder="Your name" aria-label="Your name for the leaderboard"><button class="btn" id="lbSave">Save</button></div></div>
     <div class="row">
       <button class="btn" id="bNext">Next level</button>
       <button class="btn alt" id="bAgain">Ride again</button>

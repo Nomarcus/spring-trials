@@ -188,6 +188,14 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
 .k.turn.wide{ width:192px; height:64px; flex-direction:row; gap:10px; }   /* lika bred som BRAKE + GAS, precis ovanför dem */
 .k.turn.wide span{ font-size:16px; }
 @media (max-height:420px){ .k.turn.wide{ width:168px; height:54px; } .k.turn.wide span{ font-size:14px; } }
+#lbBox{ margin:8px auto 0; max-width:320px; text-align:left; }
+#lbTitle{ font-size:17px; color:var(--ink); margin-bottom:4px; text-align:center; }
+#lbList{ font-size:14px; color:var(--muted); font-variant-numeric:tabular-nums; }
+.lbr{ display:flex; justify-content:space-between; gap:12px; padding:2px 8px; border-radius:8px; color:var(--ink); }
+.lbr.me{ background:rgba(242,184,31,.35); font-weight:800; }
+.lbf{ display:flex; gap:6px; margin-top:6px; } .lbf input{ flex:1; min-width:0; font:inherit; font-size:16px; color:var(--ink); background:var(--panel); border:2.5px solid var(--navy); border-radius:12px; padding:6px 10px; -webkit-user-select:text; user-select:text; touch-action:auto; }
+.lbf .btn{ padding:6px 14px; }
+@media (max-height:480px){ #lbBox{ margin-top:4px; } #lbList{ font-size:12.5px; } .lbr{ padding:0 8px; } }
 @media (prefers-reduced-motion:reduce){ #toast{ transition:none; } .k{ transition:none; } #appleTile.pop{ animation:none; } }
 </style>
 </head>
@@ -262,7 +270,7 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
     <div class="fld">Theme<div id="edThemes"></div></div>
     <label class="fld">Tip when the level starts<input id="edHintIn" maxlength="200" autocomplete="off" placeholder="E.g. Build up speed before the jump!"></label>
     <div class="row" style="margin-top:4px"><button class="btn alt" id="edExtendB">Extend 20 m →</button><button class="btn alt" id="edSplitB">Split long lines</button></div>
-    <div class="row"><button class="btn alt" id="edCopyB">Copy level code</button><button class="btn alt" id="edPasteB">Paste level code</button><button class="btn alt" id="edDlAll">Download all changes</button><button class="btn" id="edCodeGo" style="display:none">Load</button></div>
+    <div class="row"><button class="btn alt" id="edCopyB">Copy level code</button><button class="btn alt" id="edPasteB">Paste level code</button><button class="btn alt" id="edDlAll">Download all changes</button><button class="btn" id="edShareB" style="display:none">Share with everyone</button><button class="btn" id="edCodeGo" style="display:none">Load</button></div>
     <textarea id="edCode" spellcheck="false" aria-label="Level code"></textarea>
     <p id="edInfo"></p>
     <div class="row"><button class="btn" id="edMoreOk">Done</button><button class="btn warn" id="edReset">Restore original</button><button class="btn warn" id="edDelete">Delete level</button></div>
@@ -274,7 +282,7 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
   <div class="card">
     <div class="head"><h1 class="title disp">Fjädra</h1></div>
     <p class="sub">Trials puzzles on springs. Collect all the stars and ride to the flower. Take it easy, read the level and find the way. Only the wheels and the head touch the ground – and the head can't take a hit.</p>
-    <div class="tabs"><button class="tab on" id="tabMain">Levels</button><button class="tab" id="tabMine">My levels</button></div>
+    <div class="tabs"><button class="tab on" id="tabMain">Levels</button><button class="tab" id="tabMine">My levels</button><button class="tab" id="tabComm" style="display:none">Community</button></div>
     <div class="row" id="resumeRow" style="margin:0 0 10px;display:none"><button class="btn" id="bResume">Keep riding</button><button class="btn alt" id="bEditCur">✎ Edit level</button></div>
     <div class="row" style="margin:0 0 10px;align-items:center"><button class="btn" id="bNextUnplayed">Play next</button><button class="btn" id="bNewLevel" style="display:none">＋ New level</button><span id="progress" style="color:var(--muted);font-size:14px;font-weight:800"></span></div>
     <div class="fjad" style="margin:0 0 2px"><b class="disp">Suspension</b><div id="suspBtns"></div></div>
@@ -292,6 +300,8 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
     <h2 class="disp" id="endTitle">Finished!</h2>
     <p class="disp" id="endTime"></p>
     <p id="endNote"></p>
+    <div id="lbBox" style="display:none"><div class="disp" id="lbTitle">Leaderboard</div><div id="lbList"></div>
+      <div class="lbf" id="lbForm" style="display:none"><input id="lbName" maxlength="16" autocomplete="nickname" placeholder="Your name" aria-label="Your name for the leaderboard"><button class="btn" id="lbSave">Save</button></div></div>
     <div class="row">
       <button class="btn" id="bNext">Next level</button>
       <button class="btn alt" id="bAgain">Ride again</button>
@@ -2042,7 +2052,7 @@ function edBack(){ if(!ed) return; edTesting=false; for(const k in inp) inp[k]=0
 function edMore(){ const d=ed.doc; $('edNameIn').value=d.name; $('edHintIn').value=d.hint||''; $('edCode').style.display='none'; $('edCodeGo').style.display='none';
   $('edThemes').innerHTML=''; for(const [k,n] of ED_THEMES){ const b=document.createElement('button'); b.className='tab'+(d.theme===k?' on':''); b.textContent=n;
     b.onclick=()=>{ if(d.theme===k) return; edPush(); d.theme=k; edSync(true); edMore(); }; $('edThemes').appendChild(b); }
-  $('edReset').style.display=ed.src==='edit'&&ORIG[d.id]?'':'none'; $('edDelete').style.display=ed.src==='mine'&&!ed.isNew?'':'none';
+  $('edReset').style.display=ed.src==='edit'&&ORIG[d.id]?'':'none'; $('edDelete').style.display=ed.src==='mine'&&!ed.isNew?'':'none'; $('edShareB').style.display=ed.src==='mine'&&onl()?'':'none';
   $('edInfo').textContent=(ed.src==='mine'?'Own level':'Built-in level')+' · '+edCount()+' points · '+d.apples.length+' stars';
   $('edMore').classList.add('show'); }
 function edMoreDone(){ const d=ed.doc, n=$('edNameIn').value.trim()||d.name, h=$('edHintIn').value.trim();
@@ -2078,6 +2088,57 @@ document.querySelectorAll('#ed [data-tool]').forEach(b=>b.onclick=()=>edTool(b.d
 $('edMoreOk').onclick=edMoreDone; $('edSplitB').onclick=()=>{ edMoreDone(); edSplit(); }; $('edExtendB').onclick=()=>{ edMoreDone(); edExtend(); };
 $('edCopyB').onclick=edCopy; $('edDlAll').onclick=edDownloadAll; $('edPasteB').onclick=edPasteOpen; $('edCodeGo').onclick=edPasteGo; $('edReset').onclick=edReset; $('edDelete').onclick=edDelete;
 $('bEdBack').onclick=()=>edBack(); $('bToEd').onclick=()=>edBack();
+
+// ================= TOPPLISTA OCH COMMUNITY-BANOR =================
+// Topplista per bana (namn + tid) och banor som spelare delar med alla.
+// Sparas i Supabase när ONLINE är ifyllt. Nyckeln är den publika "anon"-nyckeln: databasens regler (docs/supabase.sql)
+// tillåter bara att läsa och lägga till – aldrig ändra eller ta bort. Huvudbanorna ligger i spelets kod och kan inte
+// ändras härifrån. Utan ONLINE finns en lokal topplista per enhet och fliken Community syns inte.
+const ONLINE={url:'',key:''};
+const onl=()=>!!(ONLINE.url&&ONLINE.key);
+async function sb(path,opt){ opt=opt||{};
+  const r=await fetch(ONLINE.url.replace(/\/$/,'')+'/rest/v1/'+path,{method:opt.method||'GET',body:opt.body,
+    headers:Object.assign({apikey:ONLINE.key,Authorization:'Bearer '+ONLINE.key,'Content-Type':'application/json'},opt.headers||{})});
+  if(!r.ok) throw new Error('http '+r.status); const t=await r.text(); return t?JSON.parse(t):null; }
+let lbName=''; try{ lbName=localStorage.getItem('fjadra.name')||''; }catch(e){}
+
+// ---------- topplista ----------
+function lbLocal(id){ return (edGet('fjadra.top',{})[id]||[]).slice(0,10); }
+function lbLocalAdd(id,name,t){ const all=edGet('fjadra.top',{}), l=all[id]||[]; l.push({name,time:+t.toFixed(2)}); l.sort((a,b)=>a.time-b.time); all[id]=l.slice(0,10); edPut('fjadra.top',all); }
+const lbOnline=id=>onl()&&!String(id).startsWith('mine-');   // egna osparade banor finns bara på enheten
+async function lbGet(id){ if(lbOnline(id)){ try{ return await sb('scores?select=name,time&level_id=eq.'+encodeURIComponent(id)+'&order=time.asc&limit=10'); }catch(e){} } return lbLocal(id); }
+async function lbAdd(id,name,t){ lbLocalAdd(id,name,t); if(lbOnline(id)) await sb('scores',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify({level_id:id,name,time:+t.toFixed(2)})}); }
+let lbCtx=null;
+function lbRender(list,hiT){ const box=$('lbList'); box.innerHTML='';
+  if(!list.length){ box.textContent='No times yet – be the first!'; return; }
+  list.slice(0,5).forEach((e,i)=>{ const row=document.createElement('div'); row.className='lbr'+(hiT!=null&&Math.abs(e.time-hiT)<0.006?' me':'');
+    const a=document.createElement('span'), b=document.createElement('span'); a.textContent=(i+1)+'. '+String(e.name).slice(0,16); b.textContent=fmt(+e.time); row.append(a,b); box.appendChild(row); }); }
+// visas i slutrutan efter mål; är tiden bland de 10 bästa kan man skriva in sitt namn
+async function lbShow(l,t){ if(!l){ lbCtx=null; $('lbBox').style.display='none'; return; }
+  lbCtx={id:l.id,t,saved:false}; $('lbBox').style.display=''; $('lbForm').style.display='none';
+  $('lbTitle').textContent=lbOnline(l.id)?'Leaderboard':'Leaderboard (this device)'; $('lbList').textContent='Loading …';
+  const list=await lbGet(l.id); if(!lbCtx||lbCtx.id!==l.id) return; lbRender(list);
+  if(list.length<10||t<list[list.length-1].time){ $('lbName').value=lbName; $('lbForm').style.display='flex'; } }
+async function lbSave(){ if(!lbCtx||lbCtx.saved) return; const n=$('lbName').value.trim().replace(/\s+/g,' ').slice(0,16); if(!n) return toast('Write your name first',1800);
+  lbName=n; try{ localStorage.setItem('fjadra.name',n); }catch(e){} lbCtx.saved=true; $('lbForm').style.display='none'; const c=lbCtx;
+  try{ await lbAdd(c.id,n,c.t); toast('Saved to the leaderboard!',2000); }catch(e){ toast('Could not reach the online leaderboard – saved on this device',2800); }
+  if(lbCtx===c) lbRender(await lbGet(c.id),c.t); }
+$('lbSave').onclick=lbSave; $('lbName').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); lbSave(); } });
+
+// ---------- community-banor ----------
+let commState='idle';   // idle | loading | ok | error
+async function commLoad(force){ if(!onl()||commState==='loading'||(commState==='ok'&&!force)) return; commState='loading'; buildMenu();
+  try{ const rows=await sb('levels?select=id,name,author,doc&order=created_at.desc&limit=40');
+    for(let i=LEVELS.length-1;i>=0;i--) if(LEVELS[i].pack==='community'&&LEVELS[i]!==lvl) LEVELS.splice(i,1);
+    for(const r of rows||[]){ try{ const L=levelFromDoc(Object.assign({},r.doc,{id:'c-'+r.id,name:String(r.name).slice(0,40)}),{pack:'community',medal:null}); L.author=String(r.author||'').slice(0,16); LEVELS.push(L); }catch(e){} }
+    commState='ok'; }catch(e){ commState='error'; }
+  if(state==='menu') buildMenu(); }
+async function commShare(){ if(!onl()) return toast('Sharing is not set up yet',2200); if(ed.dirty) return toast('Save the level first',2000);
+  let who=lbName; if(!who){ who=(prompt('Your name (shown with the level):','')||'').trim().slice(0,16); if(!who) return; lbName=who; try{ localStorage.setItem('fjadra.name',who); }catch(e){} }
+  const c=edClean(ed.doc); toast('Sharing …',1500);
+  try{ await sb('levels',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify({name:c.name,author:who,doc:c})}); commState='idle'; toast('Shared! Everyone can now play it under Community.',3000); }
+  catch(e){ toast('Could not share the level right now – try again later',2800); } }
+$('edShareB').onclick=()=>{ edMoreDone(); commShare(); };
 
 // ---------- audio ----------
 let AC=null, eng=null;
@@ -2181,7 +2242,7 @@ function toggleMenu(){ if($('menu').classList.contains('show')){ if(pausedState)
 $('bMenu').onclick=()=>{ if(edTesting) edBack(); else toggleMenu(); }; $('bMap').onclick=()=>{ audioInit(); if(state==='overview') leaveOverview(); else enterOverview(); }; $('bRestart').onclick=()=>{ if(lvl) restart(); };
 $('bResume').onclick=()=>{ if(pausedState){ state=pausedState; pausedState=null; hideOv(); if(state==='win'||state==='crash') $('endov').classList.add('show'); } };
 $('bNext').onclick=next; $('bEditCur').onclick=()=>{ if(lvl&&li>=0) edOpen(li); }; $('bNewLevel').onclick=()=>edOpen(-1);
-$('tabMain').onclick=()=>{ curPack=3; buildMenu(); }; $('tabMine').onclick=()=>{ curPack='mine'; buildMenu(); }; $('bAgain').onclick=restart; $('bLevels').onclick=()=>{ pausedState=null; showMenu(); };
+$('tabMain').onclick=()=>{ curPack=3; buildMenu(); }; $('tabMine').onclick=()=>{ curPack='mine'; buildMenu(); }; $('tabComm').onclick=()=>{ curPack='community'; buildMenu(); commLoad(); }; $('bAgain').onclick=restart; $('bLevels').onclick=()=>{ pausedState=null; showMenu(); };
 const fsOK=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen; if(!fsOK) $('bFull').style.display='none';
 $('bMusic').onclick=()=>setMusic(!musicOn);
 // fjädringsval: ändrar bara fjäder, dämpning och fjäderväg (setSusp i core.js); gäller direkt, även mitt i en åkning
@@ -2198,18 +2259,19 @@ $('bNextUnplayed').onclick=()=>{ audioInit(); pausedState=null; let i=LEVELS.fin
 
 $('bFull').onclick=()=>{ const d=document.documentElement; try{ if(document.fullscreenElement) document.exitFullscreen(); else { (d.requestFullscreen||d.webkitRequestFullscreen).call(d); if(screen.orientation&&screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{}); } }catch(e){} };
 const PENCIL='<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-7 7l1.2-4.8L4.5-8.1a1.6 1.6 0 0 1 2.3 0l1.3 1.3a1.6 1.6 0 0 1 0 2.3L-2.2 5.8z" fill="#fff" stroke="#18324f" stroke-width="1.6" stroke-linejoin="round"/><path d="M2.6-6.2l3.6 3.6" stroke="#18324f" stroke-width="1.6"/></svg>';
-function buildMenu(){ const box=$('lvls'); box.innerHTML=''; const shown=[], mine=curPack==='mine';
-  $('tabMain').classList.toggle('on',!mine); $('tabMine').classList.toggle('on',mine); $('bNewLevel').style.display=mine?'':'none'; $('bNextUnplayed').style.display=mine?'none':'';
+function buildMenu(){ const box=$('lvls'); box.innerHTML=''; const shown=[], mine=curPack==='mine', comm=curPack==='community';
+  $('tabMain').classList.toggle('on',!mine&&!comm); $('tabMine').classList.toggle('on',mine); $('tabComm').classList.toggle('on',comm); $('tabComm').style.display=onl()?'':'none'; $('bNewLevel').style.display=mine?'':'none'; $('bNextUnplayed').style.display=mine||comm?'none':'';
   LEVELS.forEach((l,i)=>{ if(l.pack!==curPack) return; const n=shown.length+1; shown.push(l); const wr=document.createElement('div'); wr.className='lvw'; const b=document.createElement('button'); b.className='lv'; const t=best[l.id];
     const badge=l.edited?'<span class="newb edb">EDITED</span>':(NEWLV.has(l.id)?'<span class="newb">NEW</span>':'');
-    b.innerHTML='<canvas></canvas>'+badge+'<div class="meta"><div class="nm"><b>'+n+'. '+l.name.replace(/[<>&]/g,'')+'</b><i>'+(t!=null?fmt(t):'Not cleared')+(l.medal?' · gold '+l.medal[0]+' s':'')+'</i></div>'+(l.medal?medalSVG(medalOf(i,t)):'')+'</div>';
+    b.innerHTML='<canvas></canvas>'+badge+'<div class="meta"><div class="nm"><b>'+n+'. '+l.name.replace(/[<>&]/g,'')+'</b><i>'+(l.author?'by '+l.author.replace(/[<>&]/g,'')+' · ':'')+(t!=null?fmt(t):'Not cleared')+(l.medal?' · gold '+l.medal[0]+' s':'')+'</i></div>'+(l.medal?medalSVG(medalOf(i,t)):'')+'</div>';
     b.onclick=()=>{ audioInit(); pausedState=null; loadLevel(i); };
     const e=document.createElement('button'); e.className='edp'; e.setAttribute('aria-label','Edit '+l.name); e.innerHTML=PENCIL; e.onclick=ev=>{ ev.stopPropagation(); edOpen(i); }; if(!edCanEdit(l)) e.style.display='none';
     wr.appendChild(b); wr.appendChild(e); box.appendChild(wr); });
   if(mine&&!shown.length) box.innerHTML='<p class="help" style="grid-column:1/-1;margin:4px 0 8px">No levels of your own yet. Tap <b>＋ New level</b> and build your first! You can also tap the pencil on a built-in level to adjust it.</p>';
   $('resumeRow').style.display=pausedState==='play'?'flex':'none'; $('bEditCur').style.display=pausedState==='play'&&li>=0&&edCanEdit(lvl)?'':'none';
   const inPack=LEVELS.filter(l=>l.pack===curPack), done=inPack.filter(l=>best[l.id]!=null).length, golds=inPack.filter(l=>medalOf(LEVELS.indexOf(l),best[l.id])===3).length;
-  $('progress').textContent=mine?(inPack.length?inPack.length+(inPack.length===1?' own level':' own levels'):''):'Cleared '+done+' of '+inPack.length+' · '+golds+' gold';
+  if(comm&&!shown.length) box.innerHTML='<p class="help" style="grid-column:1/-1;margin:4px 0 8px">'+(commState==='loading'?'Loading levels shared by players …':commState==='error'?'Could not load the community levels right now.':'No shared levels yet. Build one under My levels and tap ⋯ → Share with everyone!')+'</p>';
+  $('progress').textContent=comm?(inPack.length?inPack.length+' shared levels':''):mine?(inPack.length?inPack.length+(inPack.length===1?' own level':' own levels'):''):'Cleared '+done+' of '+inPack.length+' · '+golds+' gold';
   $('bMusic').textContent='Music: '+(musicOn?'on':'off');
   requestAnimationFrame(()=>{ box.querySelectorAll('canvas').forEach((c,i)=>drawPreview(c,shown[i])); }); }
 
@@ -2218,7 +2280,7 @@ function crash(){ if(state!=='play') return; state='crash'; endTimer=0; const [h
   rag=makeRagdoll(bike); bike.rider=false; for(const k in rag.pts){ const q=rag.pts[k]; q.px+=(Math.random()-0.5)*0.01; q.py-= 0.004; }
   for(let i=0;i<14;i++){ const a=Math.random()*6.283, v=1.5+Math.random()*3; parts.push({k:'star',x:hx,y:hy,vx:Math.cos(a)*v,vy:Math.sin(a)*v,r:.07+Math.random()*.06,l:.5,L:.5,c:i%2?'#ffe36b':'#ffffff'}); }
   beep(130,.35,'sawtooth',.13,.3); try{ navigator.vibrate&&navigator.vibrate(60); }catch(e){}
-  $('endTitle').textContent='Crash!'; $('endTime').innerHTML=''; $('endNote').textContent='Press GAS or Enter to ride again'; endButtons(false);
+  $('endTitle').textContent='Crash!'; $('endTime').innerHTML=''; $('endNote').textContent='Press GAS or Enter to ride again'; endButtons(false); lbShow(null);
   setTimeout(()=>{ if(state==='crash') $('endov').classList.add('show'); },1100); }
 function win(){ state='win'; endTimer=0; const test=li<0, prev=best[lvl.id]; const isRec=!test&&(prev==null||T<prev); if(isRec){ best[lvl.id]=T; saveBest(); saveGhost(lvl); } const rec_=isRec;
   const cols=['#ffe08a','#9bd37f','#8fb7ee','#f2a7a0','#ffffff','#b9e3ff']; for(let i=0;i<50;i++){ const an=Math.PI/2+(Math.random()-0.5)*2.0, v=3.5+Math.random()*4.5; parts.push({k:'conf',x:lvl.flower[0],y:lvl.flower[1]+1.1,vx:Math.cos(an)*v,vy:Math.sin(an)*v,rot:Math.random()*6,vr:(Math.random()-0.5)*14,l:2.2+Math.random(),L:3,c:cols[i%cols.length]}); }
@@ -2227,7 +2289,7 @@ function win(){ state='win'; endTimer=0; const test=li<0, prev=best[lvl.id]; con
   const md=lvl.medal, m=md?medalOf(li,T):0; $('endTitle').textContent='Finished!'; $('endTime').innerHTML=(m?medalSVG(m):'')+'<span>'+fmt(T)+'</span>';
   const nxt=!md?'':m===3?'Gold!':(m===2?'Gold under '+fmt(md[0]):'Silver under '+fmt(md[1])+', gold under '+fmt(md[0]));
   $('endNote').textContent=test?'Test ride – the level can be finished!':((rec_&&prev!=null?'New record! ':'')+nxt+(rec_?(nxt?' · ':'')+'Ghost saved':''));
-  endButtons(true); const pk=LEVELS.filter(l=>l.pack===lvl.pack); $('bNext').textContent=pk.indexOf(lvl)===pk.length-1?'First level':'Next level'; setTimeout(()=>{ if(state==='win') $('endov').classList.add('show'); },1000); }
+  endButtons(true); lbShow(test?null:lvl,T); const pk=LEVELS.filter(l=>l.pack===lvl.pack); $('bNext').textContent=pk.indexOf(lvl)===pk.length-1?'First level':'Next level'; setTimeout(()=>{ if(state==='win') $('endov').classList.add('show'); },1000); }
 function contactPts(){ const [hx,hy]=headPos(bike); return [[bike.wh[0].x,bike.wh[0].y,0.8],[bike.wh[1].x,bike.wh[1].y,0.8],[hx,hy,0.65]]; }
 function checkItems(){ const pts=contactPts();
   for(let k=0;k<lvl.apples.length;k++){ if(got[k]) continue; const a=lvl.apples[k];
