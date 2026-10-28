@@ -40,7 +40,7 @@ def put(d, force):
         n = max([int(x[-2:]) for x in known] + [0]) + 1
         lid = 'fjadra-p3-%02d' % n
     d['id'] = lid
-    keep = {k: d[k] for k in ('id', 'name', 'theme', 'hint', 'stuck', 'top', 'start', 'flower', 'apples', 'rings') if k in d}
+    keep = {k: d[k] for k in ('id', 'name', 'theme', 'hint', 'stuck', 'top', 'start', 'flower', 'apples', 'tips', 'rings') if k in d}
     keep['rings'] = [({'style': r['style'], 'pts': r['pts']} if r.get('style') else {'pts': r['pts']}) for r in d['rings']]
     line = "'%s':%s,\n" % (lid, json.dumps(keep, ensure_ascii=False, separators=(',', ':')))
     lines = [l for l in block.splitlines(True) if not l.startswith("'%s':" % lid)]

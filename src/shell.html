@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="sv">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#18324f">
-<title>Fjädra – motocross på fjädrar</title>
+<title>Fjädra – motocross on springs</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
@@ -194,30 +194,30 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
 <div id="hud">
   <div class="hl">
     <div class="tile disp" id="appleTile"><svg width="24" height="24" viewBox="-12 -12 24 24" aria-hidden="true"><path d="M0-10.5l3 6.6 7.2.8-5.4 4.9 1.5 7.1L0 5.3l-6.3 3.6 1.5-7.1-5.4-4.9 7.2-.8z" fill="#ffd23f" stroke="#1d2633" stroke-width="1.6" stroke-linejoin="round"/><ellipse cx="-1.5" cy="-3" rx="1" ry="1.8" fill="#fff" opacity=".85"/></svg><span id="applesTxt">0/3</span></div>
-    <div class="tile" id="gravTile">Tyngd <span id="gravArrow">↑</span></div>
+    <div class="tile" id="gravTile">Gravity <span id="gravArrow">↑</span></div>
   </div>
   <div class="tile disp" id="timerTile"><svg width="22" height="22" viewBox="-12 -12 24 24" aria-hidden="true"><circle r="9" cy="1.5" fill="none" stroke="#fff" stroke-width="2.4"/><path d="M0 1.5V-3.5M0 1.5l3 2.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><path d="M-3-10h6M0-10v2.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg><span id="timer">00:00.00</span></div>
   <div class="hbtns">
-    <button class="hb" id="bRestart" aria-label="Börja om banan"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M8.5 4.5A9.5 9.5 0 1 1 6.2-7.5" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M2.6-12.6l7.6 2.6-5.8 5.6z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg></button>
-    <button class="hb" id="bSound" aria-label="Ljud av eller på"><svg viewBox="-12 -12 24 24"><path id="sndPath" d="M-8-3h4l5-5v16l-5-5h-4z" fill="#fff"/><path id="sndWave" d="M4-4a6 6 0 0 1 0 8M6.5-7a10 10 0 0 1 0 14" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
-    <button class="hb" id="bMap" aria-label="Översikt över banan"><svg viewBox="-12 -12 24 24"><path d="M-9-6l6-3 6 3 6-3v15l-6 3-6-3-6 3z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M-3-9v15M3-6v15" stroke="#fff" stroke-width="2"/></svg></button>
-    <button class="hb" id="bEdBack" aria-label="Tillbaka till editorn"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-7 7l1.2-4.8L4.5-8.1a1.6 1.6 0 0 1 2.3 0l1.3 1.3a1.6 1.6 0 0 1 0 2.3L-2.2 5.8z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></button>
-    <button class="hb" id="bMenu" aria-label="Paus och meny"><svg viewBox="-12 -12 24 24"><rect x="-6" y="-7" width="4" height="14" rx="1.5" fill="#fff"/><rect x="2" y="-7" width="4" height="14" rx="1.5" fill="#fff"/></svg></button>
+    <button class="hb" id="bRestart" aria-label="Restart level"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M8.5 4.5A9.5 9.5 0 1 1 6.2-7.5" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M2.6-12.6l7.6 2.6-5.8 5.6z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg></button>
+    <button class="hb" id="bSound" aria-label="Sound on or off"><svg viewBox="-12 -12 24 24"><path id="sndPath" d="M-8-3h4l5-5v16l-5-5h-4z" fill="#fff"/><path id="sndWave" d="M4-4a6 6 0 0 1 0 8M6.5-7a10 10 0 0 1 0 14" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
+    <button class="hb" id="bMap" aria-label="Level overview"><svg viewBox="-12 -12 24 24"><path d="M-9-6l6-3 6 3 6-3v15l-6 3-6-3-6 3z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M-3-9v15M3-6v15" stroke="#fff" stroke-width="2"/></svg></button>
+    <button class="hb" id="bEdBack" aria-label="Back to the editor"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-7 7l1.2-4.8L4.5-8.1a1.6 1.6 0 0 1 2.3 0l1.3 1.3a1.6 1.6 0 0 1 0 2.3L-2.2 5.8z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></button>
+    <button class="hb" id="bMenu" aria-label="Pause and menu"><svg viewBox="-12 -12 24 24"><rect x="-6" y="-7" width="4" height="14" rx="1.5" fill="#fff"/><rect x="2" y="-7" width="4" height="14" rx="1.5" fill="#fff"/></svg></button>
   </div>
 </div>
 <div id="lvlname"></div>
 
 <div id="ctl">
   <div class="pad">
-    <button class="k lean" data-k="left" aria-label="Vikt bakåt / volta moturs"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M-9 3a10 10 0 1 0 4-10" stroke="#fff" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M-10.5-13.5l8.5 3.2-7.4 6.2z" fill="#fff" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/></svg></button>
-    <button class="k lean" data-k="right" aria-label="Vikt framåt / volta medurs"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M9 3a10 10 0 1 1-4-10" stroke="#fff" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M10.5-13.5l-8.5 3.2 7.4 6.2z" fill="#fff" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/></svg></button>
+    <button class="k lean" data-k="left" aria-label="Lean back / flip counter-clockwise"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M-9 3a10 10 0 1 0 4-10" stroke="#fff" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M-10.5-13.5l8.5 3.2-7.4 6.2z" fill="#fff" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/></svg></button>
+    <button class="k lean" data-k="right" aria-label="Lean forward / flip clockwise"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M9 3a10 10 0 1 1-4-10" stroke="#fff" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M10.5-13.5l-8.5 3.2 7.4 6.2z" fill="#fff" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/></svg></button>
   </div>
   <div class="pad rpad">
     <div class="srow">
-      <button class="k turn" id="kTurn" data-k="turn" aria-label="Vänd cykeln"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M-11-3C-8-10 6-11 10-4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M12.6-9.6l-1 8.4-7.6-3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/><path d="M11 4C8 11-6 11-10 4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M-12.6 9.6l1-8.4 7.6 3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg><span>VÄND</span></button>
+      <button class="k turn" id="kTurn" data-k="turn" aria-label="Turn the bike around"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M-11-3C-8-10 6-11 10-4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M12.6-9.6l-1 8.4-7.6-3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/><path d="M11 4C8 11-6 11-10 4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M-12.6 9.6l1-8.4 7.6 3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg><span>TURN</span></button>
     </div>
     <div class="brow">
-      <button class="k big" id="kBrake" data-k="brake" aria-label="Broms"><small>BROMS</small></button>
+      <button class="k big" id="kBrake" data-k="brake" aria-label="Brake"><small>BRAKE</small></button>
       <button class="k big" id="kGas" data-k="gas" aria-label="Gas"><small>GAS</small></button>
     </div>
   </div>
@@ -227,40 +227,40 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
 
 <div id="ed">
   <div class="edbar edtop">
-    <button class="eb" id="edClose" aria-label="Stäng editorn"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-6-6L6 6M6-6L-6 6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <button class="eb" id="edName" aria-label="Baninställningar">Min bana</button>
+    <button class="eb" id="edClose" aria-label="Close the editor"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-6-6L6 6M6-6L-6 6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="eb" id="edName" aria-label="Level settings">My level</button>
     <span id="edRead"></span>
     <span class="sp"></span>
-    <button class="eb" id="edUndo" aria-label="Ångra"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-7-2h9a5 5 0 0 1 0 10H-2" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M-3-7l-5 5 5 5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <button class="eb" id="edRedo" aria-label="Gör om"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M7-2h-9a5 5 0 0 0 0 10H2" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3-7l5 5-5 5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <button class="eb" id="edFitB" aria-label="Visa hela banan"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-8-3v-5h5M8-3v-5H3M-8 3v5h5M8 3v5H3" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <button class="eb" id="edMoreB" aria-label="Fler inställningar"><svg viewBox="-12 -12 24 24" aria-hidden="true"><circle cx="-6" r="1.8" fill="#fff"/><circle r="1.8" fill="#fff"/><circle cx="6" r="1.8" fill="#fff"/></svg></button>
-    <button class="eb save" id="edSave">Spara</button>
-    <button class="eb go" id="edTest"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-5-8L8 0-5 8z" fill="#fff"/></svg><span class="lbl">Testa</span></button>
+    <button class="eb" id="edUndo" aria-label="Undo"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-7-2h9a5 5 0 0 1 0 10H-2" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M-3-7l-5 5 5 5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="eb" id="edRedo" aria-label="Redo"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M7-2h-9a5 5 0 0 0 0 10H2" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3-7l5 5-5 5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="eb" id="edFitB" aria-label="Show the whole level"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-8-3v-5h5M8-3v-5H3M-8 3v5h5M8 3v5H3" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="eb" id="edMoreB" aria-label="More settings"><svg viewBox="-12 -12 24 24" aria-hidden="true"><circle cx="-6" r="1.8" fill="#fff"/><circle r="1.8" fill="#fff"/><circle cx="6" r="1.8" fill="#fff"/></svg></button>
+    <button class="eb save" id="edSave">Save</button>
+    <button class="eb go" id="edTest"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-5-8L8 0-5 8z" fill="#fff"/></svg><span class="lbl">Test</span></button>
   </div>
-  <div class="edzoom"><button class="eb" id="edZin" aria-label="Zooma in">+</button><button class="eb" id="edZout" aria-label="Zooma ut">−</button></div>
+  <div class="edzoom"><button class="eb" id="edZin" aria-label="Zoom in">+</button><button class="eb" id="edZout" aria-label="Zoom out">−</button></div>
   <div class="edbar edbot">
-    <button class="eb tl on" data-tool="move"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M0-9v18M-9 0h18M0-9l-3 3M0-9l3 3M0 9l-3-3M0 9l3-3M-9 0l3-3M-9 0l3 3M9 0l-3-3M9 0l-3 3" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Flytta</button>
-    <button class="eb tl" data-tool="add"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-9 5L-3-2 3 3 9-4" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="-3" cy="-2" r="2.4" fill="#fff"/><path d="M5-10v6M2-7h6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Punkt</button>
-    <button class="eb tl" data-tool="del"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-9 4L-3-2 3 3 9-4" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M-5-10l6 6M1-10l-6 6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Radera</button>
-    <button class="eb tl" data-tool="star"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M0-9l2.6 5.6 6 .7-4.5 4.1 1.3 6L0 4.4l-5.4 3 1.3-6-4.5-4.1 6-.7z" fill="#ffd23f" stroke="#1d2633" stroke-width="1.2" stroke-linejoin="round"/></svg>Stjärna</button>
-    <button class="eb tl" data-tool="gstar"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M0-9l2.6 5.6 6 .7-4.5 4.1 1.3 6L0 4.4l-5.4 3 1.3-6-4.5-4.1 6-.7z" fill="#5fb8ff" stroke="#1d2633" stroke-width="1.2" stroke-linejoin="round"/></svg>Blå</button>
+    <button class="eb tl on" data-tool="move"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M0-9v18M-9 0h18M0-9l-3 3M0-9l3 3M0 9l-3-3M0 9l3-3M-9 0l3-3M-9 0l3 3M9 0l-3-3M9 0l-3 3" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Move</button>
+    <button class="eb tl" data-tool="add"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-9 5L-3-2 3 3 9-4" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="-3" cy="-2" r="2.4" fill="#fff"/><path d="M5-10v6M2-7h6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Point</button>
+    <button class="eb tl" data-tool="del"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-9 4L-3-2 3 3 9-4" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M-5-10l6 6M1-10l-6 6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Delete</button>
+    <button class="eb tl" data-tool="star"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M0-9l2.6 5.6 6 .7-4.5 4.1 1.3 6L0 4.4l-5.4 3 1.3-6-4.5-4.1 6-.7z" fill="#ffd23f" stroke="#1d2633" stroke-width="1.2" stroke-linejoin="round"/></svg>Star</button>
+    <button class="eb tl" data-tool="gstar"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M0-9l2.6 5.6 6 .7-4.5 4.1 1.3 6L0 4.4l-5.4 3 1.3-6-4.5-4.1 6-.7z" fill="#5fb8ff" stroke="#1d2633" stroke-width="1.2" stroke-linejoin="round"/></svg>Blue</button>
     <button class="eb tl" data-tool="block"><svg viewBox="-12 -12 24 24" aria-hidden="true"><rect x="-9" y="-4" width="18" height="8" rx="1.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M-3-4v8M3-4v8" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Block</button>
     <span class="sp"></span>
-    <button class="eb" id="edOpt">Mjuk 2 m</button>
+    <button class="eb" id="edOpt">Soft 2 m</button>
   </div>
 </div>
 <div class="ov" id="edMore">
   <div class="card">
-    <h2 class="disp">Baninställningar</h2>
-    <label class="fld">Namn<input id="edNameIn" maxlength="40" autocomplete="off"></label>
-    <div class="fld">Tema<div id="edThemes"></div></div>
-    <label class="fld">Tips när banan startar<input id="edHintIn" maxlength="200" autocomplete="off" placeholder="T.ex. Ta sats före hoppet!"></label>
-    <div class="row" style="margin-top:4px"><button class="btn alt" id="edExtendB">Förläng 20 m →</button><button class="btn alt" id="edSplitB">Dela långa linjer</button></div>
-    <div class="row"><button class="btn alt" id="edCopyB">Kopiera bankod</button><button class="btn alt" id="edPasteB">Klistra in bankod</button><button class="btn alt" id="edDlAll">Ladda ner alla ändringar</button><button class="btn" id="edCodeGo" style="display:none">Läs in</button></div>
-    <textarea id="edCode" spellcheck="false" aria-label="Bankod"></textarea>
+    <h2 class="disp">Level settings</h2>
+    <label class="fld">Name<input id="edNameIn" maxlength="40" autocomplete="off"></label>
+    <div class="fld">Theme<div id="edThemes"></div></div>
+    <label class="fld">Tip when the level starts<input id="edHintIn" maxlength="200" autocomplete="off" placeholder="E.g. Build up speed before the jump!"></label>
+    <div class="row" style="margin-top:4px"><button class="btn alt" id="edExtendB">Extend 20 m →</button><button class="btn alt" id="edSplitB">Split long lines</button></div>
+    <div class="row"><button class="btn alt" id="edCopyB">Copy level code</button><button class="btn alt" id="edPasteB">Paste level code</button><button class="btn alt" id="edDlAll">Download all changes</button><button class="btn" id="edCodeGo" style="display:none">Load</button></div>
+    <textarea id="edCode" spellcheck="false" aria-label="Level code"></textarea>
     <p id="edInfo"></p>
-    <div class="row"><button class="btn" id="edMoreOk">Klar</button><button class="btn warn" id="edReset">Återställ original</button><button class="btn warn" id="edDelete">Ta bort banan</button></div>
+    <div class="row"><button class="btn" id="edMoreOk">Done</button><button class="btn warn" id="edReset">Restore original</button><button class="btn warn" id="edDelete">Delete level</button></div>
   </div>
 </div>
 
@@ -268,30 +268,30 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
 <div class="ov show" id="menu">
   <div class="card">
     <div class="head"><h1 class="title disp">Fjädra</h1></div>
-    <p class="sub">Trialspussel på fjädrar. Samla alla stjärnor och kör till blomman. Ta det lugnt, läs banan och hitta vägen. Bara hjulen och huvudet rör marken – och huvudet tål ingenting.</p>
-    <div class="tabs"><button class="tab on" id="tabMain">Banor</button><button class="tab" id="tabMine">Mina banor</button></div>
-    <div class="row" id="resumeRow" style="margin:0 0 10px;display:none"><button class="btn" id="bResume">Fortsätt köra</button><button class="btn alt" id="bEditCur">✎ Redigera banan</button></div>
-    <div class="row" style="margin:0 0 10px;align-items:center"><button class="btn" id="bNextUnplayed">Spela nästa</button><button class="btn" id="bNewLevel" style="display:none">＋ Ny bana</button><span id="progress" style="color:var(--muted);font-size:14px;font-weight:800"></span></div>
-    <div class="fjad" style="margin:0 0 2px"><b class="disp">Fjädring</b><div id="suspBtns"></div></div>
+    <p class="sub">Trials puzzles on springs. Collect all the stars and ride to the flower. Take it easy, read the level and find the way. Only the wheels and the head touch the ground – and the head can't take a hit.</p>
+    <div class="tabs"><button class="tab on" id="tabMain">Levels</button><button class="tab" id="tabMine">My levels</button></div>
+    <div class="row" id="resumeRow" style="margin:0 0 10px;display:none"><button class="btn" id="bResume">Keep riding</button><button class="btn alt" id="bEditCur">✎ Edit level</button></div>
+    <div class="row" style="margin:0 0 10px;align-items:center"><button class="btn" id="bNextUnplayed">Play next</button><button class="btn" id="bNewLevel" style="display:none">＋ New level</button><span id="progress" style="color:var(--muted);font-size:14px;font-weight:800"></span></div>
+    <div class="fjad" style="margin:0 0 2px"><b class="disp">Suspension</b><div id="suspBtns"></div></div>
     <p id="suspTxt" style="margin:0 0 10px"></p>
     <div class="lvls" id="lvls"></div>
-    <p class="help"><b>Mobil:</b> GAS och BROMS till höger, pilen vänder cykeln. ↺ ↻ flyttar förarens vikt och voltar cykeln – båda samtidigt ger en extra kraftig volt. <b>Pumpa:</b> luta bak och fram i takt för att ta fart med armarna. <b>Bunny hop:</b> luta bakåt en kort stund och kasta sedan vikten framåt. <b>Studs:</b> tryck ner ett hjul (landning eller volt) och tryck BROMS precis i botten. <b>Broms</b> får också hjulen att greppa – häng i kanter och balkar.<br>
-    <b>Tangentbord:</b> ↑ gas, ↓ broms, ← → volta, mellanslag vänd, Enter börja om, Esc meny.</p>
-    <p id="rot">Vänd mobilen till liggande läge för bäst kontroll.</p>
-    <div class="row"><button class="btn alt" id="bMusic">Musik: på</button><button class="btn alt" id="bStyle">Stil: Tecknad</button><button class="btn alt" id="bFull">Helskärm</button></div>
+    <p class="help"><b>Mobile:</b> GAS and BRAKE on the right, TURN flips the bike around. ↺ ↻ shift the rider's weight and flip the bike – both at once gives an extra strong flip. <b>Pump:</b> lean back and forth in rhythm to gain speed with your arms. <b>Bunny hop:</b> lean back for a moment, then throw your weight forward. <b>Bounce:</b> press a wheel down (landing or flip) and hit BRAKE right at the bottom. <b>Brake</b> also makes the wheels grip – hang on edges and beams.<br>
+    <b>Keyboard:</b> ↑ gas, ↓ brake, ← → flip, space turn, Enter restart, Esc menu.</p>
+    <p id="rot">Turn your phone to landscape for the best control.</p>
+    <div class="row"><button class="btn alt" id="bMusic">Music: on</button><button class="btn alt" id="bStyle">Style: Cartoon</button><button class="btn alt" id="bFull">Fullscreen</button></div>
   </div>
 </div>
 
 <div class="ov" id="endov">
   <div class="card">
-    <h2 class="disp" id="endTitle">I mål!</h2>
+    <h2 class="disp" id="endTitle">Finished!</h2>
     <p class="disp" id="endTime"></p>
     <p id="endNote"></p>
     <div class="row">
-      <button class="btn" id="bNext">Nästa bana</button>
-      <button class="btn alt" id="bAgain">Kör igen</button>
-      <button class="btn alt" id="bLevels">Banor</button>
-      <button class="btn alt" id="bToEd" style="display:none">✎ Till editorn</button>
+      <button class="btn" id="bNext">Next level</button>
+      <button class="btn alt" id="bAgain">Ride again</button>
+      <button class="btn alt" id="bLevels">Levels</button>
+      <button class="btn alt" id="bToEd" style="display:none">✎ To the editor</button>
     </div>
   </div>
 </div>

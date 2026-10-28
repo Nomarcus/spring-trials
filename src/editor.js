@@ -5,21 +5,21 @@
 // Banfil = {v,id,name,theme,hint,stuck,top,start,flower,apples,rings} – samma format som EDITS i levels.js.
 // "Kopiera bankod" ger banfilen som text; tools/fjadra/import_level.py bakar in den i spelet.
 // Editorn ritar banan med spelets egen grafik (state 'edit'): ingen fysik körs, kameran styrs med fingrarna.
-const ED_THEMES=[['meadow','Äng'],['sunset','Solnedgång'],['winter','Vinter'],['cave','Grotta']];
-const ED_MATS=[['wood','Trä'],['steel','Stål'],['stone','Sten'],['crate','Låda'],['log','Stock'],[null,'Mark']];
+const ED_THEMES=[['meadow','Meadow'],['sunset','Sunset'],['winter','Winter'],['cave','Cave']];
+const ED_MATS=[['wood','Wood'],['steel','Steel'],['stone','Stone'],['crate','Crate'],['log','Log'],[null,'Ground']];
 const ED_SOFT=[0,1,2,4,8];
 const ED_DIRS=['up','right','down','left'];
-const ED_TIPS={move:'Dra i marken för att forma den. Dra stjärnor, start, blomma och block. Två fingrar flyttar och zoomar.',
-  add:'Tryck på en linje för att lägga till en punkt och dra den dit du vill.', del:'Tryck på en punkt, stjärna eller ett block för att ta bort det.',
-  star:'Tryck där stjärnan ska ligga.', gstar:'Tryck där den blå stjärnan ska ligga. Tryck på en stjärna för att byta riktning.',
-  block:'Tryck där blocket ska ligga, dra för att flytta. Trä och stål: huvudet åker igenom, hjulen kör på. Mark mitt i marken gör en grotta.'};
+const ED_TIPS={move:'Drag the ground to shape it. Drag stars, start, flower and blocks. Two fingers pan and zoom.',
+  add:'Tap a line to add a point and drag it where you want.', del:'Tap a point, star or block to delete it.',
+  star:'Tap where the star should go.', gstar:'Tap where the blue star should go. Tap a star to change its direction.',
+  block:'Tap where the block should go, drag to move it. Wood and steel: the head passes through, the wheels ride on them. Ground placed inside the ground makes a cave.'};
 let ed=null, edTesting=false;
 const ORIG={};   // inbyggda banor innan de ändrades i editorn (för Återställ original)
 const r3=v=>Math.round(v*1000)/1000;
 function edGet(k,def){ try{ const s=localStorage.getItem(k); return s?JSON.parse(s):def; }catch(e){ return def; } }
 function edPut(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); return true; }catch(e){ return false; } }
 function edDocOf(l){ return {v:1,id:l.id,name:l.name,theme:l.theme,hint:l.hint||'',stuck:l.stuck||'',top:l.top||TOP,start:l.start.slice(),flower:l.flower.slice(),
-  apples:l.apples.map(a=>a.slice()),rings:l.rings.map(r=>r.style?{style:r.style,pts:r.pts.map(p=>[r3(p[0]),r3(p[1])])}:{pts:r.pts.map(p=>[r3(p[0]),r3(p[1])])})}; }
+  apples:l.apples.map(a=>a.slice()),...(l.tips?{tips:l.tips.map(t=>t.slice())}:{}),rings:l.rings.map(r=>r.style?{style:r.style,pts:r.pts.map(p=>[r3(p[0]),r3(p[1])])}:{pts:r.pts.map(p=>[r3(p[0]),r3(p[1])])})}; }
 function edNewDoc(name){ const g=[]; for(let x=0;x<=80;x++) g.push([x,0]);
   return {v:1,id:'mine-'+Date.now().toString(36),name,theme:'meadow',hint:'',stuck:'',top:TOP,start:[2,0],flower:[74,0],apples:[[30,0.75]],rings:[{pts:[[-6,TOP],[-6,0],...g,[86,0],[86,TOP]]}]}; }
 function edMineLevel(d){ return levelFromDoc(d,{pack:'mine',medal:null}); }
@@ -50,15 +50,15 @@ async function edPull(db){ let snap; try{ snap=await db.collection(EDB_COL).get(
 async function edShare(c){ const db=await edDb; if(!db) return null;
   try{ await db.collection(EDB_COL).doc(c.id).set({doc:c,at:Date.now()}); return true; }catch(e){ return (e&&e.code)||'fel'; } }
 async function edDownloadAll(){ const edits=edGet('fjadra.edits',{}), list=Object.values(edits);
-  if(!list.length) return toast('Du har inga ändrade banor än',2200);
+  if(!list.length) return toast('You have no edited levels yet',2200);
   const data=JSON.stringify({v:1,edits:list}), name='fjadra-andringar.json';
   let dl=null; try{ dl=(window.claude&&window.claude.use)?await window.claude.use('downloads'):null; }catch(e){}
   try{ if(dl) await dl.save({filename:name,data}); else { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([data],{type:'application/json'})); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000); }
-    toast(list.length+' ändrade banor – skicka filen till Claude så bakas de in i spelet',4200); }catch(e){ if(!(e&&e.code==='declined')) toast('Kunde inte spara filen',2400); } }
+    toast(list.length+' edited levels – send the file to Claude to build them into the game',4200); }catch(e){ if(!(e&&e.code==='declined')) toast('Could not save the file',2400); } }
 
 // ---------- öppna / stänga ----------
 function edOpen(i){ let doc, src;
-  if(i==null||i<0){ const n=LEVELS.filter(l=>l.pack==='mine').length+1; doc=edNewDoc('Min bana '+n); src='mine'; }
+  if(i==null||i<0){ const n=LEVELS.filter(l=>l.pack==='mine').length+1; doc=edNewDoc('My level '+n); src='mine'; }
   else { const l=LEVELS[i]; doc=edDocOf(l); src=l.pack==='mine'?'mine':'edit'; }
   edStart(doc,src,i==null||i<0); }
 function edStart(doc,src,isNew){ audioInit(); for(const k in inp) inp[k]=0;
@@ -66,7 +66,7 @@ function edStart(doc,src,isNew){ audioInit(); for(const k in inp) inp[k]=0;
   edTesting=false; pausedState=null; hideOv(); $('edMore').classList.remove('show'); state='edit'; parts=[]; rag=null; pops=[]; bloom=0;
   document.body.classList.add('editing'); document.body.classList.remove('testing'); edSync(true); edHome(); edUI(); toast(ED_TIPS.move,3600); }
 function edIdle(l){ lvl=l; setTheme(l.theme); if(!l.vis) analyze(l); bike=newBike(l.start[0],l.start[1]); got=l.apples.map(()=>false); cam.x=bike.b.x+5; cam.y=bike.b.y+1.2; parts=[]; rag=null; }
-function edClose(){ if(ed.dirty&&!confirm('Du har osparade ändringar. Stänga editorn ändå?')) return;
+function edClose(){ if(ed.dirty&&!confirm('You have unsaved changes. Close the editor anyway?')) return;
   const id=ed.doc.id, src=ed.src; ed=null; document.body.classList.remove('editing'); $('edMore').classList.remove('show');
   curPack=src==='mine'?'mine':3; edIdle(LEVELS.find(l=>l.id===id)||LEVELS[0]); zoom=0.86; SC=SC0*zoom; showMenu(); }
 // visningsobjektet som spelets ritkod använder (delar punkterna med banfilen, så ändringar syns direkt)
@@ -132,13 +132,13 @@ function edAct(sx,sy){ const [x,y]=edW(sx,sy), d=ed.doc, t=ed.tool;
     edPush(); d.rings[s.ri].pts.splice(s.i+1,0,[r3(s.px),r3(s.py)]); edSync(); const keep=ed.soft; ed.soft=0; dragPts(s.ri,s.i+1,null); ed.soft=keep; return; }
   if(t==='del'){ const o=edHitObj(x,y);
     if(o&&o.kind==='apple'){ edPush(); d.apples.splice(o.i,1); edSync(); return; }
-    if(o){ toast(o.kind==='start'?'Starten kan inte tas bort – dra den i stället':'Blomman kan inte tas bort – dra den i stället'); return; }
+    if(o){ toast(o.kind==='start'?'The start cannot be deleted – drag it instead':'The flower cannot be deleted – drag it instead'); return; }
     const p=edHitPt(x,y);
-    if(p){ const rg=d.rings[p.ri]; if(rg.pts.length<=3){ if(p.ri===0) return toast('Marken behöver minst tre punkter'); edPush(); d.rings.splice(p.ri,1); } else { edPush(); rg.pts.splice(p.i,1); } edSync(true); return; }
+    if(p){ const rg=d.rings[p.ri]; if(rg.pts.length<=3){ if(p.ri===0) return toast('The ground needs at least three points'); edPush(); d.rings.splice(p.ri,1); } else { edPush(); rg.pts.splice(p.i,1); } edSync(true); return; }
     const ri=edHitRing(x,y); if(ri>0){ edPush(); d.rings.splice(ri,1); edSync(true); return; } return pan(); }
   if(t==='star'||t==='gstar'){ const o=edHitObj(x,y);
     if(o&&o.kind==='apple'){ if(t==='star') return dragObj(o,edSnap()); const a=d.apples[o.i]; edPush(); const k=a[2]?ED_DIRS.indexOf(a[2])+1:0;
-      if(k>=ED_DIRS.length) a.length=2; else a[2]=ED_DIRS[k]; edSync(); toast(a[2]?'Blå stjärna: tyngden '+({up:'uppåt',down:'nedåt',left:'åt vänster',right:'åt höger'})[a[2]]:'Vanlig stjärna',1300); return; }
+      if(k>=ED_DIRS.length) a.length=2; else a[2]=ED_DIRS[k]; edSync(); toast(a[2]?'Blue star: gravity '+({up:'up',down:'down',left:'left',right:'right'})[a[2]]:'Normal star',1300); return; }
     edPush(); d.apples.push(t==='gstar'?[r3(x),r3(y),ed.gdir]:[r3(x),r3(y)]); edSync(); return dragObj({kind:'apple',i:d.apples.length-1},null); }
   if(t==='block'){ const ri=edHitRing(x,y); if(ri>0) return dragRing(ri,edSnap());
     edPush(); d.rings.push(edBlock(x,y,ed.mat)); edSync(true); return dragRing(d.rings.length-1,null); } }
@@ -151,7 +151,7 @@ function edMove(sx,sy){ const pe=ed.pend; if(pe){ if(Math.hypot(sx-pe.sx,sy-pe.s
   else if(dr.type==='obj'){ const a=dr.o.kind==='apple'?d.apples[dr.o.i]:dr.o.kind==='flower'?d.flower:d.start; a[0]=r3(dr.ax+dx); a[1]=r3(dr.ay+dy); rx=a[0]; ry=a[1]; }
   else if(dr.type==='ring'){ const p=d.rings[dr.ri].pts; dr.orig.forEach((q,k)=>{ p[k][0]=r3(q[0]+dx); p[k][1]=r3(q[1]+dy); }); rx=dx; ry=dy; }
   edSync(false); if(performance.now()-ed.anT>150&&edCount()<1500){ analyze(lvl); ed.anT=performance.now(); }
-  $('edRead').textContent=dr.type==='ring'?'flytta '+rx.toFixed(1)+' · '+ry.toFixed(1):'x '+rx.toFixed(1)+' · y '+ry.toFixed(1); }
+  $('edRead').textContent=dr.type==='ring'?'move '+rx.toFixed(1)+' · '+ry.toFixed(1):'x '+rx.toFixed(1)+' · y '+ry.toFixed(1); }
 function edUp(){ const pe=ed.pend; ed.pend=null; if(pe) edAct(pe.sx,pe.sy); const dr=ed.drag; ed.drag=null; $('edRead').textContent=''; if(dr&&dr.type!=='pan'&&(dr.moved||!dr.snap)) edSync(true); }
 cv.addEventListener('pointerdown',e=>{ if(state!=='edit') return; e.preventDefault(); try{ cv.setPointerCapture(e.pointerId); }catch(_){}
   ed.ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
@@ -187,34 +187,34 @@ function edSplitRing(rg,maxLen,top,only){ const p=rg.pts, out=[];
   for(let i=0;i<p.length;i++){ const a=p[i], b=p[(i+1)%p.length]; out.push(a); if(a[1]>=top-0.01&&b[1]>=top-0.01) continue; if(only&&!only(a,b)) continue;
     const L=Math.hypot(b[0]-a[0],b[1]-a[1]), n=Math.ceil(L/maxLen); for(let k=1;k<n;k++) out.push([r3(a[0]+(b[0]-a[0])*k/n),r3(a[1]+(b[1]-a[1])*k/n)]); }
   rg.pts=out; }
-function edSplit(){ edPush(); for(const rg of ed.doc.rings) if(!rg.style) edSplitRing(rg,1,ed.doc.top); edSync(true); toast('Långa linjer delade i 1 m-bitar – nu går de att forma',2200); }
+function edSplit(){ edPush(); for(const rg of ed.doc.rings) if(!rg.style) edSplitRing(rg,1,ed.doc.top); edSync(true); toast('Long lines split into 1 m pieces – now they can be shaped',2200); }
 function edExtend(){ edPush(); const rg=ed.doc.rings[0], p=rg.pts; let mx=-1e9; for(const q of p) mx=Math.max(mx,q[0]);
   for(const q of p) if(q[0]>mx-0.01) q[0]=r3(q[0]+20); edSplitRing(rg,1,ed.doc.top,(a,b)=>Math.max(a[0],b[0])>mx+0.5&&Math.min(a[0],b[0])<mx+19.5);
-  edSync(true); cam.x=mx+10; toast('Banan är 20 m längre åt höger',1800); }
+  edSync(true); cam.x=mx+10; toast('The level is 20 m longer to the right',1800); }
 function edTool(t){ ed.tool=t; edUI(); toast(ED_TIPS[t],t==='block'?4200:2600); }
 function edOpt(){ const t=ed.tool;
-  if(t==='move'||t==='add'){ ed.soft=ED_SOFT[(ED_SOFT.indexOf(ed.soft)+1)%ED_SOFT.length]; toast(ed.soft?'Mjuk: punkter inom '+ed.soft+' m följer med':'Skarp: bara punkten du drar i flyttas',1800); }
+  if(t==='move'||t==='add'){ ed.soft=ED_SOFT[(ED_SOFT.indexOf(ed.soft)+1)%ED_SOFT.length]; toast(ed.soft?'Soft: points within '+ed.soft+' m follow along':'Sharp: only the point you drag moves',1800); }
   else if(t==='gstar'){ ed.gdir=ED_DIRS[(ED_DIRS.indexOf(ed.gdir)+1)%4]; }
   else if(t==='block'){ const k=ED_MATS.findIndex(m=>m[0]===ed.mat); ed.mat=ED_MATS[(k+1)%ED_MATS.length][0]; }
   edUI(); }
 function edUI(){ if(!ed) return; const t=ed.tool;
   document.querySelectorAll('#ed [data-tool]').forEach(b=>b.classList.toggle('on',b.dataset.tool===t));
   const o=$('edOpt'); let txt='';
-  if(t==='move'||t==='add') txt=ed.soft?'Mjuk '+ed.soft+' m':'Skarp'; else if(t==='gstar') txt='Tyngd '+GARROW[ed.gdir]; else if(t==='block') txt=ED_MATS.find(m=>m[0]===ed.mat)[1];
+  if(t==='move'||t==='add') txt=ed.soft?'Soft '+ed.soft+' m':'Sharp'; else if(t==='gstar') txt='Gravity '+GARROW[ed.gdir]; else if(t==='block') txt=ED_MATS.find(m=>m[0]===ed.mat)[1];
   o.textContent=txt; o.style.display=txt?'':'none';
-  $('edUndo').disabled=!ed.undo.length; $('edRedo').disabled=!ed.redo.length; $('edSave').classList.toggle('dirty',ed.dirty); $('edName').textContent=ed.doc.name||'Namnlös'; }
+  $('edUndo').disabled=!ed.undo.length; $('edRedo').disabled=!ed.redo.length; $('edSave').classList.toggle('dirty',ed.dirty); $('edName').textContent=ed.doc.name||'Untitled'; }
 
 // ---------- spara / testa ----------
-function edClean(d){ return {v:1,id:d.id,name:(d.name||'Namnlös').slice(0,40),theme:d.theme,hint:d.hint||'',stuck:d.stuck||'',top:d.top,start:d.start,flower:d.flower,apples:d.apples,rings:d.rings.map(r=>r.style?{style:r.style,pts:r.pts}:{pts:r.pts})}; }
+function edClean(d){ return {v:1,id:d.id,name:(d.name||'Untitled').slice(0,40),theme:d.theme,hint:d.hint||'',stuck:d.stuck||'',top:d.top,start:d.start,flower:d.flower,apples:d.apples,...(d.tips?{tips:d.tips}:{}),rings:d.rings.map(r=>r.style?{style:r.style,pts:r.pts}:{pts:r.pts})}; }
 function edSave(){ const c=JSON.parse(JSON.stringify(edClean(ed.doc))), id=c.id, i=LEVELS.findIndex(l=>l.id===id);
   if(ed.src==='mine'){ const list=edGet('fjadra.mine',[]), k=list.findIndex(x=>x.id===id); if(k<0) list.push(c); else list[k]=c;
-    if(!edPut('fjadra.mine',list)) return toast('Kunde inte spara – lagringen är full',2600);
+    if(!edPut('fjadra.mine',list)) return toast('Could not save – storage is full',2600);
     const L=edMineLevel(c); if(i<0) LEVELS.push(L); else LEVELS[i]=L; }
-  else { const m=edGet('fjadra.edits',{}); m[id]=c; if(!edPut('fjadra.edits',m)) return toast('Kunde inte spara – lagringen är full',2600);
+  else { const m=edGet('fjadra.edits',{}); m[id]=c; if(!edPut('fjadra.edits',m)) return toast('Could not save – storage is full',2600);
     if(!ORIG[id]) ORIG[id]=LEVELS[i]; LEVELS[i]=levelFromDoc(c,{pack:LEVELS[i].pack,medal:LEVELS[i].medal,edited:true}); try{ localStorage.removeItem('fjadra.g4.'+id); }catch(e){} }
   ed.dirty=false; ed.isNew=false; edUI();
-  if(ed.src==='mine') return toast('Sparad under Mina banor',2200);
-  toast('Sparar …',1500); edShare(c).then(r=>toast(r===true?'Sparad för alla som spelar via länken ✓':r===null?'Sparad på den här enheten. Öppna spelet via claude.ai-länken för att spara för alla.':r==='quota_exceeded'?'Sparad här, men databasen är full':'Sparad på den här enheten (bara ägaren kan spara för alla)',3600)); }
+  if(ed.src==='mine') return toast('Saved under My levels',2200);
+  toast('Saving …',1500); edShare(c).then(r=>toast(r===true?'Saved for everyone playing via the link ✓':r===null?'Saved on this device. Open the game via the claude.ai link to save for everyone.':r==='quota_exceeded'?'Saved here, but the database is full':'Saved on this device (only the owner can save for everyone)',3600)); }
 function edTest(){ const L=levelFromDoc(edClean(ed.doc),{pack:'test',medal:null,stuck:ed.doc.stuck});
   ed.cam={x:cam.x,y:cam.y,sc:SC}; ed.ptrs.clear(); ed.pinch=null; ed.drag=null; edTesting=true; zoom=0.86; SC=SC0*zoom;
   document.body.classList.remove('editing'); document.body.classList.add('testing'); loadLevel(-1,L); }
@@ -227,30 +227,30 @@ function edMore(){ const d=ed.doc; $('edNameIn').value=d.name; $('edHintIn').val
   $('edThemes').innerHTML=''; for(const [k,n] of ED_THEMES){ const b=document.createElement('button'); b.className='tab'+(d.theme===k?' on':''); b.textContent=n;
     b.onclick=()=>{ if(d.theme===k) return; edPush(); d.theme=k; edSync(true); edMore(); }; $('edThemes').appendChild(b); }
   $('edReset').style.display=ed.src==='edit'&&ORIG[d.id]?'':'none'; $('edDelete').style.display=ed.src==='mine'&&!ed.isNew?'':'none';
-  $('edInfo').textContent=(ed.src==='mine'?'Egen bana':'Inbyggd bana')+' · '+edCount()+' punkter · '+d.apples.length+' stjärnor';
+  $('edInfo').textContent=(ed.src==='mine'?'Own level':'Built-in level')+' · '+edCount()+' points · '+d.apples.length+' stars';
   $('edMore').classList.add('show'); }
 function edMoreDone(){ const d=ed.doc, n=$('edNameIn').value.trim()||d.name, h=$('edHintIn').value.trim();
   if(n!==d.name||h!==(d.hint||'')){ edPush(); d.name=n.slice(0,40); d.hint=h.slice(0,200); edSync(false); }
   $('edMore').classList.remove('show'); edUI(); }
 async function edCopy(){ const s=JSON.stringify(edClean(ed.doc)), ta=$('edCode'); ta.value=s; ta.style.display='block'; $('edCodeGo').style.display='none'; ta.focus(); ta.select();
   let ok=false; try{ await navigator.clipboard.writeText(s); ok=true; }catch(e){ try{ ok=document.execCommand('copy'); }catch(_){} }
-  toast(ok?'Bankoden är kopierad. Skicka den till Claude så läggs banan in i spelet.':'Markera texten i rutan och kopiera den',4200); }
-function edPasteOpen(){ const ta=$('edCode'); ta.value=''; ta.style.display='block'; $('edCodeGo').style.display=''; ta.focus(); toast('Klistra in en bankod i rutan och tryck Läs in',2600); }
-function edPasteGo(){ let d; try{ d=JSON.parse($('edCode').value.trim()); }catch(e){ return toast('Koden gick inte att läsa – kopierades hela?',2600); }
+  toast(ok?'The level code is copied. Send it to Claude to build the level into the game.':'Select the text in the box and copy it',4200); }
+function edPasteOpen(){ const ta=$('edCode'); ta.value=''; ta.style.display='block'; $('edCodeGo').style.display=''; ta.focus(); toast('Paste a level code in the box and tap Load',2600); }
+function edPasteGo(){ let d; try{ d=JSON.parse($('edCode').value.trim()); }catch(e){ return toast('The code could not be read – was all of it copied?',2600); }
   const okPt=p=>Array.isArray(p)&&p.length>=2&&isFinite(p[0])&&isFinite(p[1]);
   if(!d||!Array.isArray(d.rings)||!d.rings.length||!d.rings.every(r=>r&&Array.isArray(r.pts)&&r.pts.length>=3&&r.pts.every(okPt))||!okPt(d.start)||!okPt(d.flower)||!Array.isArray(d.apples)||!d.apples.every(okPt))
-    return toast('Det där ser inte ut som en bankod',2400);
-  if(ed.dirty&&!confirm('Ersätta banan du håller på med? Osparade ändringar försvinner.')) return;
+    return toast('That does not look like a level code',2400);
+  if(ed.dirty&&!confirm('Replace the level you are working on? Unsaved changes will be lost.')) return;
   const built=LEVELS.find(l=>l.id===d.id&&l.pack!=='mine');
-  const doc={v:1,id:built?d.id:(String(d.id||'').startsWith('mine-')?d.id:'mine-'+Date.now().toString(36)),name:String(d.name||'Inläst bana').slice(0,40),theme:ED_THEMES.some(t=>t[0]===d.theme)?d.theme:'meadow',
+  const doc={v:1,id:built?d.id:(String(d.id||'').startsWith('mine-')?d.id:'mine-'+Date.now().toString(36)),name:String(d.name||'Loaded level').slice(0,40),theme:ED_THEMES.some(t=>t[0]===d.theme)?d.theme:'meadow',
     hint:String(d.hint||''),stuck:String(d.stuck||''),top:isFinite(d.top)?+d.top:TOP,start:d.start.slice(0,2),flower:d.flower.slice(0,2),
     apples:d.apples.map(a=>ED_DIRS.includes(a[2])?[+a[0],+a[1],a[2]]:[+a[0],+a[1]]),rings:d.rings.map(r=>{ const pts=r.pts.map(p=>[+p[0],+p[1]]); return ED_MATS.some(m=>m[0]&&m[0]===r.style)?{style:r.style,pts}:{pts}; })};
-  $('edMore').classList.remove('show'); edStart(doc,built?'edit':'mine',true); toast('Banan är inläst – tryck Spara för att behålla den',2600); }
-function edReset(){ const id=ed.doc.id; if(!ORIG[id]||!confirm('Återställa originalbanan? Dina ändringar av den tas bort.')) return;
+  $('edMore').classList.remove('show'); edStart(doc,built?'edit':'mine',true); toast('The level is loaded – tap Save to keep it',2600); }
+function edReset(){ const id=ed.doc.id; if(!ORIG[id]||!confirm('Restore the original level? Your changes to it will be removed.')) return;
   const m=edGet('fjadra.edits',{}); delete m[id]; edPut('fjadra.edits',m); const i=LEVELS.findIndex(l=>l.id===id); LEVELS[i]=ORIG[id]; delete ORIG[id];
   edDb.then(db=>db&&db.collection(EDB_COL).doc(id).delete()).catch(()=>{});
-  $('edMore').classList.remove('show'); edStart(edDocOf(LEVELS[i]),'edit',false); toast('Originalbanan är tillbaka',1800); }
-function edDelete(){ const id=ed.doc.id; if(!confirm('Ta bort banan "'+ed.doc.name+'" för alltid?')) return;
+  $('edMore').classList.remove('show'); edStart(edDocOf(LEVELS[i]),'edit',false); toast('The original level is back',1800); }
+function edDelete(){ const id=ed.doc.id; if(!confirm('Delete the level "'+ed.doc.name+'" forever?')) return;
   edPut('fjadra.mine',edGet('fjadra.mine',[]).filter(x=>x.id!==id)); const i=LEVELS.findIndex(l=>l.id===id); if(i>=0) LEVELS.splice(i,1);
   delete best[id]; saveBest(); try{ localStorage.removeItem('fjadra.g4.'+id); }catch(e){}
   $('edMore').classList.remove('show'); ed.dirty=false; edClose(); }
