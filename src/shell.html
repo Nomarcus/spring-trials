@@ -185,9 +185,9 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
 #suspBtns{ display:flex; gap:6px; flex-wrap:wrap; }
 #suspBtns .tab{ padding:6px 11px; font-size:15px; }
 #suspTxt{ margin:6px 0 0; font-size:13.5px; color:var(--muted); }
-.k.turn.wide{ width:192px; height:64px; flex-direction:row; gap:10px; }   /* lika bred som BRAKE + GAS, precis ovanför dem */
-.k.turn.wide span{ font-size:16px; }
-@media (max-height:420px){ .k.turn.wide{ width:168px; height:54px; } .k.turn.wide span{ font-size:14px; } }
+.turnrow{ align-self:stretch; justify-content:center; }   /* TURN centrerad ovanför BRAKE + GAS */
+.k.turn.compact{ width:96px; height:52px; border-radius:18px; } .k.turn.compact svg{ width:30px; height:30px; }
+@media (max-height:420px){ .k.turn.compact{ width:84px; height:44px; border-radius:15px; } .k.turn.compact svg{ width:26px; height:26px; } }
 #lbBox{ margin:8px auto 0; max-width:320px; text-align:left; }
 #lbTitle{ font-size:17px; color:var(--ink); margin-bottom:4px; text-align:center; }
 #lbList{ font-size:14px; color:var(--muted); font-variant-numeric:tabular-nums; }
@@ -226,12 +226,12 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
     <div class="srow">
       <button class="k small" id="bRestart" aria-label="Restart level"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M8.5 4.5A9.5 9.5 0 1 1 6.2-7.5" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M2.6-12.6l7.6 2.6-5.8 5.6z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg><span>RESET</span></button>
     </div>
-    <div class="srow">
-      <button class="k turn wide" id="kTurn" data-k="turn" aria-label="Turn the bike around"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M-11-3C-8-10 6-11 10-4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M12.6-9.6l-1 8.4-7.6-3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/><path d="M11 4C8 11-6 11-10 4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M-12.6 9.6l1-8.4 7.6 3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg><span>TURN</span></button>
+    <div class="srow turnrow">
+      <button class="k turn compact" id="kTurn" data-k="turn" aria-label="Turn the bike around"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M-11-3C-8-10 6-11 10-4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M12.6-9.6l-1 8.4-7.6-3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/><path d="M11 4C8 11-6 11-10 4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M-12.6 9.6l1-8.4 7.6 3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg></button>
     </div>
     <div class="brow">
-      <button class="k big" id="kBrake" data-k="brake" aria-label="Brake"><small>BRAKE</small></button>
-      <button class="k big" id="kGas" data-k="gas" aria-label="Gas"><small>GAS</small></button>
+      <button class="k big" id="kBrake" data-k="brake" aria-label="Brake"></button>
+      <button class="k big" id="kGas" data-k="gas" aria-label="Gas"></button>
     </div>
   </div>
 </div>
@@ -289,7 +289,7 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
     <div class="fjad" style="margin:0 0 2px"><b class="disp">Suspension</b><div id="suspBtns"></div></div>
     <p id="suspTxt" style="margin:0 0 10px"></p>
     <div class="lvls" id="lvls"></div>
-    <p class="help"><b>Mobile:</b> GAS and BRAKE on the right, TURN flips the bike around – or swipe your thumb up from GAS or BRAKE to turn without letting go. ↺ ↻ shift the rider's weight and flip the bike – both at once gives an extra strong flip. <b>Pump:</b> lean back and forth in rhythm to gain speed with your arms. <b>Bunny hop:</b> lean back for a moment, then throw your weight forward. <b>Bounce:</b> press a wheel down (landing or flip) and hit BRAKE right at the bottom. <b>Brake</b> also makes the wheels grip – hang on edges and beams.<br>
+    <p class="help"><b>Mobile:</b> green = GAS and red = BRAKE on the right, the arrows button above them turns the bike around – or swipe your thumb up from GAS or BRAKE to turn without letting go. ↺ ↻ shift the rider's weight and flip the bike – both at once gives an extra strong flip. <b>Pump:</b> lean back and forth in rhythm to gain speed with your arms. <b>Bunny hop:</b> lean back for a moment, then throw your weight forward. <b>Bounce:</b> press a wheel down (landing or flip) and hit BRAKE right at the bottom. <b>Brake</b> also makes the wheels grip – hang on edges and beams.<br>
     <b>Keyboard:</b> ↑ gas, ↓ brake, ← → flip, space turn, Enter restart, Esc menu.</p>
     <p id="rot">Turn your phone to landscape for the best control.</p>
     <div class="row"><button class="btn alt" id="bMusic">Music: on</button><button class="btn alt" id="bStyle">Style: Cartoon</button><button class="btn alt" id="bFull">Fullscreen</button></div>
