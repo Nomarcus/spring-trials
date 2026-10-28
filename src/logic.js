@@ -169,10 +169,10 @@ function buildMenu(){ const box=$('lvls'); box.innerHTML=''; const shown=[], min
     const badge=l.edited?'<span class="newb edb">EDITED</span>':(NEWLV.has(l.id)?'<span class="newb">NEW</span>':'');
     b.innerHTML='<canvas></canvas>'+badge+'<div class="meta"><div class="nm"><b>'+n+'. '+l.name.replace(/[<>&]/g,'')+'</b><i>'+(t!=null?fmt(t):'Not cleared')+(l.medal?' · gold '+l.medal[0]+' s':'')+'</i></div>'+(l.medal?medalSVG(medalOf(i,t)):'')+'</div>';
     b.onclick=()=>{ audioInit(); pausedState=null; loadLevel(i); };
-    const e=document.createElement('button'); e.className='edp'; e.setAttribute('aria-label','Edit '+l.name); e.innerHTML=PENCIL; e.onclick=ev=>{ ev.stopPropagation(); edOpen(i); };
+    const e=document.createElement('button'); e.className='edp'; e.setAttribute('aria-label','Edit '+l.name); e.innerHTML=PENCIL; e.onclick=ev=>{ ev.stopPropagation(); edOpen(i); }; if(!edCanEdit(l)) e.style.display='none';
     wr.appendChild(b); wr.appendChild(e); box.appendChild(wr); });
   if(mine&&!shown.length) box.innerHTML='<p class="help" style="grid-column:1/-1;margin:4px 0 8px">No levels of your own yet. Tap <b>＋ New level</b> and build your first! You can also tap the pencil on a built-in level to adjust it.</p>';
-  $('resumeRow').style.display=pausedState==='play'?'flex':'none'; $('bEditCur').style.display=pausedState==='play'&&li>=0?'':'none';
+  $('resumeRow').style.display=pausedState==='play'?'flex':'none'; $('bEditCur').style.display=pausedState==='play'&&li>=0&&edCanEdit(lvl)?'':'none';
   const inPack=LEVELS.filter(l=>l.pack===curPack), done=inPack.filter(l=>best[l.id]!=null).length, golds=inPack.filter(l=>medalOf(LEVELS.indexOf(l),best[l.id])===3).length;
   $('progress').textContent=mine?(inPack.length?inPack.length+(inPack.length===1?' own level':' own levels'):''):'Cleared '+done+' of '+inPack.length+' · '+golds+' gold';
   $('bMusic').textContent='Music: '+(musicOn?'on':'off');
