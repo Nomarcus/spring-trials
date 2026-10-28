@@ -185,6 +185,9 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
 #suspBtns{ display:flex; gap:6px; flex-wrap:wrap; }
 #suspBtns .tab{ padding:6px 11px; font-size:15px; }
 #suspTxt{ margin:6px 0 0; font-size:13.5px; color:var(--muted); }
+.k.turn.wide{ width:192px; height:64px; flex-direction:row; gap:10px; }   /* lika bred som BRAKE + GAS, precis ovanför dem */
+.k.turn.wide span{ font-size:16px; }
+@media (max-height:420px){ .k.turn.wide{ width:168px; height:54px; } .k.turn.wide span{ font-size:14px; } }
 @media (prefers-reduced-motion:reduce){ #toast{ transition:none; } .k{ transition:none; } #appleTile.pop{ animation:none; } }
 </style>
 </head>
@@ -198,7 +201,6 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
   </div>
   <div class="tile disp" id="timerTile"><svg width="22" height="22" viewBox="-12 -12 24 24" aria-hidden="true"><circle r="9" cy="1.5" fill="none" stroke="#fff" stroke-width="2.4"/><path d="M0 1.5V-3.5M0 1.5l3 2.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><path d="M-3-10h6M0-10v2.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg><span id="timer">00:00.00</span></div>
   <div class="hbtns">
-    <button class="hb" id="bRestart" aria-label="Restart level"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M8.5 4.5A9.5 9.5 0 1 1 6.2-7.5" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M2.6-12.6l7.6 2.6-5.8 5.6z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg></button>
     <button class="hb" id="bSound" aria-label="Sound on or off"><svg viewBox="-12 -12 24 24"><path id="sndPath" d="M-8-3h4l5-5v16l-5-5h-4z" fill="#fff"/><path id="sndWave" d="M4-4a6 6 0 0 1 0 8M6.5-7a10 10 0 0 1 0 14" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
     <button class="hb" id="bMap" aria-label="Level overview"><svg viewBox="-12 -12 24 24"><path d="M-9-6l6-3 6 3 6-3v15l-6 3-6-3-6 3z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M-3-9v15M3-6v15" stroke="#fff" stroke-width="2"/></svg></button>
     <button class="hb" id="bEdBack" aria-label="Back to the editor"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-7 7l1.2-4.8L4.5-8.1a1.6 1.6 0 0 1 2.3 0l1.3 1.3a1.6 1.6 0 0 1 0 2.3L-2.2 5.8z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></button>
@@ -214,7 +216,10 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
   </div>
   <div class="pad rpad">
     <div class="srow">
-      <button class="k turn" id="kTurn" data-k="turn" aria-label="Turn the bike around"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M-11-3C-8-10 6-11 10-4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M12.6-9.6l-1 8.4-7.6-3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/><path d="M11 4C8 11-6 11-10 4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M-12.6 9.6l1-8.4 7.6 3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg><span>TURN</span></button>
+      <button class="k small" id="bRestart" aria-label="Restart level"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M8.5 4.5A9.5 9.5 0 1 1 6.2-7.5" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M2.6-12.6l7.6 2.6-5.8 5.6z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg><span>RESET</span></button>
+    </div>
+    <div class="srow">
+      <button class="k turn wide" id="kTurn" data-k="turn" aria-label="Turn the bike around"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M-11-3C-8-10 6-11 10-4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M12.6-9.6l-1 8.4-7.6-3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/><path d="M11 4C8 11-6 11-10 4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M-12.6 9.6l1-8.4 7.6 3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg><span>TURN</span></button>
     </div>
     <div class="brow">
       <button class="k big" id="kBrake" data-k="brake" aria-label="Brake"><small>BRAKE</small></button>
@@ -275,7 +280,7 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
     <div class="fjad" style="margin:0 0 2px"><b class="disp">Suspension</b><div id="suspBtns"></div></div>
     <p id="suspTxt" style="margin:0 0 10px"></p>
     <div class="lvls" id="lvls"></div>
-    <p class="help"><b>Mobile:</b> GAS and BRAKE on the right, TURN flips the bike around. ↺ ↻ shift the rider's weight and flip the bike – both at once gives an extra strong flip. <b>Pump:</b> lean back and forth in rhythm to gain speed with your arms. <b>Bunny hop:</b> lean back for a moment, then throw your weight forward. <b>Bounce:</b> press a wheel down (landing or flip) and hit BRAKE right at the bottom. <b>Brake</b> also makes the wheels grip – hang on edges and beams.<br>
+    <p class="help"><b>Mobile:</b> GAS and BRAKE on the right, TURN flips the bike around – or swipe your thumb up from GAS or BRAKE to turn without letting go. ↺ ↻ shift the rider's weight and flip the bike – both at once gives an extra strong flip. <b>Pump:</b> lean back and forth in rhythm to gain speed with your arms. <b>Bunny hop:</b> lean back for a moment, then throw your weight forward. <b>Bounce:</b> press a wheel down (landing or flip) and hit BRAKE right at the bottom. <b>Brake</b> also makes the wheels grip – hang on edges and beams.<br>
     <b>Keyboard:</b> ↑ gas, ↓ brake, ← → flip, space turn, Enter restart, Esc menu.</p>
     <p id="rot">Turn your phone to landscape for the best control.</p>
     <div class="row"><button class="btn alt" id="bMusic">Music: on</button><button class="btn alt" id="bStyle">Style: Cartoon</button><button class="btn alt" id="bFull">Fullscreen</button></div>

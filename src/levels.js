@@ -47,7 +47,7 @@ LV3.push(()=>{ const T=skillKit(mkTrack(TOP)), tips=[]; const sign=t=>tips.push(
   sign('Bunny hop: lean BACK (↺) for a moment, then quickly lean FORWARD (↻). The bike jumps! Hop over the log.'); T.flat(6); T.log(0,0.3); T.flat(10); T.star(-4); T.flat(4);
   sign('In the air, ↺ and ↻ flip the bike. Land on both wheels – only the wheels and the head touch the ground, and the head cannot take a hit.'); T.flat(10);
   sign('This flower is the goal. It only opens when you have collected every star.'); const fx=T.X+4; T.flat(16);
-  sign('Dead end! Grab the last star, then press TURN to face the other way and ride back to the flower.'); T.flat(12); T.star(-2); T.flat(1);
+  sign('Dead end! Grab the last star, then press TURN (or swipe your thumb up from GAS) to face the other way and ride back to the flower.'); T.flat(12); T.star(-2); T.flat(1);
   T.P.push([T.X,TOP]);
   return {id:'fjadra-tutorial', name:'Tutorial', theme:'meadow', tips,
     hint:'Welcome to Fjädra! Hold GAS to ride. Ride past each sign – every sign teaches you one thing.',
