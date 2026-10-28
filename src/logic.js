@@ -146,7 +146,7 @@ function toggleMenu(){ if($('menu').classList.contains('show')){ if(pausedState)
 $('bMenu').onclick=()=>{ if(edTesting) edBack(); else toggleMenu(); }; $('bMap').onclick=()=>{ audioInit(); if(state==='overview') leaveOverview(); else enterOverview(); }; $('bRestart').onclick=()=>{ if(lvl) restart(); };
 $('bResume').onclick=()=>{ if(pausedState){ state=pausedState; pausedState=null; hideOv(); if(state==='win'||state==='crash') $('endov').classList.add('show'); } };
 $('bNext').onclick=next; $('bEditCur').onclick=()=>{ if(lvl&&li>=0) edOpen(li); }; $('bNewLevel').onclick=()=>edOpen(-1);
-$('tabMain').onclick=()=>{ curPack=3; buildMenu(); }; $('tabMine').onclick=()=>{ curPack='mine'; buildMenu(); }; $('bAgain').onclick=restart; $('bLevels').onclick=()=>{ pausedState=null; showMenu(); };
+$('tabMain').onclick=()=>{ curPack=3; buildMenu(); }; $('tabMine').onclick=()=>{ curPack='mine'; buildMenu(); }; $('tabComm').onclick=()=>{ curPack='community'; buildMenu(); commLoad(); }; $('bAgain').onclick=restart; $('bLevels').onclick=()=>{ pausedState=null; showMenu(); };
 const fsOK=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen; if(!fsOK) $('bFull').style.display='none';
 $('bMusic').onclick=()=>setMusic(!musicOn);
 // fjädringsval: ändrar bara fjäder, dämpning och fjäderväg (setSusp i core.js); gäller direkt, även mitt i en åkning
@@ -163,18 +163,19 @@ $('bNextUnplayed').onclick=()=>{ audioInit(); pausedState=null; let i=LEVELS.fin
 
 $('bFull').onclick=()=>{ const d=document.documentElement; try{ if(document.fullscreenElement) document.exitFullscreen(); else { (d.requestFullscreen||d.webkitRequestFullscreen).call(d); if(screen.orientation&&screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{}); } }catch(e){} };
 const PENCIL='<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-7 7l1.2-4.8L4.5-8.1a1.6 1.6 0 0 1 2.3 0l1.3 1.3a1.6 1.6 0 0 1 0 2.3L-2.2 5.8z" fill="#fff" stroke="#18324f" stroke-width="1.6" stroke-linejoin="round"/><path d="M2.6-6.2l3.6 3.6" stroke="#18324f" stroke-width="1.6"/></svg>';
-function buildMenu(){ const box=$('lvls'); box.innerHTML=''; const shown=[], mine=curPack==='mine';
-  $('tabMain').classList.toggle('on',!mine); $('tabMine').classList.toggle('on',mine); $('bNewLevel').style.display=mine?'':'none'; $('bNextUnplayed').style.display=mine?'none':'';
+function buildMenu(){ const box=$('lvls'); box.innerHTML=''; const shown=[], mine=curPack==='mine', comm=curPack==='community';
+  $('tabMain').classList.toggle('on',!mine&&!comm); $('tabMine').classList.toggle('on',mine); $('tabComm').classList.toggle('on',comm); $('tabComm').style.display=onl()?'':'none'; $('bNewLevel').style.display=mine?'':'none'; $('bNextUnplayed').style.display=mine||comm?'none':'';
   LEVELS.forEach((l,i)=>{ if(l.pack!==curPack) return; const n=shown.length+1; shown.push(l); const wr=document.createElement('div'); wr.className='lvw'; const b=document.createElement('button'); b.className='lv'; const t=best[l.id];
     const badge=l.edited?'<span class="newb edb">EDITED</span>':(NEWLV.has(l.id)?'<span class="newb">NEW</span>':'');
-    b.innerHTML='<canvas></canvas>'+badge+'<div class="meta"><div class="nm"><b>'+n+'. '+l.name.replace(/[<>&]/g,'')+'</b><i>'+(t!=null?fmt(t):'Not cleared')+(l.medal?' · gold '+l.medal[0]+' s':'')+'</i></div>'+(l.medal?medalSVG(medalOf(i,t)):'')+'</div>';
+    b.innerHTML='<canvas></canvas>'+badge+'<div class="meta"><div class="nm"><b>'+n+'. '+l.name.replace(/[<>&]/g,'')+'</b><i>'+(l.author?'by '+l.author.replace(/[<>&]/g,'')+' · ':'')+(t!=null?fmt(t):'Not cleared')+(l.medal?' · gold '+l.medal[0]+' s':'')+'</i></div>'+(l.medal?medalSVG(medalOf(i,t)):'')+'</div>';
     b.onclick=()=>{ audioInit(); pausedState=null; loadLevel(i); };
     const e=document.createElement('button'); e.className='edp'; e.setAttribute('aria-label','Edit '+l.name); e.innerHTML=PENCIL; e.onclick=ev=>{ ev.stopPropagation(); edOpen(i); }; if(!edCanEdit(l)) e.style.display='none';
     wr.appendChild(b); wr.appendChild(e); box.appendChild(wr); });
   if(mine&&!shown.length) box.innerHTML='<p class="help" style="grid-column:1/-1;margin:4px 0 8px">No levels of your own yet. Tap <b>＋ New level</b> and build your first! You can also tap the pencil on a built-in level to adjust it.</p>';
   $('resumeRow').style.display=pausedState==='play'?'flex':'none'; $('bEditCur').style.display=pausedState==='play'&&li>=0&&edCanEdit(lvl)?'':'none';
   const inPack=LEVELS.filter(l=>l.pack===curPack), done=inPack.filter(l=>best[l.id]!=null).length, golds=inPack.filter(l=>medalOf(LEVELS.indexOf(l),best[l.id])===3).length;
-  $('progress').textContent=mine?(inPack.length?inPack.length+(inPack.length===1?' own level':' own levels'):''):'Cleared '+done+' of '+inPack.length+' · '+golds+' gold';
+  if(comm&&!shown.length) box.innerHTML='<p class="help" style="grid-column:1/-1;margin:4px 0 8px">'+(commState==='loading'?'Loading levels shared by players …':commState==='error'?'Could not load the community levels right now.':'No shared levels yet. Build one under My levels and tap ⋯ → Share with everyone!')+'</p>';
+  $('progress').textContent=comm?(inPack.length?inPack.length+' shared levels':''):mine?(inPack.length?inPack.length+(inPack.length===1?' own level':' own levels'):''):'Cleared '+done+' of '+inPack.length+' · '+golds+' gold';
   $('bMusic').textContent='Music: '+(musicOn?'on':'off');
   requestAnimationFrame(()=>{ box.querySelectorAll('canvas').forEach((c,i)=>drawPreview(c,shown[i])); }); }
 
@@ -183,7 +184,7 @@ function crash(){ if(state!=='play') return; state='crash'; endTimer=0; const [h
   rag=makeRagdoll(bike); bike.rider=false; for(const k in rag.pts){ const q=rag.pts[k]; q.px+=(Math.random()-0.5)*0.01; q.py-= 0.004; }
   for(let i=0;i<14;i++){ const a=Math.random()*6.283, v=1.5+Math.random()*3; parts.push({k:'star',x:hx,y:hy,vx:Math.cos(a)*v,vy:Math.sin(a)*v,r:.07+Math.random()*.06,l:.5,L:.5,c:i%2?'#ffe36b':'#ffffff'}); }
   beep(130,.35,'sawtooth',.13,.3); try{ navigator.vibrate&&navigator.vibrate(60); }catch(e){}
-  $('endTitle').textContent='Crash!'; $('endTime').innerHTML=''; $('endNote').textContent='Press GAS or Enter to ride again'; endButtons(false);
+  $('endTitle').textContent='Crash!'; $('endTime').innerHTML=''; $('endNote').textContent='Press GAS or Enter to ride again'; endButtons(false); lbShow(null);
   setTimeout(()=>{ if(state==='crash') $('endov').classList.add('show'); },1100); }
 function win(){ state='win'; endTimer=0; const test=li<0, prev=best[lvl.id]; const isRec=!test&&(prev==null||T<prev); if(isRec){ best[lvl.id]=T; saveBest(); saveGhost(lvl); } const rec_=isRec;
   const cols=['#ffe08a','#9bd37f','#8fb7ee','#f2a7a0','#ffffff','#b9e3ff']; for(let i=0;i<50;i++){ const an=Math.PI/2+(Math.random()-0.5)*2.0, v=3.5+Math.random()*4.5; parts.push({k:'conf',x:lvl.flower[0],y:lvl.flower[1]+1.1,vx:Math.cos(an)*v,vy:Math.sin(an)*v,rot:Math.random()*6,vr:(Math.random()-0.5)*14,l:2.2+Math.random(),L:3,c:cols[i%cols.length]}); }
@@ -192,7 +193,7 @@ function win(){ state='win'; endTimer=0; const test=li<0, prev=best[lvl.id]; con
   const md=lvl.medal, m=md?medalOf(li,T):0; $('endTitle').textContent='Finished!'; $('endTime').innerHTML=(m?medalSVG(m):'')+'<span>'+fmt(T)+'</span>';
   const nxt=!md?'':m===3?'Gold!':(m===2?'Gold under '+fmt(md[0]):'Silver under '+fmt(md[1])+', gold under '+fmt(md[0]));
   $('endNote').textContent=test?'Test ride – the level can be finished!':((rec_&&prev!=null?'New record! ':'')+nxt+(rec_?(nxt?' · ':'')+'Ghost saved':''));
-  endButtons(true); const pk=LEVELS.filter(l=>l.pack===lvl.pack); $('bNext').textContent=pk.indexOf(lvl)===pk.length-1?'First level':'Next level'; setTimeout(()=>{ if(state==='win') $('endov').classList.add('show'); },1000); }
+  endButtons(true); lbShow(test?null:lvl,T); const pk=LEVELS.filter(l=>l.pack===lvl.pack); $('bNext').textContent=pk.indexOf(lvl)===pk.length-1?'First level':'Next level'; setTimeout(()=>{ if(state==='win') $('endov').classList.add('show'); },1000); }
 function contactPts(){ const [hx,hy]=headPos(bike); return [[bike.wh[0].x,bike.wh[0].y,0.8],[bike.wh[1].x,bike.wh[1].y,0.8],[hx,hy,0.65]]; }
 function checkItems(){ const pts=contactPts();
   for(let k=0;k<lvl.apples.length;k++){ if(got[k]) continue; const a=lvl.apples[k];

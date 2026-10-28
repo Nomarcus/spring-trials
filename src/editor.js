@@ -233,7 +233,7 @@ function edBack(){ if(!ed) return; edTesting=false; for(const k in inp) inp[k]=0
 function edMore(){ const d=ed.doc; $('edNameIn').value=d.name; $('edHintIn').value=d.hint||''; $('edCode').style.display='none'; $('edCodeGo').style.display='none';
   $('edThemes').innerHTML=''; for(const [k,n] of ED_THEMES){ const b=document.createElement('button'); b.className='tab'+(d.theme===k?' on':''); b.textContent=n;
     b.onclick=()=>{ if(d.theme===k) return; edPush(); d.theme=k; edSync(true); edMore(); }; $('edThemes').appendChild(b); }
-  $('edReset').style.display=ed.src==='edit'&&ORIG[d.id]?'':'none'; $('edDelete').style.display=ed.src==='mine'&&!ed.isNew?'':'none';
+  $('edReset').style.display=ed.src==='edit'&&ORIG[d.id]?'':'none'; $('edDelete').style.display=ed.src==='mine'&&!ed.isNew?'':'none'; $('edShareB').style.display=ed.src==='mine'&&onl()?'':'none';
   $('edInfo').textContent=(ed.src==='mine'?'Own level':'Built-in level')+' · '+edCount()+' points · '+d.apples.length+' stars';
   $('edMore').classList.add('show'); }
 function edMoreDone(){ const d=ed.doc, n=$('edNameIn').value.trim()||d.name, h=$('edHintIn').value.trim();

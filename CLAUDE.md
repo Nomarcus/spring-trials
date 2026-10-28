@@ -47,6 +47,7 @@ Spelet öppnas direkt som fil i webbläsaren, ingen server behövs.
 ## Nuläge och kända luckor (läs innan du börjar)
 - **Testboten har inte körts om på alla banor med nuvarande fysik (v11).** Verifierade: se tabellen i `docs/fjadra-LEVELS.md` (✅). Kör hela sviten först: `node tools/fjadra/test/run.js` (delas gärna upp i batcher, den är CPU-tung).
 - **Bara ägaren ändrar huvudbanorna:** pennan på inbyggda banor syns bara när `user.isOwner()`/`canEdit()` (claude.ai-länken) eller med `#admin` i adressen (påverkar då bara den enheten). Alla kan skapa egna banor (My levels).
+- **Topplista och Community-banor:** `src/scores.js`. Med `ONLINE={url,key}` (Supabase, publik anon-nyckel) sparas tider och delade banor online. Databasens regler i `docs/supabase.sql` tillåter bara läsa och lägga till. Utan ONLINE finns en lokal topplista per enhet och Community-fliken döljs.
 - **Spelet är på engelska** (all text i gränssnittet, editorn och banornas namn/tips); kod, kommentarer och dokumentation är på svenska. Banornas ID är oförändrade. Bana 1 är en tutorial (`fjadra-tutorial`) med skyltar: `tips:[[x,y,text]]` på en bana visar texten när cykeln passerar.
 - Medaljtider är satta efter botens körningar, inte mänskliga rekord.
 - Musiken i spelet är genererad (Web Audio). Suno-spåren i `assets/music/` är **inte inkopplade**.
