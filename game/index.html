@@ -253,6 +253,7 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
   </div>
   <div class="edzoom"><button class="eb" id="edZin" aria-label="Zoom in">+</button><button class="eb" id="edZout" aria-label="Zoom out">−</button></div>
   <div class="edbar edbot">
+    <button class="eb tl" data-tool="draw"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-9 7c3-6 6 2 9-4s5-5 9-9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="9" cy="-6" r="2" fill="#fff"/></svg>Draw</button>
     <button class="eb tl on" data-tool="move"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M0-9v18M-9 0h18M0-9l-3 3M0-9l3 3M0 9l-3-3M0 9l3-3M-9 0l3-3M-9 0l3 3M9 0l-3-3M9 0l-3 3" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Move</button>
     <button class="eb tl" data-tool="add"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-9 5L-3-2 3 3 9-4" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="-3" cy="-2" r="2.4" fill="#fff"/><path d="M5-10v6M2-7h6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Point</button>
     <button class="eb tl" data-tool="del"><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-9 4L-3-2 3 3 9-4" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M-5-10l6 6M1-10l-6 6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Delete</button>
@@ -1828,7 +1829,8 @@ const ED_THEMES=[['meadow','Meadow'],['sunset','Sunset'],['winter','Winter'],['c
 const ED_MATS=[['wood','Wood'],['steel','Steel'],['stone','Stone'],['crate','Crate'],['log','Log'],[null,'Ground']];
 const ED_SOFT=[0,1,2,4,8];
 const ED_DIRS=['up','right','down','left'];
-const ED_TIPS={move:'Drag the ground to shape it. Drag stars, start, flower and blocks. Two fingers pan and zoom.',
+const ED_DRAW=[['ground','Ground','#3fae37'],['solid','Rock','#8a7c6c'],['wood','Plank','#a0703f'],['steel','Steel','#8a8f96']];
+const ED_TIPS={draw:'Draw with your finger or pen. Ground: draw the whole track from left to right – start and flower move to the ends. Rock, Plank, Steel: draw pieces on top. Close a shape to make a rock.',move:'Drag the ground to shape it. Drag stars, start, flower and blocks. Two fingers pan and zoom.',
   add:'Tap a line to add a point and drag it where you want.', del:'Tap a point, star or block to delete it.',
   star:'Tap where the star should go.', gstar:'Tap where the blue star should go. Tap a star to change its direction.',
   block:'Tap where the block should go, drag to move it. Wood and steel: the head passes through, the wheels ride on them. Ground placed inside the ground makes a cave.'};
@@ -1886,9 +1888,9 @@ async function edDownloadAll(){ const edits=edGet('fjadra.edits',{}), list=Objec
 function edOpen(i){ let doc, src; if(i!=null&&i>=0&&!edCanEdit(LEVELS[i])) return toast('Only the game owner can edit the main levels. Build your own under My levels!',3200);
   if(i==null||i<0){ const n=LEVELS.filter(l=>l.pack==='mine').length+1; doc=edNewDoc('My level '+n); src='mine'; }
   else { const l=LEVELS[i]; doc=edDocOf(l); src=l.pack==='mine'?'mine':'edit'; }
-  edStart(doc,src,i==null||i<0); }
+  edStart(doc,src,i==null||i<0); if(i==null||i<0){ ed.tool='draw'; edUI(); toast(ED_TIPS.draw,5000); } }
 function edStart(doc,src,isNew){ audioInit(); for(const k in inp) inp[k]=0;
-  ed={doc,src,isNew:!!isNew,tool:'move',soft:2,mat:'wood',gdir:'up',undo:[],redo:[],dirty:!!isNew,drag:null,ptrs:new Map(),pinch:null,anT:0};
+  ed={doc,src,isNew:!!isNew,tool:'move',soft:2,mat:'wood',gdir:'up',dmode:'ground',undo:[],redo:[],dirty:!!isNew,drag:null,ptrs:new Map(),pinch:null,anT:0};
   edTesting=false; pausedState=null; hideOv(); $('edMore').classList.remove('show'); state='edit'; parts=[]; rag=null; pops=[]; bloom=0;
   document.body.classList.add('editing'); document.body.classList.remove('testing'); edSync(true); edHome(); edUI(); toast(ED_TIPS.move,3600); }
 function edIdle(l){ lvl=l; setTheme(l.theme); if(!l.vis) analyze(l); bike=newBike(l.start[0],l.start[1]); got=l.apples.map(()=>false); cam.x=bike.b.x+5; cam.y=bike.b.y+1.2; parts=[]; rag=null; }
@@ -1966,11 +1968,13 @@ function edAct(sx,sy){ const [x,y]=edW(sx,sy), d=ed.doc, t=ed.tool;
     if(o&&o.kind==='apple'){ if(t==='star') return dragObj(o,edSnap()); const a=d.apples[o.i]; edPush(); const k=a[2]?ED_DIRS.indexOf(a[2])+1:0;
       if(k>=ED_DIRS.length) a.length=2; else a[2]=ED_DIRS[k]; edSync(); toast(a[2]?'Blue star: gravity '+({up:'up',down:'down',left:'left',right:'right'})[a[2]]:'Normal star',1300); return; }
     edPush(); d.apples.push(t==='gstar'?[r3(x),r3(y),ed.gdir]:[r3(x),r3(y)]); edSync(); return dragObj({kind:'apple',i:d.apples.length-1},null); }
+  if(t==='draw'){ ed.drag={type:'stroke',pts:[[x,y]],sx,sy}; return; }
   if(t==='block'){ const ri=edHitRing(x,y); if(ri>0) return dragRing(ri,edSnap());
     edPush(); d.rings.push(edBlock(x,y,ed.mat)); edSync(true); return dragRing(d.rings.length-1,null); } }
 function edMove(sx,sy){ const pe=ed.pend; if(pe){ if(Math.hypot(sx-pe.sx,sy-pe.sy)<6) return; ed.pend=null; edAct(pe.sx,pe.sy); }
   const dr=ed.drag; if(!dr) return;
   if(dr.type==='pan'){ cam.x=dr.cx-(sx-dr.sx)/SC; cam.y=dr.cy+(sy-dr.sy)/SC; return; }
+  if(dr.type==='stroke'){ const [x,y]=edW(sx,sy), q=dr.pts[dr.pts.length-1]; if(Math.hypot(x-q[0],y-q[1])>0.12) dr.pts.push([x,y]); return; }
   if(!dr.moved){ if(Math.hypot(sx-dr.sx,sy-dr.sy)<5) return; dr.moved=true; if(dr.snap) edPush(dr.snap); }
   const [x,y]=edW(sx,sy), dx=x-dr.x0, dy=y-dr.y0, d=ed.doc; let rx, ry;
   if(dr.type==='pts'){ const p=d.rings[dr.ri].pts; for(const [k,w,px,py] of dr.list){ p[k][0]=r3(px+dx*w); p[k][1]=r3(py+dy*w); } rx=p[dr.list[0][0]][0]; ry=p[dr.list[0][0]][1]; }
@@ -1978,10 +1982,10 @@ function edMove(sx,sy){ const pe=ed.pend; if(pe){ if(Math.hypot(sx-pe.sx,sy-pe.s
   else if(dr.type==='ring'){ const p=d.rings[dr.ri].pts; dr.orig.forEach((q,k)=>{ p[k][0]=r3(q[0]+dx); p[k][1]=r3(q[1]+dy); }); rx=dx; ry=dy; }
   edSync(false); if(performance.now()-ed.anT>150&&edCount()<1500){ analyze(lvl); ed.anT=performance.now(); }
   $('edRead').textContent=dr.type==='ring'?'move '+rx.toFixed(1)+' · '+ry.toFixed(1):'x '+rx.toFixed(1)+' · y '+ry.toFixed(1); }
-function edUp(){ const pe=ed.pend; ed.pend=null; if(pe) edAct(pe.sx,pe.sy); const dr=ed.drag; ed.drag=null; $('edRead').textContent=''; if(dr&&dr.type!=='pan'&&(dr.moved||!dr.snap)) edSync(true); }
+function edUp(){ const pe=ed.pend; ed.pend=null; if(pe) edAct(pe.sx,pe.sy); const dr=ed.drag; ed.drag=null; $('edRead').textContent=''; if(dr&&dr.type==='stroke') return edStroke(dr.pts); if(dr&&dr.type!=='pan'&&(dr.moved||!dr.snap)) edSync(true); }
 cv.addEventListener('pointerdown',e=>{ if(state!=='edit') return; e.preventDefault(); try{ cv.setPointerCapture(e.pointerId); }catch(_){}
   ed.ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
-  if(ed.ptrs.size===2){ ed.pend=null; edUp(); const [a,b]=[...ed.ptrs.values()], mx=(a.x+b.x)/2, my=(a.y+b.y)/2; ed.pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1,sc:SC,w:edW(mx,my)}; return; }
+  if(ed.ptrs.size===2){ ed.pend=null; if(ed.drag&&ed.drag.type==='stroke') ed.drag=null; edUp(); const [a,b]=[...ed.ptrs.values()], mx=(a.x+b.x)/2, my=(a.y+b.y)/2; ed.pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1,sc:SC,w:edW(mx,my)}; return; }
   if(ed.ptrs.size===1) edDown(e.clientX,e.clientY); });
 cv.addEventListener('pointermove',e=>{ if(state!=='edit'||!ed.ptrs.has(e.pointerId)) return; ed.ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(ed.pinch&&ed.ptrs.size>=2){ const [a,b]=[...ed.ptrs.values()], mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
@@ -1993,6 +1997,8 @@ cv.addEventListener('wheel',e=>{ if(state!=='edit') return; e.preventDefault(); 
 
 // ---------- ritning ovanpå banan ----------
 function edDraw(){ const d=ed.doc, v=view(); worldT(); ctx.lineJoin='round';
+  const sd=ed.drag; if(sd&&sd.type==='stroke'&&sd.pts.length>1){ ctx.beginPath(); sd.pts.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1])); ctx.lineCap='round';
+    ctx.strokeStyle='rgba(255,255,255,.85)'; ctx.lineWidth=9/SC; ctx.stroke(); ctx.strokeStyle=ED_DRAW.find(m=>m[0]===ed.dmode)[2]; ctx.lineWidth=5/SC; ctx.stroke(); }
   ctx.beginPath(); for(const r of d.rings) ringPath(r.pts); ctx.strokeStyle='rgba(255,255,255,.7)'; ctx.lineWidth=1.6/SC; ctx.stroke();
   // osynligt tak
   ctx.beginPath(); ctx.moveTo(v[0],d.top); ctx.lineTo(v[2],d.top); ctx.setLineDash([8/SC,6/SC]); ctx.strokeStyle='rgba(255,255,255,.35)'; ctx.lineWidth=1.5/SC; ctx.stroke(); ctx.setLineDash([]);
@@ -2008,6 +2014,32 @@ function edDraw(){ const d=ed.doc, v=view(); worldT(); ctx.lineJoin='round';
   ctx.beginPath(); ctx.moveTo(s[0]-1.1,s[1]); ctx.lineTo(s[0]-1.1,s[1]+2.2); ctx.stroke(); ctx.beginPath(); ctx.moveTo(s[0]-1.1,s[1]+2.2); ctx.lineTo(s[0]-0.2,s[1]+1.9); ctx.lineTo(s[0]-1.1,s[1]+1.6); ctx.closePath(); ctx.fillStyle='#3fae37'; ctx.fill(); ctx.stroke();
   if(SC<14){ ctx.beginPath(); ctx.arc(f[0],f[1]+0.9,7/SC,0,6.283); ctx.fillStyle='#fff'; ctx.fill(); ctx.stroke(); for(const a of d.apples){ ctx.beginPath(); ctx.arc(a[0],a[1],5/SC,0,6.283); ctx.fillStyle=a[2]?'#5fb8ff':'#ffd23f'; ctx.fill(); ctx.stroke(); } } }
 
+// ---------- rita (Draw) ----------
+// Ett ritat streck jämnas ut och görs om till bana: Ground = hela marken (start och blomma flyttas till ändarna),
+// Rock = en klipp-remsa under strecket (eller hela formen om den är sluten), Plank/Steel = en tunn balk längs strecket.
+function edResample(pts,step){ const out=[pts[0].slice()]; let acc=0;
+  for(let i=1;i<pts.length;i++){ let a=pts[i-1], b=pts[i], L=Math.hypot(b[0]-a[0],b[1]-a[1]);
+    while(acc+L>=step){ const t=(step-acc)/L; const q=[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]; out.push(q); a=q; L=Math.hypot(b[0]-a[0],b[1]-a[1]); acc=0; } acc+=L; }
+  const last=pts[pts.length-1]; if(Math.hypot(last[0]-out[out.length-1][0],last[1]-out[out.length-1][1])>step*0.3) out.push(last.slice()); return out; }
+function edSmooth(p,n){ for(let k=0;k<n;k++) p=p.map((q,i)=>i===0||i===p.length-1?q:[(p[i-1][0]+2*q[0]+p[i+1][0])/4,(p[i-1][1]+2*q[1]+p[i+1][1])/4]); return p; }
+function edStrip(p,th){ const top=[], bot=[]; for(let i=0;i<p.length;i++){ const a=p[Math.max(0,i-1)], b=p[Math.min(p.length-1,i+1)], dx=b[0]-a[0], dy=b[1]-a[1], L=Math.hypot(dx,dy)||1;
+    let nx=dy/L, ny=-dx/L; if(ny>0){ nx=-nx; ny=-ny; } top.push([r3(p[i][0]),r3(p[i][1])]); bot.push([r3(p[i][0]+nx*th),r3(p[i][1]+ny*th)]); } return [...top,...bot.reverse()]; }
+function edStroke(raw){ if(raw.length<2) return; let len=0; for(let i=1;i<raw.length;i++) len+=Math.hypot(raw[i][0]-raw[i-1][0],raw[i][1]-raw[i-1][1]);
+  if(len<1.5) return toast('Draw a longer line',1400);
+  let p=edSmooth(edResample(raw,0.5),2); const d=ed.doc, a=p[0], z=p[p.length-1], closed=len>4&&Math.hypot(z[0]-a[0],z[1]-a[1])<Math.max(1.2,len*0.08);
+  edPush();
+  if(ed.dmode==='ground'&&!closed){ if(z[0]<a[0]) p=p.reverse(); const f=p[0], l=p[p.length-1]; let hi=-1e9; for(const q of p) hi=Math.max(hi,q[1]);
+    const top=Math.max(d.top||TOP,hi+12); d.top=top;
+    d.rings[0]={pts:[[r3(f[0]-4),top],[r3(f[0]-4),r3(f[1])],...p.map(q=>[r3(q[0]),r3(q[1])]),[r3(l[0]+4),r3(l[1])],[r3(l[0]+4),top]]};
+    d.start=[r3(f[0]-2),r3(f[1])]; d.flower=[r3(l[0]+1.5),r3(l[1])];
+    for(const s of d.apples){ for(let i=1;i<p.length;i++){ const u=p[i-1], w=p[i]; if((s[0]-u[0])*(s[0]-w[0])>0||u[0]===w[0]) continue;   // stjärnor under den nya marken lyfts upp till ytan
+      const gy=u[1]+(w[1]-u[1])*(s[0]-u[0])/(w[0]-u[0]); if(s[1]<gy+0.5) s[1]=r3(gy+0.75); break; } }
+    edSync(true); return toast('Track drawn! Add stars, then tap Test.',2400); }
+  if(closed) d.rings.push({pts:p.slice(0,-1).map(q=>[r3(q[0]),r3(q[1])])});
+  else if(ed.dmode==='solid'||ed.dmode==='ground') d.rings.push({pts:edStrip(p,0.9)});
+  else d.rings.push({style:ed.dmode,pts:edStrip(p,ed.dmode==='steel'?0.28:0.3)});
+  edSync(true); }
+
 // ---------- verktyg ----------
 function edSplitRing(rg,maxLen,top,only){ const p=rg.pts, out=[];
   for(let i=0;i<p.length;i++){ const a=p[i], b=p[(i+1)%p.length]; out.push(a); if(a[1]>=top-0.01&&b[1]>=top-0.01) continue; if(only&&!only(a,b)) continue;
@@ -2022,11 +2054,12 @@ function edOpt(){ const t=ed.tool;
   if(t==='move'||t==='add'){ ed.soft=ED_SOFT[(ED_SOFT.indexOf(ed.soft)+1)%ED_SOFT.length]; toast(ed.soft?'Soft: points within '+ed.soft+' m follow along':'Sharp: only the point you drag moves',1800); }
   else if(t==='gstar'){ ed.gdir=ED_DIRS[(ED_DIRS.indexOf(ed.gdir)+1)%4]; }
   else if(t==='block'){ const k=ED_MATS.findIndex(m=>m[0]===ed.mat); ed.mat=ED_MATS[(k+1)%ED_MATS.length][0]; }
+  else if(t==='draw'){ const k=ED_DRAW.findIndex(m=>m[0]===ed.dmode); ed.dmode=ED_DRAW[(k+1)%ED_DRAW.length][0]; toast(ed.dmode==='ground'?'Ground: your stroke becomes the whole track':'Draw a '+ED_DRAW.find(m=>m[0]===ed.dmode)[1].toLowerCase()+' – close the shape to make a rock',1800); }
   edUI(); }
 function edUI(){ if(!ed) return; const t=ed.tool;
   document.querySelectorAll('#ed [data-tool]').forEach(b=>b.classList.toggle('on',b.dataset.tool===t));
   const o=$('edOpt'); let txt='';
-  if(t==='move'||t==='add') txt=ed.soft?'Soft '+ed.soft+' m':'Sharp'; else if(t==='gstar') txt='Gravity '+GARROW[ed.gdir]; else if(t==='block') txt=ED_MATS.find(m=>m[0]===ed.mat)[1];
+  if(t==='move'||t==='add') txt=ed.soft?'Soft '+ed.soft+' m':'Sharp'; else if(t==='gstar') txt='Gravity '+GARROW[ed.gdir]; else if(t==='block') txt=ED_MATS.find(m=>m[0]===ed.mat)[1]; else if(t==='draw') txt='Draw: '+ED_DRAW.find(m=>m[0]===ed.dmode)[1];
   o.textContent=txt; o.style.display=txt?'':'none';
   $('edUndo').disabled=!ed.undo.length; $('edRedo').disabled=!ed.redo.length; $('edSave').classList.toggle('dirty',ed.dirty); $('edName').textContent=ed.doc.name||'Untitled'; }
 
