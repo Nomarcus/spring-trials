@@ -197,6 +197,34 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
 .lbf .btn{ padding:6px 14px; }
 @media (max-height:480px){ #lbBox{ margin-top:4px; } #lbList{ font-size:12.5px; } .lbr{ padding:0 8px; } }
 @media (prefers-reduced-motion:reduce){ #toast{ transition:none; } .k{ transition:none; } #appleTile.pop{ animation:none; } }
+
+/* Kontroller som Mad Skills Motocross: genomskinliga ringar. Vänster tumme: BRAKE (röd) + GAS (grön) diagonalt.
+   Höger tumme: ↺ (övre) + ↻ (nedre) diagonalt, TURN och RESET små runda ovanför. */
+#ctl{ position:absolute; inset:0; display:block; padding:0; pointer-events:none; }
+#ctl .k.rb{ position:absolute; pointer-events:auto; width:76px; height:76px; border-radius:50% !important; padding:0;
+  display:flex; align-items:center; justify-content:center; background:rgba(10,22,38,.22) !important;
+  border:3px solid rgba(235,245,255,.8) !important; box-shadow:0 2px 8px rgba(0,0,0,.25) !important; transform:none; filter:none; }
+#ctl .k.rb svg{ width:36px; height:36px; filter:drop-shadow(0 1px 2px rgba(0,0,0,.5)); }
+#ctl .k.rb.on{ background:rgba(255,255,255,.32) !important; transform:scale(.94); }
+#ctl #kBrake.rb{ left:calc(env(safe-area-inset-left,0px) + 22px); bottom:98px; border-color:#e0453a !important; border-width:4px !important; }
+#ctl #kGas.rb{ left:calc(env(safe-area-inset-left,0px) + 104px); bottom:18px; border-color:#4cc23f !important; border-width:4px !important; }
+#ctl #kBrake.rb.on{ background:rgba(224,69,58,.45) !important; }
+#ctl #kGas.rb.on{ background:rgba(76,194,63,.45) !important; }
+#ctl #kBack.rb{ right:calc(env(safe-area-inset-right,0px) + 22px); bottom:98px; }
+#ctl #kFwd.rb{ right:calc(env(safe-area-inset-right,0px) + 104px); bottom:18px; }
+#ctl #kTurn.rb{ width:54px; height:54px; right:calc(env(safe-area-inset-right,0px) + 120px); bottom:118px; }
+#ctl #kTurn.rb svg{ width:28px; height:28px; }
+#ctl #bRestart.rb{ width:46px; height:46px; right:calc(env(safe-area-inset-right,0px) + 37px); bottom:196px; }
+#ctl #bRestart.rb svg{ width:22px; height:22px; }
+body.neon #ctl #kBrake.rb{ border-color:#ff3ea5 !important; } body.neon #ctl #kGas.rb{ border-color:#18c9b8 !important; }
+@media (max-height:420px){
+  #ctl .k.rb{ width:66px; height:66px; } #ctl .k.rb svg{ width:31px; height:31px; }
+  #ctl #kBrake.rb, #ctl #kBack.rb{ bottom:84px; } #ctl #kGas.rb{ left:calc(env(safe-area-inset-left,0px) + 92px); bottom:14px; }
+  #ctl #kFwd.rb{ right:calc(env(safe-area-inset-right,0px) + 92px); bottom:14px; }
+  #ctl #kTurn.rb{ width:48px; height:48px; right:calc(env(safe-area-inset-right,0px) + 104px); bottom:100px; }
+  #ctl #bRestart.rb{ width:42px; height:42px; right:calc(env(safe-area-inset-right,0px) + 34px); bottom:166px; }
+}
+@media (prefers-reduced-motion:reduce){ #ctl .k.rb.on{ transform:none; } }
 </style>
 </head>
 <body>
@@ -218,22 +246,12 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
 <div id="lvlname"></div>
 
 <div id="ctl">
-  <div class="pad">
-    <button class="k lean" data-k="left" aria-label="Lean back / flip counter-clockwise"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M-9 3a10 10 0 1 0 4-10" stroke="#fff" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M-10.5-13.5l8.5 3.2-7.4 6.2z" fill="#fff" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/></svg></button>
-    <button class="k lean" data-k="right" aria-label="Lean forward / flip clockwise"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M9 3a10 10 0 1 1-4-10" stroke="#fff" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M10.5-13.5l-8.5 3.2 7.4 6.2z" fill="#fff" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/></svg></button>
-  </div>
-  <div class="pad rpad">
-    <div class="srow">
-      <button class="k small" id="bRestart" aria-label="Restart level"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M8.5 4.5A9.5 9.5 0 1 1 6.2-7.5" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M2.6-12.6l7.6 2.6-5.8 5.6z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg><span>RESET</span></button>
-    </div>
-    <div class="srow turnrow">
-      <button class="k turn compact" id="kTurn" data-k="turn" aria-label="Turn the bike around"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M-11-3C-8-10 6-11 10-4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M12.6-9.6l-1 8.4-7.6-3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/><path d="M11 4C8 11-6 11-10 4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M-12.6 9.6l1-8.4 7.6 3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg></button>
-    </div>
-    <div class="brow">
-      <button class="k big" id="kBrake" data-k="brake" aria-label="Brake"></button>
-      <button class="k big" id="kGas" data-k="gas" aria-label="Gas"></button>
-    </div>
-  </div>
+  <button class="k rb" id="kBrake" data-k="brake" aria-label="Brake"></button>
+  <button class="k rb" id="kGas" data-k="gas" aria-label="Gas"></button>
+  <button class="k rb" id="bRestart" aria-label="Restart level"><svg viewBox="-16 -16 32 32" aria-hidden="true"><rect x="-11" y="-10" width="4" height="20" rx="1.5" fill="#fff"/><path d="M10-10L-5 0 10 10z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></button>
+  <button class="k rb" id="kTurn" data-k="turn" aria-label="Turn the bike around"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M-11-3C-8-10 6-11 10-4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M12.6-9.6l-1 8.4-7.6-3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/><path d="M11 4C8 11-6 11-10 4" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M-12.6 9.6l1-8.4 7.6 3.8z" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg></button>
+  <button class="k rb" id="kBack" data-k="left" aria-label="Lean back / flip counter-clockwise"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M-9 3a10 10 0 1 0 4-10" stroke="#fff" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M-10.5-13.5l8.5 3.2-7.4 6.2z" fill="#fff" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/></svg></button>
+  <button class="k rb" id="kFwd" data-k="right" aria-label="Lean forward / flip clockwise"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M9 3a10 10 0 1 1-4-10" stroke="#fff" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M10.5-13.5l-8.5 3.2 7.4 6.2z" fill="#fff" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/></svg></button>
 </div>
 
 <div id="toast"></div>
@@ -289,7 +307,7 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
     <div class="fjad" style="margin:0 0 2px"><b class="disp">Suspension</b><div id="suspBtns"></div></div>
     <p id="suspTxt" style="margin:0 0 10px"></p>
     <div class="lvls" id="lvls"></div>
-    <p class="help"><b>Mobile:</b> green = GAS and red = BRAKE on the right, the arrows button above them turns the bike around – or swipe your thumb up from GAS or BRAKE to turn without letting go. ↺ ↻ shift the rider's weight and flip the bike – both at once gives an extra strong flip. <b>Pump:</b> lean back and forth in rhythm to gain speed with your arms. <b>Bunny hop:</b> lean back for a moment, then throw your weight forward. <b>Bounce:</b> press a wheel down (landing or flip) and hit BRAKE right at the bottom. <b>Brake</b> also makes the wheels grip – hang on edges and beams.<br>
+    <p class="help"><b>Mobile:</b> left thumb: green = GAS, red = BRAKE. Right thumb: ↺ ↻. The small round arrows button on the right turns the bike around – or swipe your thumb up from GAS or BRAKE to turn without letting go. ↺ ↻ shift the rider's weight and flip the bike – both at once gives an extra strong flip. <b>Pump:</b> lean back and forth in rhythm to gain speed with your arms. <b>Bunny hop:</b> lean back for a moment, then throw your weight forward. <b>Bounce:</b> press a wheel down (landing or flip) and hit BRAKE right at the bottom. <b>Brake</b> also makes the wheels grip – hang on edges and beams.<br>
     <b>Keyboard:</b> ↑ gas, ↓ brake, ← → flip, space turn, Enter restart, Esc menu.</p>
     <p id="rot">Turn your phone to landscape for the best control.</p>
     <div class="row"><button class="btn alt" id="bMusic">Music: on</button><button class="btn alt" id="bStyle">Style: Cartoon</button><button class="btn alt" id="bFull">Fullscreen</button></div>

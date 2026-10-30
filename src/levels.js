@@ -41,16 +41,16 @@ const LV3=[];
 LV3.push(()=>{ const T=skillKit(mkTrack(TOP)), tips=[]; const sign=t=>tips.push([+T.X.toFixed(2),+T.Y.toFixed(2),t]);
   T.flat(14); sign('Stars ★: ride into them to collect them. You need every star in the level.'); T.flat(6); T.star(); T.flat(8);
   sign('Bumps! Keep holding GAS and feel the springs soak them up.'); T.flat(2); T.waves(3,6,0.55); T.flat(6);
-  sign('Uphill: lean FORWARD with ↻ (the right arrow) while you gas, so the bike does not tip over backwards.'); T.flat(3); T.ease(14,3); T.flat(2); T.star(-1); T.flat(3);
-  sign('Downhill: hold BRAKE (the red button) to control your speed. Brake and lean BACK (↺) together so you do not flip forwards.'); T.flat(2); T.ease(16,-3); T.flat(8);
-  sign('A step! Just before it, lean BACK with ↺ (the left arrow) to lift the front wheel, then gas up onto it.'); T.ledge(0.5,6); T.flat(3); T.star(-1.5); T.flat(5); T.ease(5,-0.5); T.flat(8);
+  sign('Uphill: lean FORWARD with ↻ (the lower right button) while you gas, so the bike does not tip over backwards.'); T.flat(3); T.ease(14,3); T.flat(2); T.star(-1); T.flat(3);
+  sign('Downhill: hold BRAKE (the red button, left) to control your speed. Brake and lean BACK (↺) together so you do not flip forwards.'); T.flat(2); T.ease(16,-3); T.flat(8);
+  sign('A step! Just before it, lean BACK with ↺ (the upper right button) to lift the front wheel, then gas up onto it.'); T.ledge(0.5,6); T.flat(3); T.star(-1.5); T.flat(5); T.ease(5,-0.5); T.flat(8);
   sign('Bunny hop: lean BACK (↺) for a moment, then quickly lean FORWARD (↻). The bike jumps! Hop over the log.'); T.flat(6); T.log(0,0.3); T.flat(10); T.star(-4); T.flat(4);
   sign('In the air, ↺ and ↻ flip the bike. Land on both wheels – only the wheels and the head touch the ground, and the head cannot take a hit.'); T.flat(10);
   sign('This flower is the goal. It only opens when you have collected every star.'); const fx=T.X+4; T.flat(16);
-  sign('Dead end! Grab the last star, then press TURN (the arrows button above GAS and BRAKE, or swipe your thumb up from GAS) to face the other way and ride back to the flower.'); T.flat(12); T.star(-2); T.flat(1);
+  sign('Dead end! Grab the last star, then press TURN (the small round arrows button on the right, or swipe your thumb up from GAS) to face the other way and ride back to the flower.'); T.flat(12); T.star(-2); T.flat(1);
   T.P.push([T.X,TOP]);
   return {id:'fjadra-tutorial', name:'Tutorial', theme:'meadow', tips,
-    hint:'Welcome to Fjädra! Hold GAS (the green button) to ride. Ride past each sign – every sign teaches you one thing.',
+    hint:'Welcome to Fjädra! Hold GAS (the green button, bottom left) to ride. Ride past each sign – every sign teaches you one thing.',
     stuck:'Stuck? Press the restart button at the top to try again.',
     rings:[{pts:T.P}, ...T.R], apples:T.A, killers:[], flower:[fx,T.Y], start:[2,0]}; });
 // 01 Första turen — gas: platt start, mjuka gupp, stjärnor på marken
