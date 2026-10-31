@@ -93,14 +93,20 @@ function press(k,on){
   if(on&&k==='gas'&&state==='crash'&&endTimer>.35) restart();
 }
 // vänd utan att släppa gasen: dra tummen uppåt från GAS eller BRAKE (en gång per tryckning)
-for(const id of ['kGas','kBrake']){ const b=$(id); let y0=null, done=false;
-  b.addEventListener('pointerdown',e=>{ y0=e.clientY; done=false; });
-  b.addEventListener('pointermove',e=>{ if(y0==null||done||y0-e.clientY<50) return; done=true; press('turn',true); const t=$('kTurn'); t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),180); });
+for(const id of ['kGas','kBrake']){ const b=$(id); let y0=null, x0=0, done=false;
+  b.addEventListener('pointerdown',e=>{ y0=e.clientY; x0=e.clientX; done=false; });
+  b.addEventListener('pointermove',e=>{ if(y0==null||done||y0-e.clientY<50||Math.abs(e.clientX-x0)>35) return; done=true; press('turn',true); const t=$('kTurn'); t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),180); });
   const end=()=>{ y0=null; }; b.addEventListener('pointerup',end); b.addEventListener('pointercancel',end); }
-document.querySelectorAll('[data-k]').forEach(b=>{ const k=b.dataset.k;
-  b.addEventListener('pointerdown',e=>{ e.preventDefault(); try{b.setPointerCapture(e.pointerId);}catch(_){} b.classList.add('on'); press(k,true); });
-  const up=()=>{ if(!b.classList.contains('on')) return; b.classList.remove('on'); press(k,false); };
-  b.addEventListener('pointerup',up); b.addEventListener('pointercancel',up); b.addEventListener('lostpointercapture',up); b.addEventListener('contextmenu',e=>e.preventDefault()); });
+// Knapparna: träffytan är större än ringen, och tummen kan glida mellan knappar (t.ex. GAS → BRAKE, ↺ → ↻) utan att lyfta.
+const HOLD=['gas','brake','left','right'];
+function keyAt(x,y,from){ let best=null, bd=1e9; document.querySelectorAll('#ctl [data-k]').forEach(b=>{ const k=b.dataset.k; if(!HOLD.includes(k)) return;
+    const r=b.getBoundingClientRect(); if(!r.width) return; const d=Math.hypot(x-(r.left+r.width/2),y-(r.top+r.height/2)); if(d<r.width*0.5+26&&d<bd){ bd=d; best=b; } });
+  return best||from; }
+document.querySelectorAll('[data-k]').forEach(b=>{ const k0=b.dataset.k; let cur=null;
+  const on=t=>{ cur=t; t.classList.add('on'); press(t.dataset.k,true); }, off=()=>{ if(!cur) return; const t=cur; cur=null; t.classList.remove('on'); press(t.dataset.k,false); };
+  b.addEventListener('pointerdown',e=>{ e.preventDefault(); try{b.setPointerCapture(e.pointerId);}catch(_){} off(); on(b); });
+  b.addEventListener('pointermove',e=>{ if(!cur||!HOLD.includes(k0)) return; const t=keyAt(e.clientX,e.clientY,cur); if(t!==cur){ off(); on(t); } });
+  b.addEventListener('pointerup',off); b.addEventListener('pointercancel',off); b.addEventListener('lostpointercapture',off); b.addEventListener('contextmenu',e=>e.preventDefault()); });
 // ---------- egen knapplayout (Menu → Move buttons) ----------
 // fjadra.ctl = {id:{x,y,s}}: knappens mitt som andel av skärmens bredd/höjd + storleksfaktor. Saknas = standardplats från CSS.
 const CTL_IDS=['kBrake','kGas','kBack','kFwd','kTurn','bRestart'];
