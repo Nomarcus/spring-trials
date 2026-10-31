@@ -192,6 +192,13 @@ function setSuspension(k){ suspK=k; setSusp(k); try{ localStorage.setItem('fjadr
   const box=$('suspBtns'); box.innerHTML=''; for(const [id,name] of SUSP_UI){ const b=document.createElement('button'); b.className='tab'+(id===k?' on':''); b.textContent=name; b.onclick=()=>setSuspension(id); box.appendChild(b); }
   $('suspTxt').textContent=SUSP_UI.find(o=>o[0]===k)[2]; }
 setSuspension(suspK);
+// motorval: Trials = den testade grundfysiken, Zippy (standard) = piggare, Fast = ännu mer
+const ENG_UI=[['trials','Trials','Calm and heavy – the original tested feel.'],['zippy','Zippy','Quicker throttle, more power and top speed.'],['fast','Fast','Even more power and speed. Gas + lean back for long and you loop!']];
+let engK='zippy'; try{ const v=localStorage.getItem('fjadra.engine'); if(ENG_UI.some(o=>o[0]===v)) engK=v; }catch(e){}
+function setEngineUI(k){ engK=k; setEngine(k); try{ localStorage.setItem('fjadra.engine',k); }catch(e){}
+  const box=$('engBtns'); box.innerHTML=''; for(const [id,name] of ENG_UI){ const b=document.createElement('button'); b.className='tab'+(id===k?' on':''); b.textContent=name; b.onclick=()=>setEngineUI(id); box.appendChild(b); }
+  $('engTxt').textContent=ENG_UI.find(o=>o[0]===k)[2]; }
+setEngineUI(engK);
 function setStyle(s){ STYLE=s; try{ localStorage.setItem('fjadra.style',s); }catch(e){} document.body.classList.toggle('neon',s==='neon'); $('bStyle').textContent='Style: '+(s==='neon'?'Neon':'Cartoon'); curTheme=''; if(lvl) setTheme(lvl.theme); buildMenu(); }
 $('bStyle').onclick=()=>setStyle(STYLE==='neon'?'cartoon':'neon');
 $('bNextUnplayed').onclick=()=>{ audioInit(); pausedState=null; let i=LEVELS.findIndex(l=>l.pack===curPack&&best[l.id]==null); if(i<0) i=LEVELS.findIndex((l,k)=>l.pack===curPack&&medalOf(k,best[l.id])<3); if(i<0) i=LEVELS.findIndex(l=>l.pack===curPack); loadLevel(i); };

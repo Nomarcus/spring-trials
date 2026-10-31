@@ -10,6 +10,10 @@ const P = {G:10, WR:0.4, WM:1, WI:0.13, BM:2.3, BI:2.3, AX:0.96, AY:-0.55,
 const SUSP={hard:{KY:240,CY:9,TRAVEL:0.22}, normal:{}, soft:{KY:85,CY:2.4,TRAVEL:0.45}, elma:{KY:70,CY:1.2,TRAVEL:0.6,BOUNCE_MAX:4.6}, bouncy:{KY:62,CY:0.5,TRAVEL:0.7,BOUNCE_MAX:5.4}};
 const SUSP_BASE={KY:P.KY,CY:P.CY,TRAVEL:P.TRAVEL,BOUNCE_MAX:P.BOUNCE_MAX};
 function setSusp(name){ Object.assign(P,SUSP_BASE,SUSP[name]||{}); }
+// Motorval (menyn → Engine). 'trials' = värdena i P (testat, BASELINE.txt). Zippy/Fast: snabbare gaspådrag, mer kraft och toppfart, lite kraftigare volt; ANTI_LOOP höjs så att cykeln inte välter bakåt i branta backar.
+const ENGINE={trials:{}, zippy:{T:11.5,THR_RATE:8,MAXW:36,VOLT_A:50,ANTI_LOOP:28}, fast:{T:12.5,THR_RATE:9,MAXW:40,VOLT_A:52,ANTI_LOOP:34}};
+const ENGINE_BASE={T:P.T,THR_RATE:P.THR_RATE,MAXW:P.MAXW,VOLT_A:P.VOLT_A,ANTI_LOOP:P.ANTI_LOOP};
+function setEngine(name){ Object.assign(P,ENGINE_BASE,ENGINE[name]||{}); }
 
 function buildSegs(rings){
   const segs=[];
@@ -246,4 +250,4 @@ function stepRagdoll(rd,segs,dt){
     }
   }
 }
-if(typeof module!=='undefined') module.exports={P,SUSP,setSusp,step,newBike,headHit,headPos,nearest,buildSegs,volt,turn,facing,riderLocal,riderPose,makeRagdoll,stepRagdoll,setGravity,headResolve};
+if(typeof module!=='undefined') module.exports={P,SUSP,setSusp,ENGINE,setEngine,step,newBike,headHit,headPos,nearest,buildSegs,volt,turn,facing,riderLocal,riderPose,makeRagdoll,stepRagdoll,setGravity,headResolve};
