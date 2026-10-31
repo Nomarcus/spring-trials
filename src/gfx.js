@@ -434,11 +434,13 @@ function strokeLine(pts,col,w,outW){ ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0
   if(outW){ ctx.strokeStyle=OUT; ctx.lineWidth=w+outW; ctx.stroke(); } ctx.strokeStyle=col; ctx.lineWidth=w; ctx.stroke(); }
 // ===================== BIKE + RIDER ART =====================
 const BK={STEER_TOP:[0.56,0.34], STEER_BOT:[0.63,0.15], PIVOT:[-0.1,-0.3], SHOCK_TOP:[-0.17,0.1], CSHAFT:[-0.02,-0.33]};
-const COL={teal:'#c57342', tealD:'#8c462f', frameK:'#2a2e36', frameK2:'#3a404a', gold:'#d9a43a', goldD:'#a87a22', alu2:'#e3e7ec', green:'#bb7042', greenL:'#e4ac70', greenD:'#804a31', white:'#f4f2ea', whiteD:'#cfd3d8', black:'#1d2026', blackL:'#3a3f47',
-  chrome:'#d9dee4', chromeD:'#9aa2ab', alu:'#b9c0c8', gold:'#e3b23c', red:'#d8382e',
-  jersey:'#e2d8bf', jerseyD:'#a69b85', jerseyL:'#f7efdc', pants:'#22252c', pantsL:'#323741', boot:'#17191e', bootL:'#3a3f48', skin:'#f0c9a0'};
+// Cykel + förare: ren grön/vit/svart (Marcus). Neon skriver över i COL_NEON.
+const COL={teal:'#3fae37', tealD:'#257a22', frameK:'#1f2228', frameK2:'#33373f', goldD:'#2a2e36', alu2:'#e3e7ec', green:'#3fae37', greenL:'#7fd877', greenD:'#257a22', white:'#f6f7f4', whiteD:'#cfd3d8', black:'#1b1d22', blackL:'#3a3f47',
+  chrome:'#dfe3e8', chromeD:'#9aa2ab', alu:'#c3c9d0', gold:'#f2f3f0', red:'#3fae37',
+  jersey:'#f4f5f2', jerseyD:'#c4cad0', jerseyL:'#ffffff', pants:'#1d2026', pantsL:'#30343c', boot:'#15171b', bootL:'#3a3f48', skin:'#f0c9a0',
+  helmet:'#f6f7f4', helmetL:'#ffffff', helmetD:'#1b1d22', lens0:'#8fe08a', lens1:'#2f7a2c'};
 const COL_CARTOON=Object.assign({},COL);
-const COL_NEON={green:'#ff3ea5', greenL:'#ff9ad0', greenD:'#a8176b', teal:'#3ef2f2', tealD:'#1fb8b8', gold:'#3ef2f2', goldD:'#1fb8b8', red:'#ffe66d', jersey:'#3b2a86', jerseyD:'#2a1c66', jerseyL:'#5b46c0', white:'#f4eaff'};
+const COL_NEON={helmet:'#2a1458', helmetL:'#3a1c78', helmetD:'#ff3ea5', lens0:'#3ef2f2', lens1:'#b583d9', green:'#ff3ea5', greenL:'#ff9ad0', greenD:'#a8176b', teal:'#3ef2f2', tealD:'#1fb8b8', gold:'#3ef2f2', goldD:'#1fb8b8', red:'#ffe66d', jersey:'#3b2a86', jerseyD:'#2a1c66', jerseyL:'#5b46c0', white:'#f4eaff'};
 function applyStyleColors(){ Object.assign(COL, COL_CARTOON); if(STYLE==='neon') Object.assign(COL, COL_NEON); }
 function P2(p,q,t){ return [p[0]+(q[0]-p[0])*t, p[1]+(q[1]-p[1])*t]; }
 function mid(p,q){ return [(p[0]+q[0])/2,(p[1]+q[1])/2]; }
@@ -593,7 +595,7 @@ function riderBody(p,helmetRot){
 }
 function drawHelmet(hx,hy,rot){
   ctx.save(); ctx.translate(hx,hy); if(rot) ctx.rotate(rot); ctx.scale(0.88,0.88);
-  const NAVY='#1f2747', NAVYL='#34406e';
+  const NAVY=COL.helmet, NAVYL=COL.helmetL;
   const shell=()=>{ ctx.beginPath(); ctx.moveTo(-0.2,-0.12); ctx.bezierCurveTo(-0.29,0.06,-0.15,0.25,0.04,0.25); ctx.bezierCurveTo(0.2,0.25,0.28,0.13,0.29,0.04);
     ctx.quadraticCurveTo(0.36,-0.06,0.34,-0.14); ctx.quadraticCurveTo(0.31,-0.23,0.2,-0.25); ctx.lineTo(0.05,-0.25); ctx.quadraticCurveTo(-0.12,-0.24,-0.2,-0.12); ctx.closePath(); };
   shell(); ctx.fillStyle=NAVY; ctx.fill();
@@ -605,17 +607,17 @@ function drawHelmet(hx,hy,rot){
   ctx.restore();
   shell(); outl(0.032);
   // chin-bar grille
-  ctx.fillStyle='#0f1322'; ctx.beginPath(); ctx.ellipse(0.25,-0.16,0.05,0.035,-0.3,0,6.28); ctx.fill();
+  ctx.fillStyle=COL.helmetD; ctx.beginPath(); ctx.ellipse(0.25,-0.16,0.05,0.035,-0.3,0,6.28); ctx.fill();
   ctx.strokeStyle='#4a5470'; ctx.lineWidth=0.008; ctx.beginPath(); for(let k=-1;k<=1;k++){ ctx.moveTo(0.21,-0.16+k*0.016); ctx.lineTo(0.29,-0.17+k*0.016); } ctx.stroke();
   // goggles: dark frame, mirrored teal-violet lens, strap
-  ctx.beginPath(); ctx.moveTo(-0.24,0.03); ctx.quadraticCurveTo(-0.05,0.06,0.12,0.04); ctx.strokeStyle=OUT; ctx.lineWidth=0.06; ctx.stroke(); ctx.strokeStyle='#2fbfae'; ctx.lineWidth=0.034; ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-0.24,0.03); ctx.quadraticCurveTo(-0.05,0.06,0.12,0.04); ctx.strokeStyle=OUT; ctx.lineWidth=0.06; ctx.stroke(); ctx.strokeStyle=COL.helmetD; ctx.lineWidth=0.034; ctx.stroke();
   smooth([[0.1,0.1],[0.31,0.08],[0.33,-0.06],[0.1,-0.06]],'#121620',0.024);
   ctx.save(); smooth([[0.13,0.075],[0.3,0.055],[0.31,-0.04],[0.13,-0.035]],null,0); ctx.clip();
-  const lg=ctx.createLinearGradient(0.13,0.07,0.3,-0.04); lg.addColorStop(0,'#7fe0e6'); lg.addColorStop(0.55,'#6a7fd8'); lg.addColorStop(1,'#b583d9'); ctx.fillStyle=lg; ctx.fillRect(0.1,-0.1,0.25,0.2);
-  ctx.fillStyle='rgba(255,255,255,.75)'; ctx.beginPath(); ctx.moveTo(0.15,0.065); ctx.lineTo(0.2,0.06); ctx.lineTo(0.16,0.0); ctx.closePath(); ctx.fill();
+  const lg=ctx.createLinearGradient(0.13,0.07,0.3,-0.04); lg.addColorStop(0,COL.lens0); lg.addColorStop(1,COL.lens1); ctx.fillStyle=lg; ctx.fillRect(0.1,-0.1,0.25,0.2);
+  ctx.fillStyle='rgba(255,255,255,.5)'; ctx.beginPath(); ctx.moveTo(0.15,0.065); ctx.lineTo(0.2,0.06); ctx.lineTo(0.16,0.0); ctx.closePath(); ctx.fill();
   ctx.restore();
   // short peak
-  smooth([[-0.02,0.21,'s'],[0.34,0.19,'s'],[0.29,0.12,'s'],[0.06,0.15]],NAVY,0.026);
+  smooth([[-0.02,0.21,'s'],[0.34,0.19,'s'],[0.29,0.12,'s'],[0.06,0.15]],COL.helmetD,0.026);
   ctx.beginPath(); ctx.moveTo(0.03,0.19); ctx.lineTo(0.3,0.17); ctx.strokeStyle=COL.teal; ctx.lineWidth=0.016; ctx.stroke();
   ctx.restore();
 }

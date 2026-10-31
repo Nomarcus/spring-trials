@@ -76,7 +76,7 @@ function edStart(doc,src,isNew){ audioInit(); for(const k in inp) inp[k]=0;
 function edIdle(l){ lvl=l; setTheme(l.theme); if(!l.vis) analyze(l); bike=newBike(l.start[0],l.start[1]); got=l.apples.map(()=>false); cam.x=bike.b.x+5; cam.y=bike.b.y+1.2; parts=[]; rag=null; }
 function edClose(){ if(ed.dirty&&!confirm('You have unsaved changes. Close the editor anyway?')) return;
   const id=ed.doc.id, src=ed.src; ed=null; document.body.classList.remove('editing'); $('edMore').classList.remove('show');
-  curPack=src==='mine'?'mine':3; edIdle(LEVELS.find(l=>l.id===id)||LEVELS[0]); zoom=0.86; SC=SC0*zoom; showMenu(); }
+  curPack=src==='mine'?'mine':3; edIdle(LEVELS.find(l=>l.id===id)||LEVELS[0]); zoom=1.0; SC=SC0*zoom; showMenu(); }
 // visningsobjektet som spelets ritkod använder (delar punkterna med banfilen, så ändringar syns direkt)
 function edSync(full){ const d=ed.doc;
   if(!lvl||lvl._ed!==d) lvl={_ed:d,killers:[],hint:'',stuck:''};
@@ -280,7 +280,7 @@ function edSave(){ const c=JSON.parse(JSON.stringify(edClean(ed.doc))), id=c.id,
   if(ed.src==='mine') return toast('Saved under My levels',2200);
   toast('Saving …',1500); edShare(c).then(r=>toast(r===true?'Saved for everyone playing via the link ✓':r===null?'Saved on this device. Open the game via the claude.ai link to save for everyone.':r==='quota_exceeded'?'Saved here, but the database is full':'Saved on this device (only the owner can save for everyone)',3600)); }
 function edTest(){ const L=levelFromDoc(edClean(ed.doc),{pack:'test',medal:null,stuck:ed.doc.stuck});
-  ed.cam={x:cam.x,y:cam.y,sc:SC}; ed.ptrs.clear(); ed.pinch=null; ed.drag=null; edTesting=true; zoom=0.86; SC=SC0*zoom;
+  ed.cam={x:cam.x,y:cam.y,sc:SC}; ed.ptrs.clear(); ed.pinch=null; ed.drag=null; edTesting=true; zoom=1.0; SC=SC0*zoom;
   document.body.classList.remove('editing'); document.body.classList.add('testing'); loadLevel(-1,L); }
 function edBack(){ if(!ed) return; edTesting=false; for(const k in inp) inp[k]=0; document.querySelectorAll('.k.on').forEach(b=>b.classList.remove('on'));
   document.body.classList.remove('testing'); document.body.classList.add('editing'); hideOv(); state='edit'; parts=[]; rag=null; pops=[]; bloom=0;
