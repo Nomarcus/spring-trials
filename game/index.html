@@ -1116,7 +1116,7 @@ function makeLevels(){
 const LEVELS=makeLevels();
 const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
 const $=id=>document.getElementById(id);
-let W=0,Hh=0,DPR=1,SC=40,SC0=40,zoom=0.86;
+let W=0,Hh=0,DPR=1,SC=40,SC0=40,zoom=1.0;
 let li=0, lvl=null, bike=null, got=[], state='menu', T=0, acc=0, endTimer=0, flagWarn=0, parts=[], rag=null, pops=[], shake=0, bloom=0, rec=[], recT=0, ghost=null, BASE_A=1;
 const NEWLV=new Set(['fjadra-tutorial','fjadra-pack2-01','fjadra-pack2-08','fjadra-pack2-11','fjadra-p3-01','fjadra-p3-02','fjadra-p3-03','fjadra-p3-04','fjadra-p3-05','fjadra-p3-06','fjadra-p3-07','fjadra-p3-08','fjadra-p3-09','fjadra-p3-10','fjadra-p3-11','fjadra-p3-12','fjadra-p3-13','fjadra-p3-14','fjadra-p3-15','fjadra-p3-16','fjadra-p3-17','fjadra-p3-18','fjadra-p3-19','fjadra-p3-20','fjadra-p3-21','fjadra-p3-22','fjadra-p3-23','fjadra-p3-24','fjadra-p3-25','fjadra-p3-26','fjadra-p3-27','fjadra-p3-28','fjadra-p3-29','fjadra-p3-30','fjadra-p3-31','fjadra-p3-32']); let curPack=3;
 let STYLE='cartoon'; try{ STYLE=localStorage.getItem('fjadra.style')==='neon'?'neon':'cartoon'; }catch(e){}
@@ -1595,11 +1595,13 @@ function strokeLine(pts,col,w,outW){ ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0
   if(outW){ ctx.strokeStyle=OUT; ctx.lineWidth=w+outW; ctx.stroke(); } ctx.strokeStyle=col; ctx.lineWidth=w; ctx.stroke(); }
 // ===================== BIKE + RIDER ART =====================
 const BK={STEER_TOP:[0.56,0.34], STEER_BOT:[0.63,0.15], PIVOT:[-0.1,-0.3], SHOCK_TOP:[-0.17,0.1], CSHAFT:[-0.02,-0.33]};
-const COL={teal:'#c57342', tealD:'#8c462f', frameK:'#2a2e36', frameK2:'#3a404a', gold:'#d9a43a', goldD:'#a87a22', alu2:'#e3e7ec', green:'#bb7042', greenL:'#e4ac70', greenD:'#804a31', white:'#f4f2ea', whiteD:'#cfd3d8', black:'#1d2026', blackL:'#3a3f47',
-  chrome:'#d9dee4', chromeD:'#9aa2ab', alu:'#b9c0c8', gold:'#e3b23c', red:'#d8382e',
-  jersey:'#e2d8bf', jerseyD:'#a69b85', jerseyL:'#f7efdc', pants:'#22252c', pantsL:'#323741', boot:'#17191e', bootL:'#3a3f48', skin:'#f0c9a0'};
+// Cykel + förare: ren grön/vit/svart (Marcus). Neon skriver över i COL_NEON.
+const COL={teal:'#3fae37', tealD:'#257a22', frameK:'#1f2228', frameK2:'#33373f', goldD:'#2a2e36', alu2:'#e3e7ec', green:'#3fae37', greenL:'#7fd877', greenD:'#257a22', white:'#f6f7f4', whiteD:'#cfd3d8', black:'#1b1d22', blackL:'#3a3f47',
+  chrome:'#dfe3e8', chromeD:'#9aa2ab', alu:'#c3c9d0', gold:'#f2f3f0', red:'#3fae37',
+  jersey:'#f4f5f2', jerseyD:'#c4cad0', jerseyL:'#ffffff', pants:'#1d2026', pantsL:'#30343c', boot:'#15171b', bootL:'#3a3f48', skin:'#f0c9a0',
+  helmet:'#f6f7f4', helmetL:'#ffffff', helmetD:'#1b1d22', lens0:'#8fe08a', lens1:'#2f7a2c'};
 const COL_CARTOON=Object.assign({},COL);
-const COL_NEON={green:'#ff3ea5', greenL:'#ff9ad0', greenD:'#a8176b', teal:'#3ef2f2', tealD:'#1fb8b8', gold:'#3ef2f2', goldD:'#1fb8b8', red:'#ffe66d', jersey:'#3b2a86', jerseyD:'#2a1c66', jerseyL:'#5b46c0', white:'#f4eaff'};
+const COL_NEON={helmet:'#2a1458', helmetL:'#3a1c78', helmetD:'#ff3ea5', lens0:'#3ef2f2', lens1:'#b583d9', green:'#ff3ea5', greenL:'#ff9ad0', greenD:'#a8176b', teal:'#3ef2f2', tealD:'#1fb8b8', gold:'#3ef2f2', goldD:'#1fb8b8', red:'#ffe66d', jersey:'#3b2a86', jerseyD:'#2a1c66', jerseyL:'#5b46c0', white:'#f4eaff'};
 function applyStyleColors(){ Object.assign(COL, COL_CARTOON); if(STYLE==='neon') Object.assign(COL, COL_NEON); }
 function P2(p,q,t){ return [p[0]+(q[0]-p[0])*t, p[1]+(q[1]-p[1])*t]; }
 function mid(p,q){ return [(p[0]+q[0])/2,(p[1]+q[1])/2]; }
@@ -1754,7 +1756,7 @@ function riderBody(p,helmetRot){
 }
 function drawHelmet(hx,hy,rot){
   ctx.save(); ctx.translate(hx,hy); if(rot) ctx.rotate(rot); ctx.scale(0.88,0.88);
-  const NAVY='#1f2747', NAVYL='#34406e';
+  const NAVY=COL.helmet, NAVYL=COL.helmetL;
   const shell=()=>{ ctx.beginPath(); ctx.moveTo(-0.2,-0.12); ctx.bezierCurveTo(-0.29,0.06,-0.15,0.25,0.04,0.25); ctx.bezierCurveTo(0.2,0.25,0.28,0.13,0.29,0.04);
     ctx.quadraticCurveTo(0.36,-0.06,0.34,-0.14); ctx.quadraticCurveTo(0.31,-0.23,0.2,-0.25); ctx.lineTo(0.05,-0.25); ctx.quadraticCurveTo(-0.12,-0.24,-0.2,-0.12); ctx.closePath(); };
   shell(); ctx.fillStyle=NAVY; ctx.fill();
@@ -1766,17 +1768,17 @@ function drawHelmet(hx,hy,rot){
   ctx.restore();
   shell(); outl(0.032);
   // chin-bar grille
-  ctx.fillStyle='#0f1322'; ctx.beginPath(); ctx.ellipse(0.25,-0.16,0.05,0.035,-0.3,0,6.28); ctx.fill();
+  ctx.fillStyle=COL.helmetD; ctx.beginPath(); ctx.ellipse(0.25,-0.16,0.05,0.035,-0.3,0,6.28); ctx.fill();
   ctx.strokeStyle='#4a5470'; ctx.lineWidth=0.008; ctx.beginPath(); for(let k=-1;k<=1;k++){ ctx.moveTo(0.21,-0.16+k*0.016); ctx.lineTo(0.29,-0.17+k*0.016); } ctx.stroke();
   // goggles: dark frame, mirrored teal-violet lens, strap
-  ctx.beginPath(); ctx.moveTo(-0.24,0.03); ctx.quadraticCurveTo(-0.05,0.06,0.12,0.04); ctx.strokeStyle=OUT; ctx.lineWidth=0.06; ctx.stroke(); ctx.strokeStyle='#2fbfae'; ctx.lineWidth=0.034; ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-0.24,0.03); ctx.quadraticCurveTo(-0.05,0.06,0.12,0.04); ctx.strokeStyle=OUT; ctx.lineWidth=0.06; ctx.stroke(); ctx.strokeStyle=COL.helmetD; ctx.lineWidth=0.034; ctx.stroke();
   smooth([[0.1,0.1],[0.31,0.08],[0.33,-0.06],[0.1,-0.06]],'#121620',0.024);
   ctx.save(); smooth([[0.13,0.075],[0.3,0.055],[0.31,-0.04],[0.13,-0.035]],null,0); ctx.clip();
-  const lg=ctx.createLinearGradient(0.13,0.07,0.3,-0.04); lg.addColorStop(0,'#7fe0e6'); lg.addColorStop(0.55,'#6a7fd8'); lg.addColorStop(1,'#b583d9'); ctx.fillStyle=lg; ctx.fillRect(0.1,-0.1,0.25,0.2);
-  ctx.fillStyle='rgba(255,255,255,.75)'; ctx.beginPath(); ctx.moveTo(0.15,0.065); ctx.lineTo(0.2,0.06); ctx.lineTo(0.16,0.0); ctx.closePath(); ctx.fill();
+  const lg=ctx.createLinearGradient(0.13,0.07,0.3,-0.04); lg.addColorStop(0,COL.lens0); lg.addColorStop(1,COL.lens1); ctx.fillStyle=lg; ctx.fillRect(0.1,-0.1,0.25,0.2);
+  ctx.fillStyle='rgba(255,255,255,.5)'; ctx.beginPath(); ctx.moveTo(0.15,0.065); ctx.lineTo(0.2,0.06); ctx.lineTo(0.16,0.0); ctx.closePath(); ctx.fill();
   ctx.restore();
   // short peak
-  smooth([[-0.02,0.21,'s'],[0.34,0.19,'s'],[0.29,0.12,'s'],[0.06,0.15]],NAVY,0.026);
+  smooth([[-0.02,0.21,'s'],[0.34,0.19,'s'],[0.29,0.12,'s'],[0.06,0.15]],COL.helmetD,0.026);
   ctx.beginPath(); ctx.moveTo(0.03,0.19); ctx.lineTo(0.3,0.17); ctx.strokeStyle=COL.teal; ctx.lineWidth=0.016; ctx.stroke();
   ctx.restore();
 }
@@ -1934,7 +1936,7 @@ function edStart(doc,src,isNew){ audioInit(); for(const k in inp) inp[k]=0;
 function edIdle(l){ lvl=l; setTheme(l.theme); if(!l.vis) analyze(l); bike=newBike(l.start[0],l.start[1]); got=l.apples.map(()=>false); cam.x=bike.b.x+5; cam.y=bike.b.y+1.2; parts=[]; rag=null; }
 function edClose(){ if(ed.dirty&&!confirm('You have unsaved changes. Close the editor anyway?')) return;
   const id=ed.doc.id, src=ed.src; ed=null; document.body.classList.remove('editing'); $('edMore').classList.remove('show');
-  curPack=src==='mine'?'mine':3; edIdle(LEVELS.find(l=>l.id===id)||LEVELS[0]); zoom=0.86; SC=SC0*zoom; showMenu(); }
+  curPack=src==='mine'?'mine':3; edIdle(LEVELS.find(l=>l.id===id)||LEVELS[0]); zoom=1.0; SC=SC0*zoom; showMenu(); }
 // visningsobjektet som spelets ritkod använder (delar punkterna med banfilen, så ändringar syns direkt)
 function edSync(full){ const d=ed.doc;
   if(!lvl||lvl._ed!==d) lvl={_ed:d,killers:[],hint:'',stuck:''};
@@ -2138,7 +2140,7 @@ function edSave(){ const c=JSON.parse(JSON.stringify(edClean(ed.doc))), id=c.id,
   if(ed.src==='mine') return toast('Saved under My levels',2200);
   toast('Saving …',1500); edShare(c).then(r=>toast(r===true?'Saved for everyone playing via the link ✓':r===null?'Saved on this device. Open the game via the claude.ai link to save for everyone.':r==='quota_exceeded'?'Saved here, but the database is full':'Saved on this device (only the owner can save for everyone)',3600)); }
 function edTest(){ const L=levelFromDoc(edClean(ed.doc),{pack:'test',medal:null,stuck:ed.doc.stuck});
-  ed.cam={x:cam.x,y:cam.y,sc:SC}; ed.ptrs.clear(); ed.pinch=null; ed.drag=null; edTesting=true; zoom=0.86; SC=SC0*zoom;
+  ed.cam={x:cam.x,y:cam.y,sc:SC}; ed.ptrs.clear(); ed.pinch=null; ed.drag=null; edTesting=true; zoom=1.0; SC=SC0*zoom;
   document.body.classList.remove('editing'); document.body.classList.add('testing'); loadLevel(-1,L); }
 function edBack(){ if(!ed) return; edTesting=false; for(const k in inp) inp[k]=0; document.querySelectorAll('.k.on').forEach(b=>b.classList.remove('on'));
   document.body.classList.remove('testing'); document.body.classList.add('editing'); hideOv(); state='edit'; parts=[]; rag=null; pops=[]; bloom=0;
@@ -2477,7 +2479,7 @@ function frame(now){
       cam.x+=((vb[0]+vb[2])/2-cam.x)*k; cam.y+=((vb[1]+vb[3])/2-6/sco-cam.y)*k; SC+=(sco-SC)*k; }
     else if(state!=='edit'){ const fx0=rag?rag.pts.hip.x:bike.b.x, fy0=rag?rag.pts.hip.y:bike.b.y; const lx=fx0+(rag?0:Math.max(-3,Math.min(3,bike.b.vx*.28))), ly=fy0+.7+(rag?0:Math.max(-2.2,Math.min(2,bike.b.vy*0.3)));
     const k=Math.min(1,dt*2.8); cam.x+=(lx-cam.x)*k; cam.y+=(ly-cam.y)*k*0.85;
-    const spd=Math.hypot(bike.b.vx,bike.b.vy), air=(bike.contact[0]<0.5&&bike.contact[1]<0.5)?1:0; const zt=0.86-Math.min(0.12,spd*0.008)-air*0.05; zoom+=(zt-zoom)*Math.min(1,dt*1.2); const tsc=SC0*zoom; SC+=(tsc-SC)*Math.min(1,dt*5); }
+    const spd=Math.hypot(bike.b.vx,bike.b.vy), air=(bike.contact[0]<0.5&&bike.contact[1]<0.5)?1:0; const zt=1.0-Math.min(0.12,spd*0.008)-air*0.05; zoom+=(zt-zoom)*Math.min(1,dt*1.2); const tsc=SC0*zoom; SC+=(tsc-SC)*Math.min(1,dt*5); }
     shake*=Math.exp(-dt*7); const shx=(Math.random()-0.5)*shake, shy=(Math.random()-0.5)*shake; cam.x+=shx; cam.y+=shy;
     drawBackground(tt); drawLife(tt);
     for(const d of lvl.vis.deco) blit(SPR[d.kind],d.x,d.y,0,d.s);
