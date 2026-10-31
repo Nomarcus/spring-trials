@@ -441,7 +441,32 @@ const COL={teal:'#3fae37', tealD:'#257a22', frameK:'#1f2228', frameK2:'#33373f',
   helmet:'#f6f7f4', helmetL:'#ffffff', helmetD:'#1b1d22', lens0:'#8fe08a', lens1:'#2f7a2c'};
 const COL_CARTOON=Object.assign({},COL);
 const COL_NEON={helmet:'#2a1458', helmetL:'#3a1c78', helmetD:'#ff3ea5', lens0:'#3ef2f2', lens1:'#b583d9', green:'#ff3ea5', greenL:'#ff9ad0', greenD:'#a8176b', teal:'#3ef2f2', tealD:'#1fb8b8', gold:'#3ef2f2', goldD:'#1fb8b8', red:'#ffe66d', jersey:'#3b2a86', jerseyD:'#2a1c66', jerseyL:'#5b46c0', white:'#f4eaff'};
-function applyStyleColors(){ Object.assign(COL, COL_CARTOON); if(STYLE==='neon') Object.assign(COL, COL_NEON); }
+// färger per cykel (trial = grundfärgerna ovan)
+var BIKE='trial';   // valt cykel-id (sätts av setBikeUI i logic.js)
+const BIKE_LOOK={trial:{},
+  mx:{green:'#f2791c', greenL:'#ffb36b', greenD:'#b4520a', teal:'#f2791c', tealD:'#b4520a', red:'#f2791c', gold:'#1b1d22', jersey:'#1d2026', jerseyD:'#111317', jerseyL:'#3a3f47',
+    pants:'#f4f5f2', pantsL:'#ffffff', helmet:'#f2791c', helmetL:'#ff9a45', helmetD:'#1b1d22', lens0:'#ffe08a', lens1:'#c4620e'},
+  heavy:{green:'#c8302a', greenL:'#ee6a5f', greenD:'#86201b', teal:'#c8302a', tealD:'#86201b', red:'#c8302a', gold:'#dfe3e8', frameK:'#15171b', jersey:'#2d3036', jerseyD:'#1b1d22', jerseyL:'#4a4f57',
+    helmet:'#1b1d22', helmetL:'#3a3f47', helmetD:'#c8302a', lens0:'#9aa3ae', lens1:'#2a2f38'}};
+function applyStyleColors(){ Object.assign(COL, COL_CARTOON, BIKE_LOOK[BIKE]||{}); if(STYLE==='neon') Object.assign(COL, COL_NEON); }
+// extra delar per cykel, ritas ovanpå grundkroppen (i cykelns koordinater)
+function drawBikeExtras(){ const k=BIKE;
+  if(k==='mx'){
+    // högt framskärm, lång sadel och sidonummerskylt
+    smooth([[0.66,0.24,'s'],[1.02,0.3],[1.34,0.2,'s'],[1.31,0.14,'s'],[1.0,0.21],[0.68,0.16,'s']],COL.green,0.026);
+    smooth([[0.1,0.38,'s'],[-0.3,0.43],[-0.62,0.44,'s'],[-0.63,0.37,'s'],[-0.3,0.35],[0.08,0.31,'s']],'#15171b',0.024);
+    smooth([[-0.2,0.3],[-0.5,0.33],[-0.56,0.12],[-0.26,0.06]],'#f4f5f2',0.024);
+    ctx.beginPath(); ctx.moveTo(-0.28,0.24); ctx.lineTo(-0.5,0.26); ctx.moveTo(-0.3,0.13); ctx.lineTo(-0.5,0.16); ctx.strokeStyle=COL.green; ctx.lineWidth=0.035; ctx.stroke();
+  } else if(k==='heavy'){
+    // stor tank, V2-motor med kromade cylindrar och fet ljuddämpare
+    smooth([[-0.06,-0.12],[0.36,-0.08],[0.42,-0.42],[-0.18,-0.46]],'#2a2e36',0.028);
+    for(const [cx,cy,a] of [[0.0,-0.18,0.35],[0.24,-0.16,-0.35]]){ ctx.save(); ctx.translate(cx,cy); ctx.rotate(a); ctx.beginPath(); ctx.rect(-0.07,-0.02,0.14,0.2); ctx.fillStyle=COL.chrome; ctx.fill(); outl(0.02);
+      ctx.strokeStyle=COL.chromeD; ctx.lineWidth=0.012; ctx.beginPath(); for(let i=1;i<5;i++){ ctx.moveTo(-0.07,-0.02+i*0.04); ctx.lineTo(0.07,-0.02+i*0.04); } ctx.stroke(); ctx.restore(); }
+    smooth([[-0.3,0.02],[-0.86,0.12],[-0.88,-0.04],[-0.32,-0.14]],COL.chrome,0.026);
+    smooth([[0.6,0.4],[0.26,0.52],[-0.08,0.42,'s'],[-0.04,0.2],[0.24,0.12],[0.5,0.18,'s']],COL.green,0.03);
+    ctx.beginPath(); ctx.moveTo(0.0,0.36); ctx.quadraticCurveTo(0.28,0.47,0.52,0.36); ctx.strokeStyle=COL.chrome; ctx.lineWidth=0.03; ctx.stroke();
+    smooth([[-0.04,0.42,'s'],[-0.36,0.46],[-0.64,0.44,'s'],[-0.64,0.36,'s'],[-0.34,0.36],[-0.04,0.32,'s']],'#15171b',0.024);
+  } }
 function P2(p,q,t){ return [p[0]+(q[0]-p[0])*t, p[1]+(q[1]-p[1])*t]; }
 function mid(p,q){ return [(p[0]+q[0])/2,(p[1]+q[1])/2]; }
 function outl(w){ ctx.strokeStyle=OUT; ctx.lineWidth=w||0.032; ctx.lineJoin='round'; ctx.lineCap='round'; ctx.stroke(); }
@@ -525,6 +550,7 @@ function drawBikeBody(){
   smooth([[0.64,0.1,'s'],[0.96,0.1],[1.2,0.02,'s'],[1.18,-0.03,'s'],[0.95,0.03],[0.66,0.04,'s']],'#1d2026',0.026);
   // foot peg
   poly2([[-0.14,-0.42],[0.06,-0.42],[0.06,-0.46],[-0.14,-0.46]],'#9aa1aa',0.02);
+  drawBikeExtras();
 }
 function drawForkAndBars(sx,fw){
   const top=toW(BK.STEER_TOP[0],BK.STEER_TOP[1],sx), ax=[fw.x,fw.y]; const dx=ax[0]-top[0], dy=ax[1]-top[1], L=Math.hypot(dx,dy)||1, ux=dx/L, uy=dy/L, nx=-uy, ny=ux;

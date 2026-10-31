@@ -132,3 +132,6 @@ Marcus ville ha längre, mer varierade banor med mycket skill. Varje inbyggd ban
   - `stairs` (plankstege över ravin), `beams` (stålbalkar över ravin) och `stepsDown`.
 - Medaljtiderna ökas med delens längd (guld +längd/4,5 s, silver +längd/3 s). Banorna är inte testade med boten; Marcus testar själv.
 - Ändrar Marcus en sådan bana i editorn sparas hela banan, inklusive skill-delen, i EDITS, och `addSkill` hoppar över den.
+
+## Motocross Flow (`fjadra-mx-01`, sist i listan)
+Byggd i `mxLevel()` i levels.js: whoops, tre tabletops, två dubbelhopp, långa rullar, nedförsbacke och ett stort finalhopp. Ett skript (full gas och cykeln hålls rak i luften) tar alla 7 stjärnor och når blomman med alla tre cyklarna och alla fem fjädringsval (Trial ≈35 s, Motocross ≈31 s, Heavy ≈30 s). Medalj [33,50].

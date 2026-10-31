@@ -192,13 +192,13 @@ function setSuspension(k){ suspK=k; setSusp(k); try{ localStorage.setItem('fjadr
   const box=$('suspBtns'); box.innerHTML=''; for(const [id,name] of SUSP_UI){ const b=document.createElement('button'); b.className='tab'+(id===k?' on':''); b.textContent=name; b.onclick=()=>setSuspension(id); box.appendChild(b); }
   $('suspTxt').textContent=SUSP_UI.find(o=>o[0]===k)[2]; }
 setSuspension(suspK);
-// motorval: Trials = den testade grundfysiken, Zippy (standard) = piggare, Fast = ännu mer
-const ENG_UI=[['trials','Trials','Calm and heavy – the original tested feel.'],['zippy','Zippy','Quicker throttle, more power and top speed.'],['fast','Fast','Even more power and speed. Gas + lean back for long and you loop!']];
-let engK='zippy'; try{ const v=localStorage.getItem('fjadra.engine'); if(ENG_UI.some(o=>o[0]===v)) engK=v; }catch(e){}
-function setEngineUI(k){ engK=k; setEngine(k); try{ localStorage.setItem('fjadra.engine',k); }catch(e){}
-  const box=$('engBtns'); box.innerHTML=''; for(const [id,name] of ENG_UI){ const b=document.createElement('button'); b.className='tab'+(id===k?' on':''); b.textContent=name; b.onclick=()=>setEngineUI(id); box.appendChild(b); }
-  $('engTxt').textContent=ENG_UI.find(o=>o[0]===k)[2]; }
-setEngineUI(engK);
+// cykelval: tre motorcyklar med olika fysik (BIKES i core.js) och utseende (BIKE_LOOK i gfx.js)
+const BIKE_UI=[['trial','Trial','Light and nimble. Lots of punch and quick flips – made for the puzzle levels.'],['mx','Motocross','Strong and fast with a high top speed. Made for jumps and flow.'],['heavy','Heavy','Big and fast. Slow to get going and to rotate, but the highest top speed.']];
+try{ const v=localStorage.getItem('fjadra.bike'); if(BIKE_UI.some(o=>o[0]===v)) BIKE=v; }catch(e){}
+function setBikeUI(k){ BIKE=k; setBike(k); applyStyleColors(); try{ localStorage.setItem('fjadra.bike',k); }catch(e){}
+  const box=$('engBtns'); box.innerHTML=''; for(const [id,name] of BIKE_UI){ const b=document.createElement('button'); b.className='tab'+(id===k?' on':''); b.textContent=name; b.onclick=()=>setBikeUI(id); box.appendChild(b); }
+  $('engTxt').textContent=BIKE_UI.find(o=>o[0]===k)[2]; }
+setBikeUI(BIKE);
 function setStyle(s){ STYLE=s; try{ localStorage.setItem('fjadra.style',s); }catch(e){} document.body.classList.toggle('neon',s==='neon'); $('bStyle').textContent='Style: '+(s==='neon'?'Neon':'Cartoon'); curTheme=''; if(lvl) setTheme(lvl.theme); buildMenu(); }
 $('bStyle').onclick=()=>setStyle(STYLE==='neon'?'cartoon':'neon');
 $('bNextUnplayed').onclick=()=>{ audioInit(); pausedState=null; let i=LEVELS.findIndex(l=>l.pack===curPack&&best[l.id]==null); if(i<0) i=LEVELS.findIndex((l,k)=>l.pack===curPack&&medalOf(k,best[l.id])<3); if(i<0) i=LEVELS.findIndex(l=>l.pack===curPack); loadLevel(i); };

@@ -395,7 +395,7 @@ var LOOPRIDE={};
 const MEDALS3={'fjadra-tutorial':[40,60],'fjadra-p3-01':[16,26],'fjadra-p3-02':[14,24],'fjadra-p3-03':[24,38],'fjadra-p3-04':[12,20],'fjadra-p3-05':[60,100],
   'fjadra-p3-06':[35,55],'fjadra-p3-07':[55,95],'fjadra-p3-08':[20,35],'fjadra-p3-09':[35,55],'fjadra-p3-10':[14,22],'fjadra-p3-11':[35,55],'fjadra-p3-12':[15,24],'fjadra-p3-13':[30,45],'fjadra-p3-14':[14,24],'fjadra-p3-15':[11,18],
   'fjadra-p3-16':[30,45],'fjadra-p3-17':[16,26],'fjadra-p3-18':[26,40],'fjadra-p3-19':[36,52],'fjadra-p3-20':[34,50],'fjadra-p3-21':[24,36],'fjadra-p3-22':[24,36],'fjadra-p3-23':[26,40],'fjadra-p3-24':[34,50],'fjadra-p3-25':[40,60],
-  'fjadra-p3-26':[50,75],'fjadra-p3-27':[30,45],'fjadra-p3-28':[50,75],'fjadra-p3-29':[50,75],'fjadra-p3-30':[300,450],'fjadra-p3-31':[75,105],'fjadra-p3-32':[85,120]};
+  'fjadra-p3-26':[50,75],'fjadra-p3-27':[30,45],'fjadra-p3-28':[50,75],'fjadra-p3-29':[50,75],'fjadra-p3-30':[300,450],'fjadra-p3-31':[75,105],'fjadra-p3-32':[85,120],'fjadra-mx-01':[33,50]};
 const slug=n=>n.toLowerCase().replace(/å/g,'a').replace(/ä/g,'a').replace(/ö/g,'o').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 // Ändringar och nya banor från baneditorn som är inbakade i spelet (läggs in med tools/fjadra/import_level.py).
 // Nyckel = ban-ID. En inbyggd bana byts ut mot sin ändrade version, ett okänt ID blir en ny bana sist i paketet.
@@ -495,11 +495,36 @@ const SKILL_END={
 function addSkill(l){ const a=SKILL[l.id], b=SKILL_END[l.id]; let len=0;
   if(a) len+=addIntro(l,a[1],a[0]); if(b) len+=addOutro(l,b[1],b[0]); if(!len) return;
   l.medal=[l.medal[0]+Math.round(len/4.5),l.medal[1]+Math.round(len/3)]; l.skill=true; }
+// MX: motocrossbana med flow – whoops, tabletops, dubbelhopp, rytmsektion och en stor avslutning. Byggd för fart: håll gasen
+// och landa på nedförsbackarna. Kickern är brantast i kanten (x^1.6) så den kastar; landningarna är mjuka cosinusbackar.
+function mxLevel(){ const T=mkTrack(TOP);
+  const kick=(L,h)=>T.fn(L,x=>h*Math.pow(x/L,1.35),0.35);             // uppfart som skjuter iväg (brantast i kanten, men mjuk böj)
+  const table=(up,h,top,down)=>{ kick(up,h); T.flat(top); T.ease(down,-h); };
+  const dbl=(up,h,gap,land)=>{ kick(up,h); T.ease(gap*0.45,-h-0.4); T.flat(gap*0.15); T.ease(gap*0.4,h+0.2); T.ease(land,-h+0.2); };
+  T.flat(16); T.star(-4);
+  T.waves(7,3.2,0.4); T.flat(8);                                      // whoops
+  table(7,1.6,8,10); T.star(-4); T.flat(10);                          // tabletop 1
+  table(8,2.2,10,12); T.flat(4); T.star(-2); T.flat(8);               // tabletop 2
+  T.part();
+  dbl(8,2.2,12,12); T.flat(10); T.star(-3);                           // dubbelhopp
+  T.waves(4,10,0.8); T.flat(12);                                      // rytmsektion, långa rullar
+  T.ease(34,-5); T.waves(3,7,0.4); T.flat(10); T.star(-4);            // lång nedförsbacke med gupp
+  T.part();
+  table(9,2.6,9,13); T.flat(8);                                       // tabletop 3
+  dbl(9,2.6,14,14); T.flat(12); T.star(-6);                           // stort dubbelhopp
+  T.waves(6,4,0.55); T.flat(8);                                       // whoops 2
+  table(10,3.2,14,16); T.flat(6); T.star(-3);                        // stora finalhoppet
+  const fl=T.end(12,22);
+  return {id:'fjadra-mx-01', name:'Motocross Flow', theme:'sunset', parts:T.parts,
+    hint:'Motocross! Pick the Motocross bike, hold GAS and flow over the jumps. Land on the downslopes and keep the speed.',
+    stuck:'Too slow for a jump? Ride back for a longer run-up, or try the Motocross or Heavy bike. Level the bike in the air with ↺ ↻.',
+    rings:[{pts:T.P}, ...T.R], apples:T.A, killers:[], flower:fl, start:[2,0]}; }
 function makeLevels(){
   let L=LV3.map(f=>f());
   for(const l of L){ l.pack=3; l.medal=MEDALS3[l.id]||[20,35]; if(!EDITS[l.id]) addSkill(l); }
   L=L.map(l=>EDITS[l.id]?levelFromDoc(EDITS[l.id],{pack:l.pack,medal:l.medal,stuck:l.stuck,tips:l.tips}):l);
   for(const id in EDITS) if(!L.some(l=>l.id===id)) L.push(levelFromDoc(EDITS[id],{pack:3,medal:EDITS[id].medal||[30,50]}));
+  if(!L.some(l=>l.id==='fjadra-mx-01')){ const m=mxLevel(); m.pack=3; L.push(m); }
   for(const l of L) if(!l.segs) finishLevel(l);
   return L;
 }

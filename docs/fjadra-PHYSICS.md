@@ -53,13 +53,13 @@ Fast steg `P.H = 1/600 s`. `physics(dt)` i `logic.js` kör en ackumulator med h�
 
 Inget val ger huvudkrasch vid fall från 6 m. Testboten klarar bana 1–10 med alla fem valen. Kör boten med ett annat val: `SUSP=elma node tools/fjadra/test/run.js 0 1 2`.
 
-## Motorval (menyn → Engine)
-`ENGINE` i `core.js` och `setEngine(namn)`. `trials` = `P` (BASELINE.txt). Spelets standard är `zippy` (sparas i `fjadra.engine`).
+## Cykelval (menyn → Settings → Bike)
+`BIKES` i `core.js` och `setBike(namn)`; utseendet i `BIKE_LOOK` + `drawBikeExtras()` i `gfx.js`. `P` själv (= `base`) är den gamla Trials-fysiken som BASELINE.txt gäller. Valet sparas i `fjadra.bike`, standard `trial`.
 
-| Val | T | THR_RATE | MAXW | VOLT_A | ANTI_LOOP | 0→5 m/s | fart efter 4 s |
+| Cykel | Utseende | T | THR_RATE | MAXW | VOLT_A | övrigt | fart 2 s / topp |
 |---|---|---|---|---|---|---|---|
-| Trials | 9 | 3,5 | 30 | 46 | 14 | 1,6 s | 11,1 m/s |
-| Zippy | 11,5 | 8 | 36 | 50 | 28 | 1,1 s | ≈13,5 m/s |
-| Fast | 12,5 | 9 | 40 | 52 | 34 | 1,0 s | ≈15 m/s |
+| Trial | grön/vit/svart | 11,5 | 8 | 36 | 50 | ANTI_LOOP 28 | 8,2 / 14,6 m/s |
+| Motocross (`mx`) | orange/svart, högt framskärm, nummerskylt | 11 | 10 | 46 | 46 | ANTI_LOOP 40 | 8,3 / 18,6 m/s |
+| Heavy | svart/röd/krom, stor tank, V2-motor | 10 | 4,5 | 52 | 38 | HOLD 5,5, LEANMAX 3,2, ANTI_LOOP 40 | 7,5 / 21 m/s |
 
-Zippy och Fast ger inga nya huvudkrascher i `feel`/`drops`, och `gas_ramp` välter inte (högre ANTI_LOOP). Fast kan loopas med gas + luta bak i 1,5 s från stillastående. Testboten har **inte** körts med Zippy/Fast.
+Höga MAXW ger mer vridmoment vid en given fart (kurvan `1.4-0.75·wr`), därför lägre T och högre ANTI_LOOP för mx/heavy – annars välter de i branta backar. Alla tre: inga döda fall i `drops`, välter inte i `gas_ramp`. Testboten har **inte** körts på de gamla banorna med mx/heavy.
