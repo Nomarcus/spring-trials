@@ -200,7 +200,7 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
 
 /* Kontroller som Mad Skills Motocross: genomskinliga ringar. Vänster tumme: BRAKE (röd) + GAS (grön) diagonalt.
    Höger tumme: ↺ (övre) + ↻ (nedre) diagonalt, TURN och RESET små runda ovanför. */
-#ctl{ position:absolute; inset:0; display:block; padding:0; pointer-events:none; }
+#ctl{ position:absolute; inset:0; display:block; padding:0; pointer-events:none; --sr:calc(env(safe-area-inset-right,0px)*.25); }   /* närmare högerkanten på iPhone */
 #ctl .k.rb{ position:absolute; pointer-events:auto; width:76px; height:76px; border-radius:50% !important; padding:0;
   display:flex; align-items:center; justify-content:center; background:rgba(10,22,38,.22) !important;
   border:3px solid rgba(235,245,255,.8) !important; box-shadow:0 2px 8px rgba(0,0,0,.25) !important; transform:none; filter:none; }
@@ -210,21 +210,33 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
 #ctl #kGas.rb{ left:calc(env(safe-area-inset-left,0px) + 104px); bottom:18px; border-color:#4cc23f !important; border-width:4px !important; }
 #ctl #kBrake.rb.on{ background:rgba(224,69,58,.45) !important; }
 #ctl #kGas.rb.on{ background:rgba(76,194,63,.45) !important; }
-#ctl #kFwd.rb{ right:calc(env(safe-area-inset-right,0px) + 22px); bottom:98px; }
-#ctl #kBack.rb{ right:calc(env(safe-area-inset-right,0px) + 104px); bottom:18px; }
-#ctl #kTurn.rb{ width:54px; height:54px; right:calc(env(safe-area-inset-right,0px) + 120px); bottom:118px; }
+#ctl #kFwd.rb{ right:calc(var(--sr) + 22px); bottom:98px; }
+#ctl #kBack.rb{ right:calc(var(--sr) + 104px); bottom:18px; }
+#ctl #kTurn.rb{ width:54px; height:54px; right:calc(var(--sr) + 120px); bottom:118px; }
 #ctl #kTurn.rb svg{ width:28px; height:28px; }
-#ctl #bRestart.rb{ width:46px; height:46px; right:calc(env(safe-area-inset-right,0px) + 37px); bottom:196px; }
+#ctl #bRestart.rb{ width:46px; height:46px; right:calc(var(--sr) + 37px); bottom:196px; }
 #ctl #bRestart.rb svg{ width:22px; height:22px; }
 body.neon #ctl #kBrake.rb{ border-color:#ff3ea5 !important; } body.neon #ctl #kGas.rb{ border-color:#18c9b8 !important; }
 @media (max-height:420px){
   #ctl .k.rb{ width:66px; height:66px; } #ctl .k.rb svg{ width:31px; height:31px; }
   #ctl #kBrake.rb, #ctl #kFwd.rb{ bottom:84px; } #ctl #kGas.rb{ left:calc(env(safe-area-inset-left,0px) + 92px); bottom:14px; }
-  #ctl #kBack.rb{ right:calc(env(safe-area-inset-right,0px) + 92px); bottom:14px; }
-  #ctl #kTurn.rb{ width:48px; height:48px; right:calc(env(safe-area-inset-right,0px) + 104px); bottom:100px; }
-  #ctl #bRestart.rb{ width:42px; height:42px; right:calc(env(safe-area-inset-right,0px) + 34px); bottom:166px; }
+  #ctl #kBack.rb{ right:calc(var(--sr) + 92px); bottom:14px; }
+  #ctl #kTurn.rb{ width:48px; height:48px; right:calc(var(--sr) + 104px); bottom:100px; }
+  #ctl #bRestart.rb{ width:42px; height:42px; right:calc(var(--sr) + 34px); bottom:166px; }
 }
 @media (prefers-reduced-motion:reduce){ #ctl .k.rb.on{ transform:none; } }
+
+/* Flytta knappar (Menu → Move buttons): dra knapparna, tryck en för att välja och ändra storlek */
+#ctlBar{ display:none; position:absolute; left:50%; top:max(10px,env(safe-area-inset-top,0px)); transform:translateX(-50%); z-index:60;
+  gap:6px; align-items:center; background:var(--hud); border:2px solid var(--navyLine); border-radius:16px; padding:7px 9px; box-shadow:0 4px 14px rgba(0,0,0,.35); }
+#ctlBar .eb{ height:40px; min-width:44px; padding:0 12px; border-radius:12px; border:2px solid var(--navyLine); background:var(--navy2); color:#fff; font-family:'Lilita One',sans-serif; font-size:15px; }
+#ctlBar .eb.go{ background:var(--green); border-color:var(--greenDark); }
+#ctlBar span{ color:#fff; font-size:13px; font-weight:800; padding:0 4px; white-space:nowrap; }
+body.ctledit #ctlBar{ display:flex; }
+body.ctledit #ctl{ background:rgba(8,18,30,.45); pointer-events:auto; z-index:55; }
+body.ctledit #ctl .k.rb{ cursor:grab; outline:2px dashed rgba(255,255,255,.55); outline-offset:4px; touch-action:none; }
+body.ctledit #ctl .k.rb.sel{ outline:3px solid var(--gold); }
+body.ctledit #hud, body.ctledit #lvlname, body.ctledit #toast{ visibility:hidden; }
 </style>
 </head>
 <body>
@@ -254,6 +266,7 @@ body.neon #ctl #kBrake.rb{ border-color:#ff3ea5 !important; } body.neon #ctl #kG
   <button class="k rb" id="kFwd" data-k="right" aria-label="Lean forward / flip clockwise"><svg viewBox="-16 -16 32 32" aria-hidden="true"><path d="M9 3a10 10 0 1 1-4-10" stroke="#fff" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M10.5-13.5l-8.5 3.2 7.4 6.2z" fill="#fff" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/></svg></button>
 </div>
 
+<div id="ctlBar"><span id="ctlTxt">Drag the buttons</span><button class="eb" id="ctlMinus" aria-label="Smaller">−</button><button class="eb" id="ctlPlus" aria-label="Bigger">＋</button><button class="eb" id="ctlReset">Reset</button><button class="eb go" id="ctlDone">Done</button></div>
 <div id="toast"></div>
 
 <div id="ed">
@@ -310,7 +323,7 @@ body.neon #ctl #kBrake.rb{ border-color:#ff3ea5 !important; } body.neon #ctl #kG
     <p class="help"><b>Mobile:</b> left thumb: green = GAS, red = BRAKE. Right thumb: ↺ ↻. The small round arrows button on the right turns the bike around – or swipe your thumb up from GAS or BRAKE to turn without letting go. ↺ ↻ shift the rider's weight and flip the bike – both at once gives an extra strong flip. <b>Pump:</b> lean back and forth in rhythm to gain speed with your arms. <b>Bunny hop:</b> lean back for a moment, then throw your weight forward. <b>Bounce:</b> press a wheel down (landing or flip) and hit BRAKE right at the bottom. <b>Brake</b> also makes the wheels grip – hang on edges and beams.<br>
     <b>Keyboard:</b> ↑ gas, ↓ brake, ← → flip, space turn, Enter restart, Esc menu.</p>
     <p id="rot">Turn your phone to landscape for the best control.</p>
-    <div class="row"><button class="btn alt" id="bMusic">Music: on</button><button class="btn alt" id="bStyle">Style: Cartoon</button><button class="btn alt" id="bFull">Fullscreen</button></div>
+    <div class="row"><button class="btn alt" id="bMusic">Music: on</button><button class="btn alt" id="bStyle">Style: Cartoon</button><button class="btn alt" id="bFull">Fullscreen</button><button class="btn alt" id="bCtl">Move buttons</button></div>
   </div>
 </div>
 
@@ -2274,6 +2287,35 @@ document.querySelectorAll('[data-k]').forEach(b=>{ const k=b.dataset.k;
   b.addEventListener('pointerdown',e=>{ e.preventDefault(); try{b.setPointerCapture(e.pointerId);}catch(_){} b.classList.add('on'); press(k,true); });
   const up=()=>{ if(!b.classList.contains('on')) return; b.classList.remove('on'); press(k,false); };
   b.addEventListener('pointerup',up); b.addEventListener('pointercancel',up); b.addEventListener('lostpointercapture',up); b.addEventListener('contextmenu',e=>e.preventDefault()); });
+// ---------- egen knapplayout (Menu → Move buttons) ----------
+// fjadra.ctl = {id:{x,y,s}}: knappens mitt som andel av skärmens bredd/höjd + storleksfaktor. Saknas = standardplats från CSS.
+const CTL_IDS=['kBrake','kGas','kBack','kFwd','kTurn','bRestart'];
+let ctlLay={}; try{ ctlLay=JSON.parse(localStorage.getItem('fjadra.ctl')||'{}')||{}; }catch(e){ ctlLay={}; }
+let ctlSel=null;
+function ctlApply(){ for(const id of CTL_IDS){ const b=$(id), o=ctlLay[id]||{}, sv=b.querySelector('svg');
+    b.style.width=b.style.height=b.style.left=b.style.top=b.style.right=b.style.bottom=''; if(sv) sv.style.width=sv.style.height='';
+    const w0=b.offsetWidth||70, w=Math.round(w0*(o.s||1));
+    if(o.s&&o.s!==1){ b.style.width=b.style.height=w+'px'; if(sv) sv.style.width=sv.style.height=Math.round(w*0.47)+'px'; }
+    if(o.x!=null){ const W=innerWidth, H=innerHeight; const cx=Math.max(w/2,Math.min(W-w/2,o.x*W)), cy=Math.max(w/2,Math.min(H-w/2,o.y*H));
+      b.style.left=Math.round(cx-w/2)+'px'; b.style.top=Math.round(cy-w/2)+'px'; b.style.right=b.style.bottom='auto'; } } }
+function ctlSave(){ try{ localStorage.setItem('fjadra.ctl',JSON.stringify(ctlLay)); }catch(e){} }
+function ctlMark(){ CTL_IDS.forEach(id=>$(id).classList.toggle('sel',id===ctlSel)); $('ctlTxt').textContent=ctlSel?'Size of this button:':'Drag · tap one to resize'; }
+function ctlEdit(on){ document.body.classList.toggle('ctledit',on); ctlSel=null; ctlMark();
+  if(on){ $('menu').classList.remove('show'); } else { ctlSave(); showMenu(); } }
+$('bCtl').onclick=()=>ctlEdit(true); $('ctlDone').onclick=()=>ctlEdit(false);
+$('ctlReset').onclick=()=>{ if(ctlSel) delete ctlLay[ctlSel]; else ctlLay={}; ctlApply(); ctlSave(); };
+function ctlSize(f){ const ids=ctlSel?[ctlSel]:CTL_IDS; for(const id of ids){ const o=ctlLay[id]||(ctlLay[id]={}); o.s=Math.max(0.6,Math.min(1.8,+((o.s||1)*f).toFixed(3))); if(o.x==null){ const r=$(id).getBoundingClientRect(); o.x=(r.left+r.width/2)/innerWidth; o.y=(r.top+r.height/2)/innerHeight; } } ctlApply(); ctlSave(); }
+$('ctlMinus').onclick=()=>ctlSize(1/1.12); $('ctlPlus').onclick=()=>ctlSize(1.12);
+(function(){ const box=$('ctl'); let drag=null;
+  box.addEventListener('pointerdown',e=>{ if(!document.body.classList.contains('ctledit')) return; e.stopPropagation(); e.preventDefault();
+    const b=e.target.closest('.k'); if(!b){ ctlSel=null; ctlMark(); return; } const r=b.getBoundingClientRect();
+    drag={b,id:b.id,dx:e.clientX-(r.left+r.width/2),dy:e.clientY-(r.top+r.height/2),x0:e.clientX,y0:e.clientY,moved:false}; try{ box.setPointerCapture(e.pointerId); }catch(_){} },true);
+  box.addEventListener('pointermove',e=>{ if(!drag) return; e.stopPropagation(); if(Math.hypot(e.clientX-drag.x0,e.clientY-drag.y0)>6) drag.moved=true; if(!drag.moved) return;
+    const o=ctlLay[drag.id]||(ctlLay[drag.id]={}); o.x=(e.clientX-drag.dx)/innerWidth; o.y=(e.clientY-drag.dy)/innerHeight; ctlApply(); },true);
+  const end=e=>{ if(!drag) return; e.stopPropagation(); if(!drag.moved){ ctlSel=ctlSel===drag.id?null:drag.id; ctlMark(); } else ctlSave(); drag=null; };
+  box.addEventListener('pointerup',end,true); box.addEventListener('pointercancel',end,true);
+  box.addEventListener('click',e=>{ if(document.body.classList.contains('ctledit')){ e.stopPropagation(); e.preventDefault(); } },true);
+  addEventListener('resize',()=>setTimeout(ctlApply,60)); ctlApply(); })();
 const KEYS={ArrowUp:'gas',KeyW:'gas',ArrowDown:'brake',KeyS:'brake',ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right'};
 addEventListener('keydown',e=>{
   if(e.target&&e.target.closest&&e.target.closest('input,textarea')) return;

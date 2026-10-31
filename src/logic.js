@@ -101,6 +101,35 @@ document.querySelectorAll('[data-k]').forEach(b=>{ const k=b.dataset.k;
   b.addEventListener('pointerdown',e=>{ e.preventDefault(); try{b.setPointerCapture(e.pointerId);}catch(_){} b.classList.add('on'); press(k,true); });
   const up=()=>{ if(!b.classList.contains('on')) return; b.classList.remove('on'); press(k,false); };
   b.addEventListener('pointerup',up); b.addEventListener('pointercancel',up); b.addEventListener('lostpointercapture',up); b.addEventListener('contextmenu',e=>e.preventDefault()); });
+// ---------- egen knapplayout (Menu → Move buttons) ----------
+// fjadra.ctl = {id:{x,y,s}}: knappens mitt som andel av skärmens bredd/höjd + storleksfaktor. Saknas = standardplats från CSS.
+const CTL_IDS=['kBrake','kGas','kBack','kFwd','kTurn','bRestart'];
+let ctlLay={}; try{ ctlLay=JSON.parse(localStorage.getItem('fjadra.ctl')||'{}')||{}; }catch(e){ ctlLay={}; }
+let ctlSel=null;
+function ctlApply(){ for(const id of CTL_IDS){ const b=$(id), o=ctlLay[id]||{}, sv=b.querySelector('svg');
+    b.style.width=b.style.height=b.style.left=b.style.top=b.style.right=b.style.bottom=''; if(sv) sv.style.width=sv.style.height='';
+    const w0=b.offsetWidth||70, w=Math.round(w0*(o.s||1));
+    if(o.s&&o.s!==1){ b.style.width=b.style.height=w+'px'; if(sv) sv.style.width=sv.style.height=Math.round(w*0.47)+'px'; }
+    if(o.x!=null){ const W=innerWidth, H=innerHeight; const cx=Math.max(w/2,Math.min(W-w/2,o.x*W)), cy=Math.max(w/2,Math.min(H-w/2,o.y*H));
+      b.style.left=Math.round(cx-w/2)+'px'; b.style.top=Math.round(cy-w/2)+'px'; b.style.right=b.style.bottom='auto'; } } }
+function ctlSave(){ try{ localStorage.setItem('fjadra.ctl',JSON.stringify(ctlLay)); }catch(e){} }
+function ctlMark(){ CTL_IDS.forEach(id=>$(id).classList.toggle('sel',id===ctlSel)); $('ctlTxt').textContent=ctlSel?'Size of this button:':'Drag · tap one to resize'; }
+function ctlEdit(on){ document.body.classList.toggle('ctledit',on); ctlSel=null; ctlMark();
+  if(on){ $('menu').classList.remove('show'); } else { ctlSave(); showMenu(); } }
+$('bCtl').onclick=()=>ctlEdit(true); $('ctlDone').onclick=()=>ctlEdit(false);
+$('ctlReset').onclick=()=>{ if(ctlSel) delete ctlLay[ctlSel]; else ctlLay={}; ctlApply(); ctlSave(); };
+function ctlSize(f){ const ids=ctlSel?[ctlSel]:CTL_IDS; for(const id of ids){ const o=ctlLay[id]||(ctlLay[id]={}); o.s=Math.max(0.6,Math.min(1.8,+((o.s||1)*f).toFixed(3))); if(o.x==null){ const r=$(id).getBoundingClientRect(); o.x=(r.left+r.width/2)/innerWidth; o.y=(r.top+r.height/2)/innerHeight; } } ctlApply(); ctlSave(); }
+$('ctlMinus').onclick=()=>ctlSize(1/1.12); $('ctlPlus').onclick=()=>ctlSize(1.12);
+(function(){ const box=$('ctl'); let drag=null;
+  box.addEventListener('pointerdown',e=>{ if(!document.body.classList.contains('ctledit')) return; e.stopPropagation(); e.preventDefault();
+    const b=e.target.closest('.k'); if(!b){ ctlSel=null; ctlMark(); return; } const r=b.getBoundingClientRect();
+    drag={b,id:b.id,dx:e.clientX-(r.left+r.width/2),dy:e.clientY-(r.top+r.height/2),x0:e.clientX,y0:e.clientY,moved:false}; try{ box.setPointerCapture(e.pointerId); }catch(_){} },true);
+  box.addEventListener('pointermove',e=>{ if(!drag) return; e.stopPropagation(); if(Math.hypot(e.clientX-drag.x0,e.clientY-drag.y0)>6) drag.moved=true; if(!drag.moved) return;
+    const o=ctlLay[drag.id]||(ctlLay[drag.id]={}); o.x=(e.clientX-drag.dx)/innerWidth; o.y=(e.clientY-drag.dy)/innerHeight; ctlApply(); },true);
+  const end=e=>{ if(!drag) return; e.stopPropagation(); if(!drag.moved){ ctlSel=ctlSel===drag.id?null:drag.id; ctlMark(); } else ctlSave(); drag=null; };
+  box.addEventListener('pointerup',end,true); box.addEventListener('pointercancel',end,true);
+  box.addEventListener('click',e=>{ if(document.body.classList.contains('ctledit')){ e.stopPropagation(); e.preventDefault(); } },true);
+  addEventListener('resize',()=>setTimeout(ctlApply,60)); ctlApply(); })();
 const KEYS={ArrowUp:'gas',KeyW:'gas',ArrowDown:'brake',KeyS:'brake',ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right'};
 addEventListener('keydown',e=>{
   if(e.target&&e.target.closest&&e.target.closest('input,textarea')) return;
