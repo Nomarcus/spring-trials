@@ -135,3 +135,7 @@ Marcus ville ha längre, mer varierade banor med mycket skill. Varje inbyggd ban
 
 ## Motocross Flow (`fjadra-mx-01`, sist i listan)
 Byggd i `mxLevel()` i levels.js: whoops, tre tabletops, två dubbelhopp, långa rullar, nedförsbacke och ett stort finalhopp. Ett skript (full gas och cykeln hålls rak i luften) tar alla 7 stjärnor och når blomman med alla tre cyklarna och alla fem fjädringsval (Trial ≈35 s, Motocross ≈31 s, Heavy ≈30 s). Medalj [33,50].
+
+## Motocross-paketet (fliken Motocross, `pack:'mx'`)
+11 banor: `fjadra-mx-01` (Motocross Flow, `mxLevel()`) och `fjadra-mx-02`…`-11` (`MXL` med byggstenarna i `mxKit`: kick, table, dbl, triple, stepUp, drop, hill, roll). Kameran är mer utzoomad på dessa banor (0.86 mot 1.0).
+Skriptbevis (full gas, cykeln hålls rak i luften): **alla 11 klaras med alla 7/5/6/4… stjärnor av Trial, Motocross och Heavy med fjädring Normal.** Med Hard/Soft/Elma/Bouncy kraschar skriptet på några hopp (studsig fjädring i hög fart) – där behöver man broma/anpassa. Lärdom: höga rullar (>0,5 m) och korta pucklar direkt efter en landning kastar cykeln framåt; trippelhoppen är därför en lång landning med två mjuka pucklar.

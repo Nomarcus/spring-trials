@@ -76,7 +76,7 @@ function edStart(doc,src,isNew){ audioInit(); for(const k in inp) inp[k]=0;
 function edIdle(l){ lvl=l; setTheme(l.theme); if(!l.vis) analyze(l); bike=newBike(l.start[0],l.start[1]); got=l.apples.map(()=>false); cam.x=bike.b.x+5; cam.y=bike.b.y+1.2; parts=[]; rag=null; }
 function edClose(){ if(ed.dirty&&!confirm('You have unsaved changes. Close the editor anyway?')) return;
   const id=ed.doc.id, src=ed.src; ed=null; document.body.classList.remove('editing'); $('edMore').classList.remove('show');
-  curPack=src==='mine'?'mine':3; edIdle(LEVELS.find(l=>l.id===id)||LEVELS[0]); zoom=1.0; SC=SC0*zoom; showMenu(); }
+  const el=LEVELS.find(l=>l.id===id)||LEVELS[0]; curPack=src==='mine'?'mine':(el.pack==='mx'?'mx':3); edIdle(el); zoom=1.0; SC=SC0*zoom; showMenu(); }
 // visningsobjektet som spelets ritkod använder (delar punkterna med banfilen, så ändringar syns direkt)
 function edSync(full){ const d=ed.doc;
   if(!lvl||lvl._ed!==d) lvl={_ed:d,killers:[],hint:'',stuck:''};

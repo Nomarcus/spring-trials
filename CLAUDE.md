@@ -19,7 +19,7 @@ Spelet öppnas direkt som fil i webbläsaren, ingen server behövs.
 | Fil | Innehåll | Rör bara om uppgiften gäller… |
 |---|---|---|
 | `src/core.js` | **Fysik** (ingen DOM): cykel, fjädring, förare, broms/häng, studs, bunny hop, pumpning, vändning, ragdoll, tyngdkraftsbyte. Konstanter i objektet `P`; fjädringsvalen i `SUSP`/`setSusp()` (standard `normal` = `P`). | fysik |
-| `src/levels.js` | **Bandata** + hjälpfunktioner (`sample`, `arc`, `cr`, `rect`, `crate`, `log`, `pillar`, `blob`, `loopRide`). Banor i `LV3`, inbakade editorändringar i `EDITS`, motocrossbanan `mxLevel()` läggs sist. | banor |
+| `src/levels.js` | **Bandata** + hjälpfunktioner (`sample`, `arc`, `cr`, `rect`, `crate`, `log`, `pillar`, `blob`, `loopRide`). Banor i `LV3`, inbakade editorändringar i `EDITS`, motocrossbanorna (`mxLevel()` + `MXL`) ligger i en egen flik (`pack:'mx'`). | banor |
 | `src/editor.js` | **Baneditorn** i spelet: forma mark, stjärnor, block, testa, spara egna/ändrade banor, kopiera/klistra in bankod. | editorn |
 | `src/logic.js` | Spelloop, input, meny, ljud/musik, rekord/spöke, kamera, översikt, pilar, kraschar/vinst. | spelregler/UI-logik |
 | `src/gfx.js` | All ritning: teman (`THEMES`, `NEON`), bakgrund, mark, cykel + förare, partiklar, banförhandsvisning. | grafik |
