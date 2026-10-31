@@ -332,7 +332,7 @@ body.neon #setBox{ background:rgba(255,62,165,.06); }
       <p id="engTxt"></p>
       <div class="row setbtns"><button class="btn alt" id="bMusic">Music: on</button><button class="btn alt" id="bStyle">Style: Cartoon</button><button class="btn alt" id="bFull">Fullscreen</button><button class="btn alt" id="bCtl">Move buttons</button></div>
     </div>
-    <div class="tabs"><button class="tab on" id="tabMain">Levels</button><button class="tab" id="tabMine">My levels</button><button class="tab" id="tabComm" style="display:none">Community</button></div>
+    <div class="tabs"><button class="tab on" id="tabMain">Levels</button><button class="tab" id="tabMX">Motocross</button><button class="tab" id="tabMine">My levels</button><button class="tab" id="tabComm" style="display:none">Community</button></div>
     <div class="row" id="resumeRow" style="margin:0 0 10px;display:none"><button class="btn" id="bResume">Keep riding</button><button class="btn alt" id="bEditCur">✎ Edit level</button></div>
     <div class="row" style="margin:0 0 10px;align-items:center"><button class="btn" id="bNextUnplayed">Play next</button><button class="btn" id="bNewLevel" style="display:none">＋ New level</button><span id="progress" style="color:var(--muted);font-size:14px;font-weight:800"></span></div>
     <div class="lvls" id="lvls"></div>
@@ -1016,7 +1016,8 @@ var LOOPRIDE={};
 const MEDALS3={'fjadra-tutorial':[40,60],'fjadra-p3-01':[16,26],'fjadra-p3-02':[14,24],'fjadra-p3-03':[24,38],'fjadra-p3-04':[12,20],'fjadra-p3-05':[60,100],
   'fjadra-p3-06':[35,55],'fjadra-p3-07':[55,95],'fjadra-p3-08':[20,35],'fjadra-p3-09':[35,55],'fjadra-p3-10':[14,22],'fjadra-p3-11':[35,55],'fjadra-p3-12':[15,24],'fjadra-p3-13':[30,45],'fjadra-p3-14':[14,24],'fjadra-p3-15':[11,18],
   'fjadra-p3-16':[30,45],'fjadra-p3-17':[16,26],'fjadra-p3-18':[26,40],'fjadra-p3-19':[36,52],'fjadra-p3-20':[34,50],'fjadra-p3-21':[24,36],'fjadra-p3-22':[24,36],'fjadra-p3-23':[26,40],'fjadra-p3-24':[34,50],'fjadra-p3-25':[40,60],
-  'fjadra-p3-26':[50,75],'fjadra-p3-27':[30,45],'fjadra-p3-28':[50,75],'fjadra-p3-29':[50,75],'fjadra-p3-30':[300,450],'fjadra-p3-31':[75,105],'fjadra-p3-32':[85,120],'fjadra-mx-01':[33,50]};
+  'fjadra-p3-26':[50,75],'fjadra-p3-27':[30,45],'fjadra-p3-28':[50,75],'fjadra-p3-29':[50,75],'fjadra-p3-30':[300,450],'fjadra-p3-31':[75,105],'fjadra-p3-32':[85,120],'fjadra-mx-01':[33,50],
+  'fjadra-mx-02':[19,28],'fjadra-mx-03':[20,30],'fjadra-mx-04':[21,32],'fjadra-mx-05':[22,33],'fjadra-mx-06':[19,28],'fjadra-mx-07':[17,26],'fjadra-mx-08':[24,36],'fjadra-mx-09':[16,24],'fjadra-mx-10':[24,36],'fjadra-mx-11':[32,48]};
 const slug=n=>n.toLowerCase().replace(/å/g,'a').replace(/ä/g,'a').replace(/ö/g,'o').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 // Ändringar och nya banor från baneditorn som är inbakade i spelet (läggs in med tools/fjadra/import_level.py).
 // Nyckel = ban-ID. En inbyggd bana byts ut mot sin ändrade version, ett okänt ID blir en ny bana sist i paketet.
@@ -1140,12 +1141,92 @@ function mxLevel(){ const T=mkTrack(TOP);
     hint:'Motocross! Pick the Motocross bike, hold GAS and flow over the jumps. Land on the downslopes and keep the speed.',
     stuck:'Too slow for a jump? Ride back for a longer run-up, or try the Motocross or Heavy bike. Level the bike in the air with ↺ ↻.',
     rings:[{pts:T.P}, ...T.R], apples:T.A, killers:[], flower:fl, start:[2,0]}; }
+// ---------- Motocross-paketet (egen flik, pack 'mx') ----------
+// Byggstenar för flow: kickern är brantast i kanten (x^1.35), landningar är mjuka cosinusbackar. Stjärnor ligger på plan mark efter landningar.
+function mxKit(T){
+  T.kick=(L,h)=>T.fn(L,x=>h*Math.pow(x/L,1.35),0.35);
+  T.table=(up,h,top,down)=>{ T.kick(up,h); T.flat(top); T.ease(down,-h); };
+  T.dbl=(up,h,gap,land)=>{ T.kick(up,h); T.ease(gap*0.4,-h-0.4); T.flat(gap*0.1); T.ease(gap*0.5,h+0.2); T.ease(land,-h+0.2); };
+  T.triple=(up,h)=>{ const L=up*3; T.kick(up,h); T.fn(L,x=>-h*(0.5-0.5*Math.cos(Math.PI*x/L))+0.2*h*Math.sin(2*Math.PI*x/L)**2); };   // kick + lång landning med två mjuka pucklar
+  T.stepUp=(up,h,top)=>{ T.kick(up,h*0.75); T.ease(3,h*0.25); T.flat(top); };                                                      // man landar högre upp
+  T.drop=(h,L)=>{ T.flat(1); T.ease(L,-h); };                                                                                      // mjuk nedfart från platå
+  T.hill=(L,h,top)=>{ T.ease(L,h); T.flat(top); T.ease(L,-h); };
+  T.roll=(n,w,h)=>T.waves(n,w,h);
+  return T; }
+const MXL=[];
+const mxDone=(T,id,name,theme,hint)=>{ const fl=T.end(12,22); return {id,name,theme,hint,parts:T.parts,
+  stuck:'Too slow for a jump? Ride back for a longer run-up, or try the Motocross or Heavy bike. Level the bike in the air with ↺ ↻.',
+  rings:[{pts:T.P}, ...T.R], apples:T.A, killers:[], flower:fl, start:[2,0]}; };
+// 02 Whoop Valley – lätt: whoops och små bord
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(14); T.star(-4);
+  T.roll(8,3,0.35); T.flat(8); T.star(-3); T.table(6,1.2,6,8); T.flat(8); T.star(-3);
+  T.roll(10,2.8,0.3); T.flat(8); T.part(); T.table(7,1.5,7,9); T.flat(6); T.table(7,1.5,7,9); T.flat(8); T.star(-3);
+  T.roll(6,3.4,0.4); T.flat(10); T.star(-4); T.table(8,1.8,9,11); T.flat(6);
+  return mxDone(T,'fjadra-mx-02','Whoop Valley','meadow','Easy start: keep the gas on through the whoops and hop the small tables.'); });
+// 03 Desert Doubles – kedja av dubbelhopp
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(18); T.star(-4);
+  T.dbl(7,1.8,10,10); T.flat(10); T.star(-4); T.dbl(8,2.1,11,11); T.flat(10); T.star(-4); T.part();
+  T.dbl(8,2.3,12,12); T.flat(8); T.dbl(8,2.3,12,12); T.flat(12); T.star(-5);
+  T.roll(5,4,0.5); T.flat(10); T.dbl(9,2.6,13,13); T.flat(10); T.star(-4);
+  return mxDone(T,'fjadra-mx-03','Desert Doubles','sunset','Doubles everywhere! Full gas off each lip and land on the far downslope.'); });
+// 04 Snow Rollers – långa rullar och nedfarter
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(14); T.star(-4);
+  T.ease(16,3); T.flat(8); T.star(-3); T.drop(3,14); T.roll(4,9,0.6); T.flat(16); T.star(-4); T.part();
+  T.ease(22,4); T.flat(6); T.drop(4,16); T.roll(5,9,0.5); T.flat(14); T.star(-3);
+  T.table(8,2,10,12); T.flat(8); T.roll(3,12,0.45); T.flat(14); T.star(-4);
+  return mxDone(T,'fjadra-mx-04','Snow Rollers','winter','Pump the long rollers: let the bike float over the tops and drive down the backsides.'); });
+// 05 Mountain Run – uppför med bord, lång nedfart
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(16); T.star(-4);
+  T.ease(24,4); T.flat(6); T.table(7,1.6,7,9); T.flat(4); T.ease(22,3); T.flat(8); T.star(-3); T.part();
+  T.table(7,1.8,8,10); T.flat(4); T.ease(22,3); T.flat(10); T.star(-4);
+  T.ease(40,-8); T.roll(3,7,0.5); T.flat(10); T.star(-4); T.part();
+  T.ease(18,3); T.flat(4); T.drop(3,14); T.flat(6); T.table(9,2.4,10,13); T.flat(8); T.star(-3);
+  return mxDone(T,'fjadra-mx-05','Mountain Run','meadow','Climb the mountain over small tables, then let it fly all the way down.'); });
+// 06 Triple Trouble – trippelhopp
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(20); T.star(-4);
+  T.table(7,1.6,8,10); T.flat(10); T.star(-4); T.triple(8,2); T.flat(12); T.star(-5); T.part();
+  T.roll(5,3.2,0.4); T.flat(10); T.triple(9,2.3); T.flat(12); T.star(-4);
+  T.dbl(8,2.2,12,12); T.flat(10); T.triple(9,2.5); T.flat(10); T.star(-4);
+  return mxDone(T,'fjadra-mx-06','Triple Trouble','sunset','Triples: hit the lip with speed and fly over both humps. Too slow? Roll them like rollers.'); });
+// 07 Step Up City – steg upp och sen nedfarter
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(16); T.star(-4);
+  T.stepUp(7,2,10); T.star(-4); T.stepUp(7,2,10); T.star(-4); T.stepUp(8,2.2,12); T.star(-5); T.part();
+  T.drop(2.4,12); T.flat(6); T.drop(2.4,12); T.flat(6); T.drop(2.4,12); T.flat(10); T.star(-4);
+  T.table(8,2,10,12); T.flat(6); T.stepUp(8,2.2,10); T.drop(4,18); T.flat(10); T.star(-4);
+  return mxDone(T,'fjadra-mx-07','Step Up City','meadow','Jump UP onto each ledge, then fly down the drops on the other side.'); });
+// 08 Rhythm Garden – blandade rytmsektioner
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(14); T.star(-4);
+  T.roll(6,4.5,0.6); T.flat(6); T.roll(4,7,0.9); T.flat(10); T.star(-4); T.part();
+  T.table(6,1.4,5,7); T.table(6,1.4,5,7); T.table(6,1.4,5,7); T.flat(10); T.star(-4);
+  T.roll(8,3,0.35); T.flat(6); T.dbl(8,2.1,11,11); T.flat(8); T.roll(5,7,0.55); T.flat(12); T.star(-4);
+  return mxDone(T,'fjadra-mx-08','Rhythm Garden','meadow','Find the rhythm: some bumps you pump, some you jump. Keep it smooth.'); });
+// 09 Big Air – få men stora hopp
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(24); T.star(-4);
+  T.table(10,3,14,16); T.flat(14); T.star(-5); T.part();
+  T.dbl(11,3.2,16,16); T.flat(14); T.star(-5);
+  T.ease(20,-4); T.flat(10); T.table(11,3.6,16,18); T.flat(12); T.star(-4);
+  return mxDone(T,'fjadra-mx-09','Big Air','winter','Big jumps! Take a long run-up, full gas, and keep the bike level in the air.'); });
+// 10 Sunset Supercross – tätt: whoops, trippel, bord
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(14); T.star(-4);
+  T.roll(9,2.6,0.32); T.flat(6); T.table(6,1.4,6,8); T.flat(6); T.triple(7,1.8); T.flat(8); T.star(-3); T.part();
+  T.roll(7,2.6,0.32); T.flat(6); T.dbl(7,1.9,10,10); T.flat(6); T.table(6,1.5,6,8); T.flat(8); T.star(-3);
+  T.triple(8,2.1); T.flat(6); T.roll(9,2.6,0.32); T.flat(8); T.star(-3); T.table(8,2.2,9,11); T.flat(8);
+  return mxDone(T,'fjadra-mx-10','Sunset Supercross','sunset','Supercross! Tight whoops, triples and tables one after another.'); });
+// 11 Grand Prix – lång blandning av allt
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(18); T.star(-4);
+  T.roll(6,3.2,0.4); T.flat(8); T.table(8,2,9,11); T.flat(8); T.star(-3); T.dbl(8,2.2,12,12); T.flat(10); T.star(-4); T.part();
+  T.ease(18,4); T.flat(6); T.stepUp(7,2,10); T.star(-4); T.drop(6,24); T.roll(4,11,0.5); T.flat(12); T.star(-4); T.part();
+  T.triple(9,2.3); T.flat(10); T.roll(8,3,0.35); T.flat(8); T.dbl(9,2.6,14,14); T.flat(12); T.star(-5); T.part();
+  T.hill(16,3,6); T.flat(8); T.table(10,3,13,15); T.flat(8); T.star(-3);
+  return mxDone(T,'fjadra-mx-11','Grand Prix','sunset','The full race: whoops, doubles, step-ups, triples and one last big jump.'); });
 function makeLevels(){
   let L=LV3.map(f=>f());
   for(const l of L){ l.pack=3; l.medal=MEDALS3[l.id]||[20,35]; if(!EDITS[l.id]) addSkill(l); }
   L=L.map(l=>EDITS[l.id]?levelFromDoc(EDITS[l.id],{pack:l.pack,medal:l.medal,stuck:l.stuck,tips:l.tips}):l);
   for(const id in EDITS) if(!L.some(l=>l.id===id)) L.push(levelFromDoc(EDITS[id],{pack:3,medal:EDITS[id].medal||[30,50]}));
-  if(!L.some(l=>l.id==='fjadra-mx-01')){ const m=mxLevel(); m.pack=3; L.push(m); }
+  // motocrossbanorna i egen flik
+  for(const f of [mxLevel,...MXL]){ const m=f(); if(L.some(l=>l.id===m.id)) continue; m.medal=MEDALS3[m.id]||[40,60]; L.push(EDITS[m.id]?levelFromDoc(EDITS[m.id],{medal:m.medal,stuck:m.stuck}):m); }
+  for(const l of L) if(/^fjadra-mx-/.test(l.id)) l.pack='mx';
   for(const l of L) if(!l.segs) finishLevel(l);
   return L;
 }
@@ -1159,7 +1240,7 @@ const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
 const $=id=>document.getElementById(id);
 let W=0,Hh=0,DPR=1,SC=40,SC0=40,zoom=1.0;
 let li=0, lvl=null, bike=null, got=[], state='menu', T=0, acc=0, endTimer=0, flagWarn=0, parts=[], rag=null, pops=[], shake=0, bloom=0, rec=[], recT=0, ghost=null, BASE_A=1;
-const NEWLV=new Set(['fjadra-tutorial','fjadra-pack2-01','fjadra-pack2-08','fjadra-pack2-11','fjadra-p3-01','fjadra-p3-02','fjadra-p3-03','fjadra-p3-04','fjadra-p3-05','fjadra-p3-06','fjadra-p3-07','fjadra-p3-08','fjadra-p3-09','fjadra-p3-10','fjadra-p3-11','fjadra-p3-12','fjadra-p3-13','fjadra-p3-14','fjadra-p3-15','fjadra-p3-16','fjadra-p3-17','fjadra-p3-18','fjadra-p3-19','fjadra-p3-20','fjadra-p3-21','fjadra-p3-22','fjadra-p3-23','fjadra-p3-24','fjadra-p3-25','fjadra-p3-26','fjadra-p3-27','fjadra-p3-28','fjadra-p3-29','fjadra-p3-30','fjadra-p3-31','fjadra-p3-32']); let curPack=3;
+const NEWLV=new Set(['fjadra-mx-01','fjadra-mx-02','fjadra-mx-03','fjadra-mx-04','fjadra-mx-05','fjadra-mx-06','fjadra-mx-07','fjadra-mx-08','fjadra-mx-09','fjadra-mx-10','fjadra-mx-11','fjadra-tutorial','fjadra-pack2-01','fjadra-pack2-08','fjadra-pack2-11','fjadra-p3-01','fjadra-p3-02','fjadra-p3-03','fjadra-p3-04','fjadra-p3-05','fjadra-p3-06','fjadra-p3-07','fjadra-p3-08','fjadra-p3-09','fjadra-p3-10','fjadra-p3-11','fjadra-p3-12','fjadra-p3-13','fjadra-p3-14','fjadra-p3-15','fjadra-p3-16','fjadra-p3-17','fjadra-p3-18','fjadra-p3-19','fjadra-p3-20','fjadra-p3-21','fjadra-p3-22','fjadra-p3-23','fjadra-p3-24','fjadra-p3-25','fjadra-p3-26','fjadra-p3-27','fjadra-p3-28','fjadra-p3-29','fjadra-p3-30','fjadra-p3-31','fjadra-p3-32']); let curPack=3;
 let STYLE='cartoon'; try{ STYLE=localStorage.getItem('fjadra.style')==='neon'?'neon':'cartoon'; }catch(e){}
 let stuckT=0, stuckCD=0, tipsSeen=new Set();
 // ghosts are stored per stable level id; old name-keyed ghosts are moved over the first time
@@ -2003,7 +2084,7 @@ function edStart(doc,src,isNew){ audioInit(); for(const k in inp) inp[k]=0;
 function edIdle(l){ lvl=l; setTheme(l.theme); if(!l.vis) analyze(l); bike=newBike(l.start[0],l.start[1]); got=l.apples.map(()=>false); cam.x=bike.b.x+5; cam.y=bike.b.y+1.2; parts=[]; rag=null; }
 function edClose(){ if(ed.dirty&&!confirm('You have unsaved changes. Close the editor anyway?')) return;
   const id=ed.doc.id, src=ed.src; ed=null; document.body.classList.remove('editing'); $('edMore').classList.remove('show');
-  curPack=src==='mine'?'mine':3; edIdle(LEVELS.find(l=>l.id===id)||LEVELS[0]); zoom=1.0; SC=SC0*zoom; showMenu(); }
+  const el=LEVELS.find(l=>l.id===id)||LEVELS[0]; curPack=src==='mine'?'mine':(el.pack==='mx'?'mx':3); edIdle(el); zoom=1.0; SC=SC0*zoom; showMenu(); }
 // visningsobjektet som spelets ritkod använder (delar punkterna med banfilen, så ändringar syns direkt)
 function edSync(full){ const d=ed.doc;
   if(!lvl||lvl._ed!==d) lvl={_ed:d,killers:[],hint:'',stuck:''};
@@ -2443,7 +2524,7 @@ function toggleMenu(){ if($('menu').classList.contains('show')){ if(pausedState)
 $('bMenu').onclick=()=>{ if(edTesting) edBack(); else toggleMenu(); }; $('bMap').onclick=()=>{ audioInit(); if(state==='overview') leaveOverview(); else enterOverview(); }; $('bRestart').onclick=()=>{ if(lvl) restart(); };
 $('bResume').onclick=()=>{ if(pausedState){ state=pausedState; pausedState=null; hideOv(); if(state==='win'||state==='crash') $('endov').classList.add('show'); } };
 $('bNext').onclick=next; $('bEditCur').onclick=()=>{ if(lvl&&li>=0) edOpen(li); }; $('bNewLevel').onclick=()=>edOpen(-1);
-$('tabMain').onclick=()=>{ curPack=3; buildMenu(); }; $('tabMine').onclick=()=>{ curPack='mine'; buildMenu(); }; $('tabComm').onclick=()=>{ curPack='community'; buildMenu(); commLoad(); }; $('bAgain').onclick=restart; $('bLevels').onclick=()=>{ pausedState=null; showMenu(); };
+$('tabMain').onclick=()=>{ curPack=3; buildMenu(); }; $('tabMX').onclick=()=>{ curPack='mx'; buildMenu(); }; $('tabMine').onclick=()=>{ curPack='mine'; buildMenu(); }; $('tabComm').onclick=()=>{ curPack='community'; buildMenu(); commLoad(); }; $('bAgain').onclick=restart; $('bLevels').onclick=()=>{ pausedState=null; showMenu(); };
 const fsOK=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen; if(!fsOK) $('bFull').style.display='none';
 $('bMusic').onclick=()=>setMusic(!musicOn);
 // fjädringsval: ändrar bara fjäder, dämpning och fjäderväg (setSusp i core.js); gäller direkt, även mitt i en åkning
@@ -2468,7 +2549,7 @@ $('bNextUnplayed').onclick=()=>{ audioInit(); pausedState=null; let i=LEVELS.fin
 $('bFull').onclick=()=>{ const d=document.documentElement; try{ if(document.fullscreenElement) document.exitFullscreen(); else { (d.requestFullscreen||d.webkitRequestFullscreen).call(d); if(screen.orientation&&screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{}); } }catch(e){} };
 const PENCIL='<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-7 7l1.2-4.8L4.5-8.1a1.6 1.6 0 0 1 2.3 0l1.3 1.3a1.6 1.6 0 0 1 0 2.3L-2.2 5.8z" fill="#fff" stroke="#18324f" stroke-width="1.6" stroke-linejoin="round"/><path d="M2.6-6.2l3.6 3.6" stroke="#18324f" stroke-width="1.6"/></svg>';
 function buildMenu(){ const box=$('lvls'); box.innerHTML=''; const shown=[], mine=curPack==='mine', comm=curPack==='community';
-  $('tabMain').classList.toggle('on',!mine&&!comm); $('tabMine').classList.toggle('on',mine); $('tabComm').classList.toggle('on',comm); $('tabComm').style.display=onl()?'':'none'; $('bNewLevel').style.display=mine?'':'none'; $('bNextUnplayed').style.display=mine||comm?'none':'';
+  $('tabMain').classList.toggle('on',curPack===3); $('tabMX').classList.toggle('on',curPack==='mx'); $('tabMine').classList.toggle('on',mine); $('tabComm').classList.toggle('on',comm); $('tabComm').style.display=onl()?'':'none'; $('bNewLevel').style.display=mine?'':'none'; $('bNextUnplayed').style.display=mine||comm?'none':'';
   LEVELS.forEach((l,i)=>{ if(l.pack!==curPack) return; const n=shown.length+1; shown.push(l); const wr=document.createElement('div'); wr.className='lvw'; const b=document.createElement('button'); b.className='lv'; const t=best[l.id];
     const badge=l.edited?'<span class="newb edb">EDITED</span>':(NEWLV.has(l.id)?'<span class="newb">NEW</span>':'');
     b.innerHTML='<canvas></canvas>'+badge+'<div class="meta"><div class="nm"><b>'+n+'. '+l.name.replace(/[<>&]/g,'')+'</b><i>'+(l.author?'by '+l.author.replace(/[<>&]/g,'')+' · ':'')+(t!=null?fmt(t):'Not cleared')+(l.medal?' · gold '+l.medal[0]+' s':'')+'</i></div>'+(l.medal?medalSVG(medalOf(i,t)):'')+'</div>';
@@ -2546,7 +2627,8 @@ function frame(now){
       cam.x+=((vb[0]+vb[2])/2-cam.x)*k; cam.y+=((vb[1]+vb[3])/2-6/sco-cam.y)*k; SC+=(sco-SC)*k; }
     else if(state!=='edit'){ const fx0=rag?rag.pts.hip.x:bike.b.x, fy0=rag?rag.pts.hip.y:bike.b.y; const lx=fx0+(rag?0:Math.max(-3,Math.min(3,bike.b.vx*.28))), ly=fy0+.7+(rag?0:Math.max(-2.2,Math.min(2,bike.b.vy*0.3)));
     const k=Math.min(1,dt*2.8); cam.x+=(lx-cam.x)*k; cam.y+=(ly-cam.y)*k*0.85;
-    const spd=Math.hypot(bike.b.vx,bike.b.vy), air=(bike.contact[0]<0.5&&bike.contact[1]<0.5)?1:0; const zt=1.0-Math.min(0.12,spd*0.008)-air*0.05; zoom+=(zt-zoom)*Math.min(1,dt*1.2); const tsc=SC0*zoom; SC+=(tsc-SC)*Math.min(1,dt*5); }
+    // kamera: motocross mer utzoomat (0.86), övriga 1.0
+    const spd=Math.hypot(bike.b.vx,bike.b.vy), air=(bike.contact[0]<0.5&&bike.contact[1]<0.5)?1:0; const zt=(lvl&&lvl.pack==='mx'?0.86:1.0)-Math.min(0.12,spd*0.008)-air*0.05; zoom+=(zt-zoom)*Math.min(1,dt*1.2); const tsc=SC0*zoom; SC+=(tsc-SC)*Math.min(1,dt*5); }
     shake*=Math.exp(-dt*7); const shx=(Math.random()-0.5)*shake, shy=(Math.random()-0.5)*shake; cam.x+=shx; cam.y+=shy;
     drawBackground(tt); drawLife(tt);
     for(const d of lvl.vis.deco) blit(SPR[d.kind],d.x,d.y,0,d.s);

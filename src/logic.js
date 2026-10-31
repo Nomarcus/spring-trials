@@ -4,7 +4,7 @@ const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
 const $=id=>document.getElementById(id);
 let W=0,Hh=0,DPR=1,SC=40,SC0=40,zoom=1.0;
 let li=0, lvl=null, bike=null, got=[], state='menu', T=0, acc=0, endTimer=0, flagWarn=0, parts=[], rag=null, pops=[], shake=0, bloom=0, rec=[], recT=0, ghost=null, BASE_A=1;
-const NEWLV=new Set(['fjadra-tutorial','fjadra-pack2-01','fjadra-pack2-08','fjadra-pack2-11','fjadra-p3-01','fjadra-p3-02','fjadra-p3-03','fjadra-p3-04','fjadra-p3-05','fjadra-p3-06','fjadra-p3-07','fjadra-p3-08','fjadra-p3-09','fjadra-p3-10','fjadra-p3-11','fjadra-p3-12','fjadra-p3-13','fjadra-p3-14','fjadra-p3-15','fjadra-p3-16','fjadra-p3-17','fjadra-p3-18','fjadra-p3-19','fjadra-p3-20','fjadra-p3-21','fjadra-p3-22','fjadra-p3-23','fjadra-p3-24','fjadra-p3-25','fjadra-p3-26','fjadra-p3-27','fjadra-p3-28','fjadra-p3-29','fjadra-p3-30','fjadra-p3-31','fjadra-p3-32']); let curPack=3;
+const NEWLV=new Set(['fjadra-mx-01','fjadra-mx-02','fjadra-mx-03','fjadra-mx-04','fjadra-mx-05','fjadra-mx-06','fjadra-mx-07','fjadra-mx-08','fjadra-mx-09','fjadra-mx-10','fjadra-mx-11','fjadra-tutorial','fjadra-pack2-01','fjadra-pack2-08','fjadra-pack2-11','fjadra-p3-01','fjadra-p3-02','fjadra-p3-03','fjadra-p3-04','fjadra-p3-05','fjadra-p3-06','fjadra-p3-07','fjadra-p3-08','fjadra-p3-09','fjadra-p3-10','fjadra-p3-11','fjadra-p3-12','fjadra-p3-13','fjadra-p3-14','fjadra-p3-15','fjadra-p3-16','fjadra-p3-17','fjadra-p3-18','fjadra-p3-19','fjadra-p3-20','fjadra-p3-21','fjadra-p3-22','fjadra-p3-23','fjadra-p3-24','fjadra-p3-25','fjadra-p3-26','fjadra-p3-27','fjadra-p3-28','fjadra-p3-29','fjadra-p3-30','fjadra-p3-31','fjadra-p3-32']); let curPack=3;
 let STYLE='cartoon'; try{ STYLE=localStorage.getItem('fjadra.style')==='neon'?'neon':'cartoon'; }catch(e){}
 let stuckT=0, stuckCD=0, tipsSeen=new Set();
 // ghosts are stored per stable level id; old name-keyed ghosts are moved over the first time
@@ -181,7 +181,7 @@ function toggleMenu(){ if($('menu').classList.contains('show')){ if(pausedState)
 $('bMenu').onclick=()=>{ if(edTesting) edBack(); else toggleMenu(); }; $('bMap').onclick=()=>{ audioInit(); if(state==='overview') leaveOverview(); else enterOverview(); }; $('bRestart').onclick=()=>{ if(lvl) restart(); };
 $('bResume').onclick=()=>{ if(pausedState){ state=pausedState; pausedState=null; hideOv(); if(state==='win'||state==='crash') $('endov').classList.add('show'); } };
 $('bNext').onclick=next; $('bEditCur').onclick=()=>{ if(lvl&&li>=0) edOpen(li); }; $('bNewLevel').onclick=()=>edOpen(-1);
-$('tabMain').onclick=()=>{ curPack=3; buildMenu(); }; $('tabMine').onclick=()=>{ curPack='mine'; buildMenu(); }; $('tabComm').onclick=()=>{ curPack='community'; buildMenu(); commLoad(); }; $('bAgain').onclick=restart; $('bLevels').onclick=()=>{ pausedState=null; showMenu(); };
+$('tabMain').onclick=()=>{ curPack=3; buildMenu(); }; $('tabMX').onclick=()=>{ curPack='mx'; buildMenu(); }; $('tabMine').onclick=()=>{ curPack='mine'; buildMenu(); }; $('tabComm').onclick=()=>{ curPack='community'; buildMenu(); commLoad(); }; $('bAgain').onclick=restart; $('bLevels').onclick=()=>{ pausedState=null; showMenu(); };
 const fsOK=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen; if(!fsOK) $('bFull').style.display='none';
 $('bMusic').onclick=()=>setMusic(!musicOn);
 // fjädringsval: ändrar bara fjäder, dämpning och fjäderväg (setSusp i core.js); gäller direkt, även mitt i en åkning
@@ -206,7 +206,7 @@ $('bNextUnplayed').onclick=()=>{ audioInit(); pausedState=null; let i=LEVELS.fin
 $('bFull').onclick=()=>{ const d=document.documentElement; try{ if(document.fullscreenElement) document.exitFullscreen(); else { (d.requestFullscreen||d.webkitRequestFullscreen).call(d); if(screen.orientation&&screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{}); } }catch(e){} };
 const PENCIL='<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-7 7l1.2-4.8L4.5-8.1a1.6 1.6 0 0 1 2.3 0l1.3 1.3a1.6 1.6 0 0 1 0 2.3L-2.2 5.8z" fill="#fff" stroke="#18324f" stroke-width="1.6" stroke-linejoin="round"/><path d="M2.6-6.2l3.6 3.6" stroke="#18324f" stroke-width="1.6"/></svg>';
 function buildMenu(){ const box=$('lvls'); box.innerHTML=''; const shown=[], mine=curPack==='mine', comm=curPack==='community';
-  $('tabMain').classList.toggle('on',!mine&&!comm); $('tabMine').classList.toggle('on',mine); $('tabComm').classList.toggle('on',comm); $('tabComm').style.display=onl()?'':'none'; $('bNewLevel').style.display=mine?'':'none'; $('bNextUnplayed').style.display=mine||comm?'none':'';
+  $('tabMain').classList.toggle('on',curPack===3); $('tabMX').classList.toggle('on',curPack==='mx'); $('tabMine').classList.toggle('on',mine); $('tabComm').classList.toggle('on',comm); $('tabComm').style.display=onl()?'':'none'; $('bNewLevel').style.display=mine?'':'none'; $('bNextUnplayed').style.display=mine||comm?'none':'';
   LEVELS.forEach((l,i)=>{ if(l.pack!==curPack) return; const n=shown.length+1; shown.push(l); const wr=document.createElement('div'); wr.className='lvw'; const b=document.createElement('button'); b.className='lv'; const t=best[l.id];
     const badge=l.edited?'<span class="newb edb">EDITED</span>':(NEWLV.has(l.id)?'<span class="newb">NEW</span>':'');
     b.innerHTML='<canvas></canvas>'+badge+'<div class="meta"><div class="nm"><b>'+n+'. '+l.name.replace(/[<>&]/g,'')+'</b><i>'+(l.author?'by '+l.author.replace(/[<>&]/g,'')+' · ':'')+(t!=null?fmt(t):'Not cleared')+(l.medal?' · gold '+l.medal[0]+' s':'')+'</i></div>'+(l.medal?medalSVG(medalOf(i,t)):'')+'</div>';
@@ -284,7 +284,8 @@ function frame(now){
       cam.x+=((vb[0]+vb[2])/2-cam.x)*k; cam.y+=((vb[1]+vb[3])/2-6/sco-cam.y)*k; SC+=(sco-SC)*k; }
     else if(state!=='edit'){ const fx0=rag?rag.pts.hip.x:bike.b.x, fy0=rag?rag.pts.hip.y:bike.b.y; const lx=fx0+(rag?0:Math.max(-3,Math.min(3,bike.b.vx*.28))), ly=fy0+.7+(rag?0:Math.max(-2.2,Math.min(2,bike.b.vy*0.3)));
     const k=Math.min(1,dt*2.8); cam.x+=(lx-cam.x)*k; cam.y+=(ly-cam.y)*k*0.85;
-    const spd=Math.hypot(bike.b.vx,bike.b.vy), air=(bike.contact[0]<0.5&&bike.contact[1]<0.5)?1:0; const zt=1.0-Math.min(0.12,spd*0.008)-air*0.05; zoom+=(zt-zoom)*Math.min(1,dt*1.2); const tsc=SC0*zoom; SC+=(tsc-SC)*Math.min(1,dt*5); }
+    // kamera: motocross mer utzoomat (0.86), övriga 1.0
+    const spd=Math.hypot(bike.b.vx,bike.b.vy), air=(bike.contact[0]<0.5&&bike.contact[1]<0.5)?1:0; const zt=(lvl&&lvl.pack==='mx'?0.86:1.0)-Math.min(0.12,spd*0.008)-air*0.05; zoom+=(zt-zoom)*Math.min(1,dt*1.2); const tsc=SC0*zoom; SC+=(tsc-SC)*Math.min(1,dt*5); }
     shake*=Math.exp(-dt*7); const shx=(Math.random()-0.5)*shake, shy=(Math.random()-0.5)*shake; cam.x+=shx; cam.y+=shy;
     drawBackground(tt); drawLife(tt);
     for(const d of lvl.vis.deco) blit(SPR[d.kind],d.x,d.y,0,d.s);

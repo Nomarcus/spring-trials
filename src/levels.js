@@ -395,7 +395,8 @@ var LOOPRIDE={};
 const MEDALS3={'fjadra-tutorial':[40,60],'fjadra-p3-01':[16,26],'fjadra-p3-02':[14,24],'fjadra-p3-03':[24,38],'fjadra-p3-04':[12,20],'fjadra-p3-05':[60,100],
   'fjadra-p3-06':[35,55],'fjadra-p3-07':[55,95],'fjadra-p3-08':[20,35],'fjadra-p3-09':[35,55],'fjadra-p3-10':[14,22],'fjadra-p3-11':[35,55],'fjadra-p3-12':[15,24],'fjadra-p3-13':[30,45],'fjadra-p3-14':[14,24],'fjadra-p3-15':[11,18],
   'fjadra-p3-16':[30,45],'fjadra-p3-17':[16,26],'fjadra-p3-18':[26,40],'fjadra-p3-19':[36,52],'fjadra-p3-20':[34,50],'fjadra-p3-21':[24,36],'fjadra-p3-22':[24,36],'fjadra-p3-23':[26,40],'fjadra-p3-24':[34,50],'fjadra-p3-25':[40,60],
-  'fjadra-p3-26':[50,75],'fjadra-p3-27':[30,45],'fjadra-p3-28':[50,75],'fjadra-p3-29':[50,75],'fjadra-p3-30':[300,450],'fjadra-p3-31':[75,105],'fjadra-p3-32':[85,120],'fjadra-mx-01':[33,50]};
+  'fjadra-p3-26':[50,75],'fjadra-p3-27':[30,45],'fjadra-p3-28':[50,75],'fjadra-p3-29':[50,75],'fjadra-p3-30':[300,450],'fjadra-p3-31':[75,105],'fjadra-p3-32':[85,120],'fjadra-mx-01':[33,50],
+  'fjadra-mx-02':[19,28],'fjadra-mx-03':[20,30],'fjadra-mx-04':[21,32],'fjadra-mx-05':[22,33],'fjadra-mx-06':[19,28],'fjadra-mx-07':[17,26],'fjadra-mx-08':[24,36],'fjadra-mx-09':[16,24],'fjadra-mx-10':[24,36],'fjadra-mx-11':[32,48]};
 const slug=n=>n.toLowerCase().replace(/å/g,'a').replace(/ä/g,'a').replace(/ö/g,'o').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 // Ändringar och nya banor från baneditorn som är inbakade i spelet (läggs in med tools/fjadra/import_level.py).
 // Nyckel = ban-ID. En inbyggd bana byts ut mot sin ändrade version, ett okänt ID blir en ny bana sist i paketet.
@@ -519,12 +520,92 @@ function mxLevel(){ const T=mkTrack(TOP);
     hint:'Motocross! Pick the Motocross bike, hold GAS and flow over the jumps. Land on the downslopes and keep the speed.',
     stuck:'Too slow for a jump? Ride back for a longer run-up, or try the Motocross or Heavy bike. Level the bike in the air with ↺ ↻.',
     rings:[{pts:T.P}, ...T.R], apples:T.A, killers:[], flower:fl, start:[2,0]}; }
+// ---------- Motocross-paketet (egen flik, pack 'mx') ----------
+// Byggstenar för flow: kickern är brantast i kanten (x^1.35), landningar är mjuka cosinusbackar. Stjärnor ligger på plan mark efter landningar.
+function mxKit(T){
+  T.kick=(L,h)=>T.fn(L,x=>h*Math.pow(x/L,1.35),0.35);
+  T.table=(up,h,top,down)=>{ T.kick(up,h); T.flat(top); T.ease(down,-h); };
+  T.dbl=(up,h,gap,land)=>{ T.kick(up,h); T.ease(gap*0.4,-h-0.4); T.flat(gap*0.1); T.ease(gap*0.5,h+0.2); T.ease(land,-h+0.2); };
+  T.triple=(up,h)=>{ const L=up*3; T.kick(up,h); T.fn(L,x=>-h*(0.5-0.5*Math.cos(Math.PI*x/L))+0.2*h*Math.sin(2*Math.PI*x/L)**2); };   // kick + lång landning med två mjuka pucklar
+  T.stepUp=(up,h,top)=>{ T.kick(up,h*0.75); T.ease(3,h*0.25); T.flat(top); };                                                      // man landar högre upp
+  T.drop=(h,L)=>{ T.flat(1); T.ease(L,-h); };                                                                                      // mjuk nedfart från platå
+  T.hill=(L,h,top)=>{ T.ease(L,h); T.flat(top); T.ease(L,-h); };
+  T.roll=(n,w,h)=>T.waves(n,w,h);
+  return T; }
+const MXL=[];
+const mxDone=(T,id,name,theme,hint)=>{ const fl=T.end(12,22); return {id,name,theme,hint,parts:T.parts,
+  stuck:'Too slow for a jump? Ride back for a longer run-up, or try the Motocross or Heavy bike. Level the bike in the air with ↺ ↻.',
+  rings:[{pts:T.P}, ...T.R], apples:T.A, killers:[], flower:fl, start:[2,0]}; };
+// 02 Whoop Valley – lätt: whoops och små bord
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(14); T.star(-4);
+  T.roll(8,3,0.35); T.flat(8); T.star(-3); T.table(6,1.2,6,8); T.flat(8); T.star(-3);
+  T.roll(10,2.8,0.3); T.flat(8); T.part(); T.table(7,1.5,7,9); T.flat(6); T.table(7,1.5,7,9); T.flat(8); T.star(-3);
+  T.roll(6,3.4,0.4); T.flat(10); T.star(-4); T.table(8,1.8,9,11); T.flat(6);
+  return mxDone(T,'fjadra-mx-02','Whoop Valley','meadow','Easy start: keep the gas on through the whoops and hop the small tables.'); });
+// 03 Desert Doubles – kedja av dubbelhopp
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(18); T.star(-4);
+  T.dbl(7,1.8,10,10); T.flat(10); T.star(-4); T.dbl(8,2.1,11,11); T.flat(10); T.star(-4); T.part();
+  T.dbl(8,2.3,12,12); T.flat(8); T.dbl(8,2.3,12,12); T.flat(12); T.star(-5);
+  T.roll(5,4,0.5); T.flat(10); T.dbl(9,2.6,13,13); T.flat(10); T.star(-4);
+  return mxDone(T,'fjadra-mx-03','Desert Doubles','sunset','Doubles everywhere! Full gas off each lip and land on the far downslope.'); });
+// 04 Snow Rollers – långa rullar och nedfarter
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(14); T.star(-4);
+  T.ease(16,3); T.flat(8); T.star(-3); T.drop(3,14); T.roll(4,9,0.6); T.flat(16); T.star(-4); T.part();
+  T.ease(22,4); T.flat(6); T.drop(4,16); T.roll(5,9,0.5); T.flat(14); T.star(-3);
+  T.table(8,2,10,12); T.flat(8); T.roll(3,12,0.45); T.flat(14); T.star(-4);
+  return mxDone(T,'fjadra-mx-04','Snow Rollers','winter','Pump the long rollers: let the bike float over the tops and drive down the backsides.'); });
+// 05 Mountain Run – uppför med bord, lång nedfart
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(16); T.star(-4);
+  T.ease(24,4); T.flat(6); T.table(7,1.6,7,9); T.flat(4); T.ease(22,3); T.flat(8); T.star(-3); T.part();
+  T.table(7,1.8,8,10); T.flat(4); T.ease(22,3); T.flat(10); T.star(-4);
+  T.ease(40,-8); T.roll(3,7,0.5); T.flat(10); T.star(-4); T.part();
+  T.ease(18,3); T.flat(4); T.drop(3,14); T.flat(6); T.table(9,2.4,10,13); T.flat(8); T.star(-3);
+  return mxDone(T,'fjadra-mx-05','Mountain Run','meadow','Climb the mountain over small tables, then let it fly all the way down.'); });
+// 06 Triple Trouble – trippelhopp
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(20); T.star(-4);
+  T.table(7,1.6,8,10); T.flat(10); T.star(-4); T.triple(8,2); T.flat(12); T.star(-5); T.part();
+  T.roll(5,3.2,0.4); T.flat(10); T.triple(9,2.3); T.flat(12); T.star(-4);
+  T.dbl(8,2.2,12,12); T.flat(10); T.triple(9,2.5); T.flat(10); T.star(-4);
+  return mxDone(T,'fjadra-mx-06','Triple Trouble','sunset','Triples: hit the lip with speed and fly over both humps. Too slow? Roll them like rollers.'); });
+// 07 Step Up City – steg upp och sen nedfarter
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(16); T.star(-4);
+  T.stepUp(7,2,10); T.star(-4); T.stepUp(7,2,10); T.star(-4); T.stepUp(8,2.2,12); T.star(-5); T.part();
+  T.drop(2.4,12); T.flat(6); T.drop(2.4,12); T.flat(6); T.drop(2.4,12); T.flat(10); T.star(-4);
+  T.table(8,2,10,12); T.flat(6); T.stepUp(8,2.2,10); T.drop(4,18); T.flat(10); T.star(-4);
+  return mxDone(T,'fjadra-mx-07','Step Up City','meadow','Jump UP onto each ledge, then fly down the drops on the other side.'); });
+// 08 Rhythm Garden – blandade rytmsektioner
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(14); T.star(-4);
+  T.roll(6,4.5,0.6); T.flat(6); T.roll(4,7,0.9); T.flat(10); T.star(-4); T.part();
+  T.table(6,1.4,5,7); T.table(6,1.4,5,7); T.table(6,1.4,5,7); T.flat(10); T.star(-4);
+  T.roll(8,3,0.35); T.flat(6); T.dbl(8,2.1,11,11); T.flat(8); T.roll(5,7,0.55); T.flat(12); T.star(-4);
+  return mxDone(T,'fjadra-mx-08','Rhythm Garden','meadow','Find the rhythm: some bumps you pump, some you jump. Keep it smooth.'); });
+// 09 Big Air – få men stora hopp
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(24); T.star(-4);
+  T.table(10,3,14,16); T.flat(14); T.star(-5); T.part();
+  T.dbl(11,3.2,16,16); T.flat(14); T.star(-5);
+  T.ease(20,-4); T.flat(10); T.table(11,3.6,16,18); T.flat(12); T.star(-4);
+  return mxDone(T,'fjadra-mx-09','Big Air','winter','Big jumps! Take a long run-up, full gas, and keep the bike level in the air.'); });
+// 10 Sunset Supercross – tätt: whoops, trippel, bord
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(14); T.star(-4);
+  T.roll(9,2.6,0.32); T.flat(6); T.table(6,1.4,6,8); T.flat(6); T.triple(7,1.8); T.flat(8); T.star(-3); T.part();
+  T.roll(7,2.6,0.32); T.flat(6); T.dbl(7,1.9,10,10); T.flat(6); T.table(6,1.5,6,8); T.flat(8); T.star(-3);
+  T.triple(8,2.1); T.flat(6); T.roll(9,2.6,0.32); T.flat(8); T.star(-3); T.table(8,2.2,9,11); T.flat(8);
+  return mxDone(T,'fjadra-mx-10','Sunset Supercross','sunset','Supercross! Tight whoops, triples and tables one after another.'); });
+// 11 Grand Prix – lång blandning av allt
+MXL.push(()=>{ const T=mxKit(mkTrack(TOP)); T.flat(18); T.star(-4);
+  T.roll(6,3.2,0.4); T.flat(8); T.table(8,2,9,11); T.flat(8); T.star(-3); T.dbl(8,2.2,12,12); T.flat(10); T.star(-4); T.part();
+  T.ease(18,4); T.flat(6); T.stepUp(7,2,10); T.star(-4); T.drop(6,24); T.roll(4,11,0.5); T.flat(12); T.star(-4); T.part();
+  T.triple(9,2.3); T.flat(10); T.roll(8,3,0.35); T.flat(8); T.dbl(9,2.6,14,14); T.flat(12); T.star(-5); T.part();
+  T.hill(16,3,6); T.flat(8); T.table(10,3,13,15); T.flat(8); T.star(-3);
+  return mxDone(T,'fjadra-mx-11','Grand Prix','sunset','The full race: whoops, doubles, step-ups, triples and one last big jump.'); });
 function makeLevels(){
   let L=LV3.map(f=>f());
   for(const l of L){ l.pack=3; l.medal=MEDALS3[l.id]||[20,35]; if(!EDITS[l.id]) addSkill(l); }
   L=L.map(l=>EDITS[l.id]?levelFromDoc(EDITS[l.id],{pack:l.pack,medal:l.medal,stuck:l.stuck,tips:l.tips}):l);
   for(const id in EDITS) if(!L.some(l=>l.id===id)) L.push(levelFromDoc(EDITS[id],{pack:3,medal:EDITS[id].medal||[30,50]}));
-  if(!L.some(l=>l.id==='fjadra-mx-01')){ const m=mxLevel(); m.pack=3; L.push(m); }
+  // motocrossbanorna i egen flik
+  for(const f of [mxLevel,...MXL]){ const m=f(); if(L.some(l=>l.id===m.id)) continue; m.medal=MEDALS3[m.id]||[40,60]; L.push(EDITS[m.id]?levelFromDoc(EDITS[m.id],{medal:m.medal,stuck:m.stuck}):m); }
+  for(const l of L) if(/^fjadra-mx-/.test(l.id)) l.pack='mx';
   for(const l of L) if(!l.segs) finishLevel(l);
   return L;
 }
