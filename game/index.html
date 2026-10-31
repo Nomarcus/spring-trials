@@ -328,7 +328,7 @@ body.neon #setBox{ background:rgba(255,62,165,.06); }
       <div class="disp sethead">Settings</div>
       <div class="fjad"><b class="disp">Suspension</b><div id="suspBtns"></div></div>
       <p id="suspTxt"></p>
-      <div class="fjad"><b class="disp">Engine</b><div id="engBtns" class="tabrow"></div></div>
+      <div class="fjad"><b class="disp">Bike</b><div id="engBtns" class="tabrow"></div></div>
       <p id="engTxt"></p>
       <div class="row setbtns"><button class="btn alt" id="bMusic">Music: on</button><button class="btn alt" id="bStyle">Style: Cartoon</button><button class="btn alt" id="bFull">Fullscreen</button><button class="btn alt" id="bCtl">Move buttons</button></div>
     </div>
@@ -372,10 +372,13 @@ const P = {G:10, WR:0.4, WM:1, WI:0.13, BM:2.3, BI:2.3, AX:0.96, AY:-0.55,
 const SUSP={hard:{KY:240,CY:9,TRAVEL:0.22}, normal:{}, soft:{KY:85,CY:2.4,TRAVEL:0.45}, elma:{KY:70,CY:1.2,TRAVEL:0.6,BOUNCE_MAX:4.6}, bouncy:{KY:62,CY:0.5,TRAVEL:0.7,BOUNCE_MAX:5.4}};
 const SUSP_BASE={KY:P.KY,CY:P.CY,TRAVEL:P.TRAVEL,BOUNCE_MAX:P.BOUNCE_MAX};
 function setSusp(name){ Object.assign(P,SUSP_BASE,SUSP[name]||{}); }
-// Motorval (menyn → Engine). 'trials' = värdena i P (testat, BASELINE.txt). Zippy/Fast: snabbare gaspådrag, mer kraft och toppfart, lite kraftigare volt; ANTI_LOOP höjs så att cykeln inte välter bakåt i branta backar.
-const ENGINE={trials:{}, zippy:{T:11.5,THR_RATE:8,MAXW:36,VOLT_A:50,ANTI_LOOP:28}, fast:{T:12.5,THR_RATE:9,MAXW:40,VOLT_A:52,ANTI_LOOP:34}};
-const ENGINE_BASE={T:P.T,THR_RATE:P.THR_RATE,MAXW:P.MAXW,VOLT_A:P.VOLT_A,ANTI_LOOP:P.ANTI_LOOP};
-function setEngine(name){ Object.assign(P,ENGINE_BASE,ENGINE[name]||{}); }
+// Cykelval (menyn → Bike). 'trial' = den tidigare Zippy-motorn. P själv är den gamla Trials-fysiken som BASELINE.txt gäller.
+//   trial: kvick, mycket vridmoment och snabb volt.  mx (motocross): stark och hög toppfart.  heavy: tung och snabb – trög start och rotation, högst toppfart.
+const BIKES={base:{}, trial:{T:11.5,THR_RATE:8,MAXW:36,VOLT_A:50,ANTI_LOOP:28},
+  mx:{T:11,THR_RATE:10,MAXW:46,VOLT_A:46,ANTI_LOOP:40},
+  heavy:{T:10,THR_RATE:4.5,MAXW:52,VOLT_A:38,HOLD:5.5,LEANMAX:3.2,ANTI_LOOP:40}};
+const BIKE_BASE={T:P.T,THR_RATE:P.THR_RATE,MAXW:P.MAXW,VOLT_A:P.VOLT_A,ANTI_LOOP:P.ANTI_LOOP,HOLD:P.HOLD,LEANMAX:P.LEANMAX,BI:P.BI};
+function setBike(name){ Object.assign(P,BIKE_BASE,BIKES[name]||{}); }
 
 function buildSegs(rings){
   const segs=[];
@@ -1013,7 +1016,7 @@ var LOOPRIDE={};
 const MEDALS3={'fjadra-tutorial':[40,60],'fjadra-p3-01':[16,26],'fjadra-p3-02':[14,24],'fjadra-p3-03':[24,38],'fjadra-p3-04':[12,20],'fjadra-p3-05':[60,100],
   'fjadra-p3-06':[35,55],'fjadra-p3-07':[55,95],'fjadra-p3-08':[20,35],'fjadra-p3-09':[35,55],'fjadra-p3-10':[14,22],'fjadra-p3-11':[35,55],'fjadra-p3-12':[15,24],'fjadra-p3-13':[30,45],'fjadra-p3-14':[14,24],'fjadra-p3-15':[11,18],
   'fjadra-p3-16':[30,45],'fjadra-p3-17':[16,26],'fjadra-p3-18':[26,40],'fjadra-p3-19':[36,52],'fjadra-p3-20':[34,50],'fjadra-p3-21':[24,36],'fjadra-p3-22':[24,36],'fjadra-p3-23':[26,40],'fjadra-p3-24':[34,50],'fjadra-p3-25':[40,60],
-  'fjadra-p3-26':[50,75],'fjadra-p3-27':[30,45],'fjadra-p3-28':[50,75],'fjadra-p3-29':[50,75],'fjadra-p3-30':[300,450],'fjadra-p3-31':[75,105],'fjadra-p3-32':[85,120]};
+  'fjadra-p3-26':[50,75],'fjadra-p3-27':[30,45],'fjadra-p3-28':[50,75],'fjadra-p3-29':[50,75],'fjadra-p3-30':[300,450],'fjadra-p3-31':[75,105],'fjadra-p3-32':[85,120],'fjadra-mx-01':[33,50]};
 const slug=n=>n.toLowerCase().replace(/å/g,'a').replace(/ä/g,'a').replace(/ö/g,'o').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 // Ändringar och nya banor från baneditorn som är inbakade i spelet (läggs in med tools/fjadra/import_level.py).
 // Nyckel = ban-ID. En inbyggd bana byts ut mot sin ändrade version, ett okänt ID blir en ny bana sist i paketet.
@@ -1113,11 +1116,36 @@ const SKILL_END={
 function addSkill(l){ const a=SKILL[l.id], b=SKILL_END[l.id]; let len=0;
   if(a) len+=addIntro(l,a[1],a[0]); if(b) len+=addOutro(l,b[1],b[0]); if(!len) return;
   l.medal=[l.medal[0]+Math.round(len/4.5),l.medal[1]+Math.round(len/3)]; l.skill=true; }
+// MX: motocrossbana med flow – whoops, tabletops, dubbelhopp, rytmsektion och en stor avslutning. Byggd för fart: håll gasen
+// och landa på nedförsbackarna. Kickern är brantast i kanten (x^1.6) så den kastar; landningarna är mjuka cosinusbackar.
+function mxLevel(){ const T=mkTrack(TOP);
+  const kick=(L,h)=>T.fn(L,x=>h*Math.pow(x/L,1.35),0.35);             // uppfart som skjuter iväg (brantast i kanten, men mjuk böj)
+  const table=(up,h,top,down)=>{ kick(up,h); T.flat(top); T.ease(down,-h); };
+  const dbl=(up,h,gap,land)=>{ kick(up,h); T.ease(gap*0.45,-h-0.4); T.flat(gap*0.15); T.ease(gap*0.4,h+0.2); T.ease(land,-h+0.2); };
+  T.flat(16); T.star(-4);
+  T.waves(7,3.2,0.4); T.flat(8);                                      // whoops
+  table(7,1.6,8,10); T.star(-4); T.flat(10);                          // tabletop 1
+  table(8,2.2,10,12); T.flat(4); T.star(-2); T.flat(8);               // tabletop 2
+  T.part();
+  dbl(8,2.2,12,12); T.flat(10); T.star(-3);                           // dubbelhopp
+  T.waves(4,10,0.8); T.flat(12);                                      // rytmsektion, långa rullar
+  T.ease(34,-5); T.waves(3,7,0.4); T.flat(10); T.star(-4);            // lång nedförsbacke med gupp
+  T.part();
+  table(9,2.6,9,13); T.flat(8);                                       // tabletop 3
+  dbl(9,2.6,14,14); T.flat(12); T.star(-6);                           // stort dubbelhopp
+  T.waves(6,4,0.55); T.flat(8);                                       // whoops 2
+  table(10,3.2,14,16); T.flat(6); T.star(-3);                        // stora finalhoppet
+  const fl=T.end(12,22);
+  return {id:'fjadra-mx-01', name:'Motocross Flow', theme:'sunset', parts:T.parts,
+    hint:'Motocross! Pick the Motocross bike, hold GAS and flow over the jumps. Land on the downslopes and keep the speed.',
+    stuck:'Too slow for a jump? Ride back for a longer run-up, or try the Motocross or Heavy bike. Level the bike in the air with ↺ ↻.',
+    rings:[{pts:T.P}, ...T.R], apples:T.A, killers:[], flower:fl, start:[2,0]}; }
 function makeLevels(){
   let L=LV3.map(f=>f());
   for(const l of L){ l.pack=3; l.medal=MEDALS3[l.id]||[20,35]; if(!EDITS[l.id]) addSkill(l); }
   L=L.map(l=>EDITS[l.id]?levelFromDoc(EDITS[l.id],{pack:l.pack,medal:l.medal,stuck:l.stuck,tips:l.tips}):l);
   for(const id in EDITS) if(!L.some(l=>l.id===id)) L.push(levelFromDoc(EDITS[id],{pack:3,medal:EDITS[id].medal||[30,50]}));
+  if(!L.some(l=>l.id==='fjadra-mx-01')){ const m=mxLevel(); m.pack=3; L.push(m); }
   for(const l of L) if(!l.segs) finishLevel(l);
   return L;
 }
@@ -1615,7 +1643,32 @@ const COL={teal:'#3fae37', tealD:'#257a22', frameK:'#1f2228', frameK2:'#33373f',
   helmet:'#f6f7f4', helmetL:'#ffffff', helmetD:'#1b1d22', lens0:'#8fe08a', lens1:'#2f7a2c'};
 const COL_CARTOON=Object.assign({},COL);
 const COL_NEON={helmet:'#2a1458', helmetL:'#3a1c78', helmetD:'#ff3ea5', lens0:'#3ef2f2', lens1:'#b583d9', green:'#ff3ea5', greenL:'#ff9ad0', greenD:'#a8176b', teal:'#3ef2f2', tealD:'#1fb8b8', gold:'#3ef2f2', goldD:'#1fb8b8', red:'#ffe66d', jersey:'#3b2a86', jerseyD:'#2a1c66', jerseyL:'#5b46c0', white:'#f4eaff'};
-function applyStyleColors(){ Object.assign(COL, COL_CARTOON); if(STYLE==='neon') Object.assign(COL, COL_NEON); }
+// färger per cykel (trial = grundfärgerna ovan)
+var BIKE='trial';   // valt cykel-id (sätts av setBikeUI i logic.js)
+const BIKE_LOOK={trial:{},
+  mx:{green:'#f2791c', greenL:'#ffb36b', greenD:'#b4520a', teal:'#f2791c', tealD:'#b4520a', red:'#f2791c', gold:'#1b1d22', jersey:'#1d2026', jerseyD:'#111317', jerseyL:'#3a3f47',
+    pants:'#f4f5f2', pantsL:'#ffffff', helmet:'#f2791c', helmetL:'#ff9a45', helmetD:'#1b1d22', lens0:'#ffe08a', lens1:'#c4620e'},
+  heavy:{green:'#c8302a', greenL:'#ee6a5f', greenD:'#86201b', teal:'#c8302a', tealD:'#86201b', red:'#c8302a', gold:'#dfe3e8', frameK:'#15171b', jersey:'#2d3036', jerseyD:'#1b1d22', jerseyL:'#4a4f57',
+    helmet:'#1b1d22', helmetL:'#3a3f47', helmetD:'#c8302a', lens0:'#9aa3ae', lens1:'#2a2f38'}};
+function applyStyleColors(){ Object.assign(COL, COL_CARTOON, BIKE_LOOK[BIKE]||{}); if(STYLE==='neon') Object.assign(COL, COL_NEON); }
+// extra delar per cykel, ritas ovanpå grundkroppen (i cykelns koordinater)
+function drawBikeExtras(){ const k=BIKE;
+  if(k==='mx'){
+    // högt framskärm, lång sadel och sidonummerskylt
+    smooth([[0.66,0.24,'s'],[1.02,0.3],[1.34,0.2,'s'],[1.31,0.14,'s'],[1.0,0.21],[0.68,0.16,'s']],COL.green,0.026);
+    smooth([[0.1,0.38,'s'],[-0.3,0.43],[-0.62,0.44,'s'],[-0.63,0.37,'s'],[-0.3,0.35],[0.08,0.31,'s']],'#15171b',0.024);
+    smooth([[-0.2,0.3],[-0.5,0.33],[-0.56,0.12],[-0.26,0.06]],'#f4f5f2',0.024);
+    ctx.beginPath(); ctx.moveTo(-0.28,0.24); ctx.lineTo(-0.5,0.26); ctx.moveTo(-0.3,0.13); ctx.lineTo(-0.5,0.16); ctx.strokeStyle=COL.green; ctx.lineWidth=0.035; ctx.stroke();
+  } else if(k==='heavy'){
+    // stor tank, V2-motor med kromade cylindrar och fet ljuddämpare
+    smooth([[-0.06,-0.12],[0.36,-0.08],[0.42,-0.42],[-0.18,-0.46]],'#2a2e36',0.028);
+    for(const [cx,cy,a] of [[0.0,-0.18,0.35],[0.24,-0.16,-0.35]]){ ctx.save(); ctx.translate(cx,cy); ctx.rotate(a); ctx.beginPath(); ctx.rect(-0.07,-0.02,0.14,0.2); ctx.fillStyle=COL.chrome; ctx.fill(); outl(0.02);
+      ctx.strokeStyle=COL.chromeD; ctx.lineWidth=0.012; ctx.beginPath(); for(let i=1;i<5;i++){ ctx.moveTo(-0.07,-0.02+i*0.04); ctx.lineTo(0.07,-0.02+i*0.04); } ctx.stroke(); ctx.restore(); }
+    smooth([[-0.3,0.02],[-0.86,0.12],[-0.88,-0.04],[-0.32,-0.14]],COL.chrome,0.026);
+    smooth([[0.6,0.4],[0.26,0.52],[-0.08,0.42,'s'],[-0.04,0.2],[0.24,0.12],[0.5,0.18,'s']],COL.green,0.03);
+    ctx.beginPath(); ctx.moveTo(0.0,0.36); ctx.quadraticCurveTo(0.28,0.47,0.52,0.36); ctx.strokeStyle=COL.chrome; ctx.lineWidth=0.03; ctx.stroke();
+    smooth([[-0.04,0.42,'s'],[-0.36,0.46],[-0.64,0.44,'s'],[-0.64,0.36,'s'],[-0.34,0.36],[-0.04,0.32,'s']],'#15171b',0.024);
+  } }
 function P2(p,q,t){ return [p[0]+(q[0]-p[0])*t, p[1]+(q[1]-p[1])*t]; }
 function mid(p,q){ return [(p[0]+q[0])/2,(p[1]+q[1])/2]; }
 function outl(w){ ctx.strokeStyle=OUT; ctx.lineWidth=w||0.032; ctx.lineJoin='round'; ctx.lineCap='round'; ctx.stroke(); }
@@ -1699,6 +1752,7 @@ function drawBikeBody(){
   smooth([[0.64,0.1,'s'],[0.96,0.1],[1.2,0.02,'s'],[1.18,-0.03,'s'],[0.95,0.03],[0.66,0.04,'s']],'#1d2026',0.026);
   // foot peg
   poly2([[-0.14,-0.42],[0.06,-0.42],[0.06,-0.46],[-0.14,-0.46]],'#9aa1aa',0.02);
+  drawBikeExtras();
 }
 function drawForkAndBars(sx,fw){
   const top=toW(BK.STEER_TOP[0],BK.STEER_TOP[1],sx), ax=[fw.x,fw.y]; const dx=ax[0]-top[0], dy=ax[1]-top[1], L=Math.hypot(dx,dy)||1, ux=dx/L, uy=dy/L, nx=-uy, ny=ux;
@@ -2400,13 +2454,13 @@ function setSuspension(k){ suspK=k; setSusp(k); try{ localStorage.setItem('fjadr
   const box=$('suspBtns'); box.innerHTML=''; for(const [id,name] of SUSP_UI){ const b=document.createElement('button'); b.className='tab'+(id===k?' on':''); b.textContent=name; b.onclick=()=>setSuspension(id); box.appendChild(b); }
   $('suspTxt').textContent=SUSP_UI.find(o=>o[0]===k)[2]; }
 setSuspension(suspK);
-// motorval: Trials = den testade grundfysiken, Zippy (standard) = piggare, Fast = ännu mer
-const ENG_UI=[['trials','Trials','Calm and heavy – the original tested feel.'],['zippy','Zippy','Quicker throttle, more power and top speed.'],['fast','Fast','Even more power and speed. Gas + lean back for long and you loop!']];
-let engK='zippy'; try{ const v=localStorage.getItem('fjadra.engine'); if(ENG_UI.some(o=>o[0]===v)) engK=v; }catch(e){}
-function setEngineUI(k){ engK=k; setEngine(k); try{ localStorage.setItem('fjadra.engine',k); }catch(e){}
-  const box=$('engBtns'); box.innerHTML=''; for(const [id,name] of ENG_UI){ const b=document.createElement('button'); b.className='tab'+(id===k?' on':''); b.textContent=name; b.onclick=()=>setEngineUI(id); box.appendChild(b); }
-  $('engTxt').textContent=ENG_UI.find(o=>o[0]===k)[2]; }
-setEngineUI(engK);
+// cykelval: tre motorcyklar med olika fysik (BIKES i core.js) och utseende (BIKE_LOOK i gfx.js)
+const BIKE_UI=[['trial','Trial','Light and nimble. Lots of punch and quick flips – made for the puzzle levels.'],['mx','Motocross','Strong and fast with a high top speed. Made for jumps and flow.'],['heavy','Heavy','Big and fast. Slow to get going and to rotate, but the highest top speed.']];
+try{ const v=localStorage.getItem('fjadra.bike'); if(BIKE_UI.some(o=>o[0]===v)) BIKE=v; }catch(e){}
+function setBikeUI(k){ BIKE=k; setBike(k); applyStyleColors(); try{ localStorage.setItem('fjadra.bike',k); }catch(e){}
+  const box=$('engBtns'); box.innerHTML=''; for(const [id,name] of BIKE_UI){ const b=document.createElement('button'); b.className='tab'+(id===k?' on':''); b.textContent=name; b.onclick=()=>setBikeUI(id); box.appendChild(b); }
+  $('engTxt').textContent=BIKE_UI.find(o=>o[0]===k)[2]; }
+setBikeUI(BIKE);
 function setStyle(s){ STYLE=s; try{ localStorage.setItem('fjadra.style',s); }catch(e){} document.body.classList.toggle('neon',s==='neon'); $('bStyle').textContent='Style: '+(s==='neon'?'Neon':'Cartoon'); curTheme=''; if(lvl) setTheme(lvl.theme); buildMenu(); }
 $('bStyle').onclick=()=>setStyle(STYLE==='neon'?'cartoon':'neon');
 $('bNextUnplayed').onclick=()=>{ audioInit(); pausedState=null; let i=LEVELS.findIndex(l=>l.pack===curPack&&best[l.id]==null); if(i<0) i=LEVELS.findIndex((l,k)=>l.pack===curPack&&medalOf(k,best[l.id])<3); if(i<0) i=LEVELS.findIndex(l=>l.pack===curPack); loadLevel(i); };
