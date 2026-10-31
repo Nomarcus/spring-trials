@@ -182,9 +182,9 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
 @media (max-width:700px){ .tl{ min-width:48px; padding:0 5px; } .eb .lbl{ display:none; } }
 .fjad{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:12px; }
 .fjad b{ font-weight:400; font-size:19px; color:var(--ink); }
-#suspBtns{ display:flex; gap:6px; flex-wrap:wrap; }
-#suspBtns .tab{ padding:6px 11px; font-size:15px; }
-#suspTxt{ margin:6px 0 0; font-size:13.5px; color:var(--muted); }
+#suspBtns,#engBtns{ display:flex; gap:6px; flex-wrap:wrap; }
+#suspBtns .tab,#engBtns .tab{ padding:6px 11px; font-size:15px; }
+#suspTxt,#engTxt{ margin:6px 0 0; font-size:13.5px; color:var(--muted); }
 .turnrow{ align-self:stretch; justify-content:center; }   /* TURN centrerad ovanför BRAKE + GAS */
 .k.turn.compact{ width:96px; height:52px; border-radius:18px; } .k.turn.compact svg{ width:30px; height:30px; }
 @media (max-height:420px){ .k.turn.compact{ width:84px; height:44px; border-radius:15px; } .k.turn.compact svg{ width:26px; height:26px; } }
@@ -320,6 +320,8 @@ body.ctledit #hud, body.ctledit #lvlname, body.ctledit #toast{ visibility:hidden
     <div class="row" style="margin:0 0 10px;align-items:center"><button class="btn" id="bNextUnplayed">Play next</button><button class="btn" id="bNewLevel" style="display:none">＋ New level</button><span id="progress" style="color:var(--muted);font-size:14px;font-weight:800"></span></div>
     <div class="fjad" style="margin:0 0 2px"><b class="disp">Suspension</b><div id="suspBtns"></div></div>
     <p id="suspTxt" style="margin:0 0 10px"></p>
+    <div class="fjad" style="margin:0 0 2px"><b class="disp">Engine</b><div id="engBtns" class="tabrow"></div></div>
+    <p id="engTxt" style="margin:0 0 10px"></p>
     <div class="lvls" id="lvls"></div>
     <p class="help"><b>Mobile:</b> left thumb: green = GAS, red = BRAKE. Right thumb: ↺ ↻. The small round arrows button on the right turns the bike around – or swipe your thumb up from GAS or BRAKE to turn without letting go. ↺ ↻ shift the rider's weight and flip the bike – both at once gives an extra strong flip. <b>Pump:</b> lean back and forth in rhythm to gain speed with your arms. <b>Bunny hop:</b> lean back for a moment, then throw your weight forward. <b>Bounce:</b> press a wheel down (landing or flip) and hit BRAKE right at the bottom. <b>Brake</b> also makes the wheels grip – hang on edges and beams.<br>
     <b>Keyboard:</b> ↑ gas, ↓ brake, ← → flip, space turn, Enter restart, Esc menu.</p>

@@ -182,9 +182,9 @@ body.editing #hud, body.editing #ctl, body.editing #lvlname{ display:none; }
 @media (max-width:700px){ .tl{ min-width:48px; padding:0 5px; } .eb .lbl{ display:none; } }
 .fjad{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:12px; }
 .fjad b{ font-weight:400; font-size:19px; color:var(--ink); }
-#suspBtns{ display:flex; gap:6px; flex-wrap:wrap; }
-#suspBtns .tab{ padding:6px 11px; font-size:15px; }
-#suspTxt{ margin:6px 0 0; font-size:13.5px; color:var(--muted); }
+#suspBtns,#engBtns{ display:flex; gap:6px; flex-wrap:wrap; }
+#suspBtns .tab,#engBtns .tab{ padding:6px 11px; font-size:15px; }
+#suspTxt,#engTxt{ margin:6px 0 0; font-size:13.5px; color:var(--muted); }
 .turnrow{ align-self:stretch; justify-content:center; }   /* TURN centrerad ovanför BRAKE + GAS */
 .k.turn.compact{ width:96px; height:52px; border-radius:18px; } .k.turn.compact svg{ width:30px; height:30px; }
 @media (max-height:420px){ .k.turn.compact{ width:84px; height:44px; border-radius:15px; } .k.turn.compact svg{ width:26px; height:26px; } }
@@ -320,6 +320,8 @@ body.ctledit #hud, body.ctledit #lvlname, body.ctledit #toast{ visibility:hidden
     <div class="row" style="margin:0 0 10px;align-items:center"><button class="btn" id="bNextUnplayed">Play next</button><button class="btn" id="bNewLevel" style="display:none">＋ New level</button><span id="progress" style="color:var(--muted);font-size:14px;font-weight:800"></span></div>
     <div class="fjad" style="margin:0 0 2px"><b class="disp">Suspension</b><div id="suspBtns"></div></div>
     <p id="suspTxt" style="margin:0 0 10px"></p>
+    <div class="fjad" style="margin:0 0 2px"><b class="disp">Engine</b><div id="engBtns" class="tabrow"></div></div>
+    <p id="engTxt" style="margin:0 0 10px"></p>
     <div class="lvls" id="lvls"></div>
     <p class="help"><b>Mobile:</b> left thumb: green = GAS, red = BRAKE. Right thumb: ↺ ↻. The small round arrows button on the right turns the bike around – or swipe your thumb up from GAS or BRAKE to turn without letting go. ↺ ↻ shift the rider's weight and flip the bike – both at once gives an extra strong flip. <b>Pump:</b> lean back and forth in rhythm to gain speed with your arms. <b>Bunny hop:</b> lean back for a moment, then throw your weight forward. <b>Bounce:</b> press a wheel down (landing or flip) and hit BRAKE right at the bottom. <b>Brake</b> also makes the wheels grip – hang on edges and beams.<br>
     <b>Keyboard:</b> ↑ gas, ↓ brake, ← → flip, space turn, Enter restart, Esc menu.</p>
@@ -357,6 +359,10 @@ const P = {G:10, WR:0.4, WM:1, WI:0.13, BM:2.3, BI:2.3, AX:0.96, AY:-0.55,
 const SUSP={hard:{KY:240,CY:9,TRAVEL:0.22}, normal:{}, soft:{KY:85,CY:2.4,TRAVEL:0.45}, elma:{KY:70,CY:1.2,TRAVEL:0.6,BOUNCE_MAX:4.6}, bouncy:{KY:62,CY:0.5,TRAVEL:0.7,BOUNCE_MAX:5.4}};
 const SUSP_BASE={KY:P.KY,CY:P.CY,TRAVEL:P.TRAVEL,BOUNCE_MAX:P.BOUNCE_MAX};
 function setSusp(name){ Object.assign(P,SUSP_BASE,SUSP[name]||{}); }
+// Motorval (menyn → Engine). 'trials' = värdena i P (testat, BASELINE.txt). Zippy/Fast: snabbare gaspådrag, mer kraft och toppfart, lite kraftigare volt; ANTI_LOOP höjs så att cykeln inte välter bakåt i branta backar.
+const ENGINE={trials:{}, zippy:{T:11.5,THR_RATE:8,MAXW:36,VOLT_A:50,ANTI_LOOP:28}, fast:{T:12.5,THR_RATE:9,MAXW:40,VOLT_A:52,ANTI_LOOP:34}};
+const ENGINE_BASE={T:P.T,THR_RATE:P.THR_RATE,MAXW:P.MAXW,VOLT_A:P.VOLT_A,ANTI_LOOP:P.ANTI_LOOP};
+function setEngine(name){ Object.assign(P,ENGINE_BASE,ENGINE[name]||{}); }
 
 function buildSegs(rings){
   const segs=[];
@@ -2379,6 +2385,13 @@ function setSuspension(k){ suspK=k; setSusp(k); try{ localStorage.setItem('fjadr
   const box=$('suspBtns'); box.innerHTML=''; for(const [id,name] of SUSP_UI){ const b=document.createElement('button'); b.className='tab'+(id===k?' on':''); b.textContent=name; b.onclick=()=>setSuspension(id); box.appendChild(b); }
   $('suspTxt').textContent=SUSP_UI.find(o=>o[0]===k)[2]; }
 setSuspension(suspK);
+// motorval: Trials = den testade grundfysiken, Zippy (standard) = piggare, Fast = ännu mer
+const ENG_UI=[['trials','Trials','Calm and heavy – the original tested feel.'],['zippy','Zippy','Quicker throttle, more power and top speed.'],['fast','Fast','Even more power and speed. Gas + lean back for long and you loop!']];
+let engK='zippy'; try{ const v=localStorage.getItem('fjadra.engine'); if(ENG_UI.some(o=>o[0]===v)) engK=v; }catch(e){}
+function setEngineUI(k){ engK=k; setEngine(k); try{ localStorage.setItem('fjadra.engine',k); }catch(e){}
+  const box=$('engBtns'); box.innerHTML=''; for(const [id,name] of ENG_UI){ const b=document.createElement('button'); b.className='tab'+(id===k?' on':''); b.textContent=name; b.onclick=()=>setEngineUI(id); box.appendChild(b); }
+  $('engTxt').textContent=ENG_UI.find(o=>o[0]===k)[2]; }
+setEngineUI(engK);
 function setStyle(s){ STYLE=s; try{ localStorage.setItem('fjadra.style',s); }catch(e){} document.body.classList.toggle('neon',s==='neon'); $('bStyle').textContent='Style: '+(s==='neon'?'Neon':'Cartoon'); curTheme=''; if(lvl) setTheme(lvl.theme); buildMenu(); }
 $('bStyle').onclick=()=>setStyle(STYLE==='neon'?'cartoon':'neon');
 $('bNextUnplayed').onclick=()=>{ audioInit(); pausedState=null; let i=LEVELS.findIndex(l=>l.pack===curPack&&best[l.id]==null); if(i<0) i=LEVELS.findIndex((l,k)=>l.pack===curPack&&medalOf(k,best[l.id])<3); if(i<0) i=LEVELS.findIndex(l=>l.pack===curPack); loadLevel(i); };

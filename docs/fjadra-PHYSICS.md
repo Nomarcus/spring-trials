@@ -52,3 +52,14 @@ Fast steg `P.H = 1/600 s`. `physics(dt)` i `logic.js` kör en ackumulator med h�
 | Studsboll (`bouncy`) | 62 | 0,5 | 0,70 | 5,4 | 0,56 m | 1,00 m |
 
 Inget val ger huvudkrasch vid fall från 6 m. Testboten klarar bana 1–10 med alla fem valen. Kör boten med ett annat val: `SUSP=elma node tools/fjadra/test/run.js 0 1 2`.
+
+## Motorval (menyn → Engine)
+`ENGINE` i `core.js` och `setEngine(namn)`. `trials` = `P` (BASELINE.txt). Spelets standard är `zippy` (sparas i `fjadra.engine`).
+
+| Val | T | THR_RATE | MAXW | VOLT_A | ANTI_LOOP | 0→5 m/s | fart efter 4 s |
+|---|---|---|---|---|---|---|---|
+| Trials | 9 | 3,5 | 30 | 46 | 14 | 1,6 s | 11,1 m/s |
+| Zippy | 11,5 | 8 | 36 | 50 | 28 | 1,1 s | ≈13,5 m/s |
+| Fast | 12,5 | 9 | 40 | 52 | 34 | 1,0 s | ≈15 m/s |
+
+Zippy och Fast ger inga nya huvudkrascher i `feel`/`drops`, och `gas_ramp` välter inte (högre ANTI_LOOP). Fast kan loopas med gas + luta bak i 1,5 s från stillastående. Testboten har **inte** körts med Zippy/Fast.
