@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#18324f">
-<title>Fjädra – motocross on springs</title>
+<title>Spring Trials</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
@@ -323,7 +323,7 @@ body.neon #setBox{ background:rgba(255,62,165,.06); }
 
 <div class="ov show" id="menu">
   <div class="card">
-    <div class="head"><h1 class="title disp">Fjädra</h1></div>
+    <div class="head"><h1 class="title disp">Spring Trials</h1></div>
     <div id="setBox">
       <div class="disp sethead">Settings</div>
       <div class="fjad"><b class="disp">Suspension</b><div id="suspBtns"></div></div>
@@ -671,7 +671,7 @@ LV3.push(()=>{ const T=skillKit(mkTrack(TOP)), tips=[]; const sign=t=>tips.push(
   sign('Dead end! Grab the last star, then press TURN (the small round arrows button on the right, or swipe your thumb up from GAS) to face the other way and ride back to the flower.'); T.flat(12); T.star(-2); T.flat(1);
   T.P.push([T.X,TOP]);
   return {id:'fjadra-tutorial', name:'Tutorial', theme:'meadow', tips,
-    hint:'Welcome to Fjädra! Hold GAS (the green button, bottom left) to ride. Ride past each sign – every sign teaches you one thing.',
+    hint:'Welcome to Spring Trials! Hold GAS (the green button, bottom left) to ride. Ride past each sign – every sign teaches you one thing.',
     stuck:'Stuck? Press the restart button at the top to try again.',
     rings:[{pts:T.P}, ...T.R], apples:T.A, killers:[], flower:[fx,T.Y], start:[2,0]}; });
 // 01 Första turen — gas: platt start, mjuka gupp, stjärnor på marken

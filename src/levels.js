@@ -50,7 +50,7 @@ LV3.push(()=>{ const T=skillKit(mkTrack(TOP)), tips=[]; const sign=t=>tips.push(
   sign('Dead end! Grab the last star, then press TURN (the small round arrows button on the right, or swipe your thumb up from GAS) to face the other way and ride back to the flower.'); T.flat(12); T.star(-2); T.flat(1);
   T.P.push([T.X,TOP]);
   return {id:'fjadra-tutorial', name:'Tutorial', theme:'meadow', tips,
-    hint:'Welcome to Fjädra! Hold GAS (the green button, bottom left) to ride. Ride past each sign – every sign teaches you one thing.',
+    hint:'Welcome to Spring Trials! Hold GAS (the green button, bottom left) to ride. Ride past each sign – every sign teaches you one thing.',
     stuck:'Stuck? Press the restart button at the top to try again.',
     rings:[{pts:T.P}, ...T.R], apples:T.A, killers:[], flower:[fx,T.Y], start:[2,0]}; });
 // 01 Första turen — gas: platt start, mjuka gupp, stjärnor på marken

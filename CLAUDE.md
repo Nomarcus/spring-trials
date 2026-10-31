@@ -1,6 +1,6 @@
 # Fjädra / Spring Trials – projektguide för Claude Code
 
-Fjädra är ett fysikbaserat motorcykelpusselspel för **mobil i liggande läge**, inspirerat av Elasto Mania och Trials. Allt ligger i **en enda självständig HTML-fil** (`game/index.html`) som byggs av källfiler i `src/`.
+Fjädra (i spelet: **Spring Trials**) är ett fysikbaserat motorcykelpusselspel för **mobil i liggande läge**, inspirerat av Elasto Mania och Trials. Allt ligger i **en enda självständig HTML-fil** (`game/index.html`) som byggs av källfiler i `src/`.
 Bara hjulen och huvudet kolliderar med världen. Huvudet tål nästan ingenting, fjädringen är spelets själ, och banorna är pussel där man måste använda fysiken.
 
 Live-version (senast publicerad): https://claude.ai/artifact/BXq7d8PwweYmL2PzYkVZ9o  ·  Grafikark med 20 stilförslag: https://claude.ai/artifact/XfgKHDakZiJvwaMtBbEdjr
