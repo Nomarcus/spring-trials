@@ -238,6 +238,16 @@ body.ctledit #ctl{ background:rgba(8,18,30,.45); pointer-events:auto; z-index:55
 body.ctledit #ctl .k.rb{ cursor:grab; outline:2px dashed rgba(255,255,255,.55); outline-offset:4px; touch-action:none; }
 body.ctledit #ctl .k.rb.sel{ outline:3px solid var(--gold); }
 body.ctledit #hud, body.ctledit #lvlname, body.ctledit #toast{ visibility:hidden; }
+
+/* Inställningar högst upp i menyn */
+#setBox{ background:rgba(24,50,79,.06); border:2px solid var(--line); border-radius:16px; padding:8px 12px 10px; margin:0 0 12px; }
+#setBox .sethead{ font-size:17px; margin:0 0 4px; color:var(--ink); }
+#setBox .fjad{ margin:4px 0 0; } #setBox .fjad b{ font-size:16px; min-width:92px; }
+#setBox #suspTxt, #setBox #engTxt{ margin:3px 0 2px; font-size:12.5px; }
+#setBox .setbtns{ margin-top:8px; gap:6px; }
+#setBox .setbtns .btn{ padding:6px 11px; font-size:14px; }
+#menu .sub{ margin:12px 0 0; }
+body.neon #setBox{ background:rgba(255,62,165,.06); }
 </style>
 </head>
 <body>
@@ -314,19 +324,22 @@ body.ctledit #hud, body.ctledit #lvlname, body.ctledit #toast{ visibility:hidden
 <div class="ov show" id="menu">
   <div class="card">
     <div class="head"><h1 class="title disp">Fjädra</h1></div>
-    <p class="sub">Trials puzzles on springs. Collect all the stars and ride to the flower. Take it easy, read the level and find the way. Only the wheels and the head touch the ground – and the head can't take a hit.</p>
+    <div id="setBox">
+      <div class="disp sethead">Settings</div>
+      <div class="fjad"><b class="disp">Suspension</b><div id="suspBtns"></div></div>
+      <p id="suspTxt"></p>
+      <div class="fjad"><b class="disp">Engine</b><div id="engBtns" class="tabrow"></div></div>
+      <p id="engTxt"></p>
+      <div class="row setbtns"><button class="btn alt" id="bMusic">Music: on</button><button class="btn alt" id="bStyle">Style: Cartoon</button><button class="btn alt" id="bFull">Fullscreen</button><button class="btn alt" id="bCtl">Move buttons</button></div>
+    </div>
     <div class="tabs"><button class="tab on" id="tabMain">Levels</button><button class="tab" id="tabMine">My levels</button><button class="tab" id="tabComm" style="display:none">Community</button></div>
     <div class="row" id="resumeRow" style="margin:0 0 10px;display:none"><button class="btn" id="bResume">Keep riding</button><button class="btn alt" id="bEditCur">✎ Edit level</button></div>
     <div class="row" style="margin:0 0 10px;align-items:center"><button class="btn" id="bNextUnplayed">Play next</button><button class="btn" id="bNewLevel" style="display:none">＋ New level</button><span id="progress" style="color:var(--muted);font-size:14px;font-weight:800"></span></div>
-    <div class="fjad" style="margin:0 0 2px"><b class="disp">Suspension</b><div id="suspBtns"></div></div>
-    <p id="suspTxt" style="margin:0 0 10px"></p>
-    <div class="fjad" style="margin:0 0 2px"><b class="disp">Engine</b><div id="engBtns" class="tabrow"></div></div>
-    <p id="engTxt" style="margin:0 0 10px"></p>
     <div class="lvls" id="lvls"></div>
+    <p class="sub">Trials puzzles on springs. Collect all the stars and ride to the flower. Take it easy, read the level and find the way. Only the wheels and the head touch the ground – and the head can't take a hit.</p>
     <p class="help"><b>Mobile:</b> left thumb: green = GAS, red = BRAKE. Right thumb: ↺ ↻. The small round arrows button on the right turns the bike around – or swipe your thumb up from GAS or BRAKE to turn without letting go. ↺ ↻ shift the rider's weight and flip the bike – both at once gives an extra strong flip. <b>Pump:</b> lean back and forth in rhythm to gain speed with your arms. <b>Bunny hop:</b> lean back for a moment, then throw your weight forward. <b>Bounce:</b> press a wheel down (landing or flip) and hit BRAKE right at the bottom. <b>Brake</b> also makes the wheels grip – hang on edges and beams.<br>
     <b>Keyboard:</b> ↑ gas, ↓ brake, ← → flip, space turn, Enter restart, Esc menu.</p>
     <p id="rot">Turn your phone to landscape for the best control.</p>
-    <div class="row"><button class="btn alt" id="bMusic">Music: on</button><button class="btn alt" id="bStyle">Style: Cartoon</button><button class="btn alt" id="bFull">Fullscreen</button><button class="btn alt" id="bCtl">Move buttons</button></div>
   </div>
 </div>
 
