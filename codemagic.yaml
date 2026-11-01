@@ -30,6 +30,7 @@ workflows:
           cd ios/App
           agvtool new-marketing-version "$APP_VERSION"
           agvtool new-version -all "$BUILD_NUMBER"
+          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = 13.0/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' App.xcodeproj/project.pbxproj
           sed -i '' 's/TARGETED_DEVICE_FAMILY = "1,2"/TARGETED_DEVICE_FAMILY = 1/g' App.xcodeproj/project.pbxproj
       - name: Install CocoaPods
         script: cd ios/App && pod install
