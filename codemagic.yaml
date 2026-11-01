@@ -6,9 +6,6 @@ workflows:
     integrations:
       app_store_connect: Codemagic
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: se.springtrials.game
       vars:
         SPRING_TRIALS_BUNDLE_ID: se.springtrials.game
         APP_VERSION: '1.0'
